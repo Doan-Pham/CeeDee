@@ -8,14 +8,14 @@
     android:orientation="vertical"
     android:gravity="center"
     >
-    <!-- TODO: Update blank fragment layout -->
+
     <ImageView
         android:id="@+id/img_logo_login"
         android:layout_width="144dp"
         android:layout_height="144dp"
         android:src="@drawable/ic_launcher_background"
 
-        />
+        android:contentDescription="@string/login_logo" />
 
     <TextView
         android:id="@+id/tv_login"
@@ -32,43 +32,36 @@
 
     <EditText
         android:id="@+id/edt_username_login"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
+        style="@style/edt_login_style"
+
         android:layout_marginStart="48dp"
         android:layout_marginEnd="48dp"
         android:layout_marginTop="90dp"
 
-        android:paddingStart="12dp"
-        android:background="@drawable/login_edit_text_background"
         android:drawableStart="@drawable/ic_round_person_24"
-
-        android:drawableTint="@color/dark_grey"
-        android:drawablePadding="14dp"
-        android:hint="User name"
-
-        />
+        android:inputType="text"
+        android:hint="@string/username"
+        android:autofillHints="" />
 
     <EditText
         android:id="@+id/edt_password_login"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
+        style="@style/edt_login_style"
+
         android:layout_marginStart="48dp"
         android:layout_marginEnd="48dp"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="24dp"
 
-        android:paddingStart="12dp"
-        android:background="@drawable/login_edit_text_background"
         android:drawableStart="@drawable/ic_round_lock_24"
-        android:drawableTint="@color/dark_grey"
-        android:drawablePadding="14dp"
-        android:hint="Password"
-
+        android:inputType="textPassword"
+        android:hint="@string/password"
+        android:autofillHints=""
         />
 
     <Button
         android:id="@+id/btn_login"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+
         android:layout_marginStart="48dp"
         android:layout_marginEnd="48dp"
         android:layout_marginTop="90dp"
