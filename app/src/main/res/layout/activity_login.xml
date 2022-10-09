@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".LoginActivity"
+    android:orientation="vertical"
+    android:gravity="center"
+    >
+    <ImageView
+        android:layout_width="144dp"
+        android:layout_height="144dp"
+        android:src="@drawable/ic_launcher_background"
+
+        android:layout_marginTop="40dp"
+        android:contentDescription="@string/login_logo" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/login"
+
+        android:textColor="@color/primary"
+        android:letterSpacing="0.01"
+        android:textStyle="bold"
+        android:textSize="36sp"
+        android:padding="18dp"
+        />
+
+    <EditText
+        android:id="@+id/edt_username_login"
+        style="@style/edt_login_style"
+
+        android:layout_marginStart="48dp"
+        android:layout_marginEnd="48dp"
+        android:layout_marginTop="60dp"
+
+        android:drawableStart="@drawable/ic_round_person_24"
+        android:inputType="text"
+        android:hint="@string/username"
+        android:autofillHints="" />
+
+    <EditText
+        android:id="@+id/edt_password_login"
+        style="@style/edt_login_style"
+
+        android:layout_marginStart="48dp"
+        android:layout_marginEnd="48dp"
+        android:layout_marginTop="24dp"
+
+        android:drawableStart="@drawable/ic_round_lock_24"
+        android:inputType="textPassword"
+        android:hint="@string/password"
+        android:autofillHints=""
+        />
+
+    <Button
+        android:id="@+id/btn_login"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+        android:layout_marginStart="48dp"
+        android:layout_marginEnd="48dp"
+        android:layout_marginTop="90dp"
+
+        android:background="@drawable/login_button_background"
+        app:backgroundTint="@null"
+
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:textColor="#FFFFFF"
+
+        android:textAllCaps="false"
+        android:text="@string/login"
+        />
+</LinearLayout>
