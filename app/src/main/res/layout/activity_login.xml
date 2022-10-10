@@ -37,7 +37,7 @@
         android:layout_marginTop="60dp"
 
         android:drawableStart="@drawable/ic_round_person_24"
-        android:inputType="text"
+        android:inputType="textEmailAddress"
         android:hint="@string/username"
         android:autofillHints="" />
 
