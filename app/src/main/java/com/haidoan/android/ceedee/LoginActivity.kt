@@ -4,9 +4,9 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import android.util.Log
+
 import android.view.View
-import androidx.appcompat.app.AppCompatActivity
+
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 
