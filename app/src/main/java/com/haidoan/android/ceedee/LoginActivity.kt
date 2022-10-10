@@ -2,6 +2,8 @@ package com.haidoan.android.ceedee
 
 import android.content.Intent
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
@@ -24,6 +26,7 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        installSplashScreen()
         super.onCreate(savedInstanceState)
         auth = Firebase.auth
         authViewModel = ViewModelProvider(this)[AuthenticationViewModel::class.java]
