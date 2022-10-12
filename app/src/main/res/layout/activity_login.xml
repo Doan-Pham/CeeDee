@@ -33,7 +33,7 @@
         style="@style/edt_login_style"
 
         android:layout_marginStart="48dp"
-        android:layout_marginTop="60dp"
+        android:layout_marginTop="52dp"
         android:layout_marginEnd="48dp"
 
         android:autofillHints=""
@@ -54,28 +54,33 @@
         android:hint="@string/password"
         android:inputType="textPassword" />
 
-    <TextView
-        android:id="@+id/tv_message_required"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="right"
-        android:visibility="gone"
-        android:layout_marginStart="48dp"
+        android:layout_height="100dp"
+        android:layout_marginTop="8dp">
+        <TextView
+            android:id="@+id/tv_message_required"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="top|right"
+            android:visibility="invisible"
+            android:layout_marginStart="48dp"
 
-        android:layout_marginEnd="48dp"
-        android:letterSpacing="0.01"
+            android:layout_marginEnd="48dp"
+            android:letterSpacing="0.01"
 
-        android:padding="4dp"
-        android:text=""
-        android:textColor="@color/secondary"
-        android:textSize="14sp"
-        android:textStyle="normal"
+            android:padding="4dp"
+            android:text=""
+            android:textColor="@color/secondary"
+            android:textSize="14sp"
+            android:textStyle="normal"
 
-        android:drawablePadding="4dp"
-        android:drawableTint="@color/secondary"
-        android:drawableEnd="@drawable/ic_round_info_24"
-        tools:ignore="RtlHardcoded,UseCompatTextViewDrawableXml"
-        tools:targetApi="m" />
+            android:drawablePadding="4dp"
+            android:drawableTint="@color/secondary"
+            android:drawableEnd="@drawable/ic_round_info_24"
+            tools:ignore="RtlHardcoded,UseCompatTextViewDrawableXml"
+            tools:targetApi="m" />
+    </LinearLayout>
 
 
     <Button
@@ -84,7 +89,7 @@
         android:layout_height="wrap_content"
 
         android:layout_marginStart="48dp"
-        android:layout_marginTop="90dp"
+        android:layout_marginTop="4dp"
         android:layout_marginEnd="48dp"
 
         android:background="@drawable/login_button_background"

@@ -43,7 +43,7 @@ class LoginActivity : AppCompatActivity() {
 
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        binding.tvMessageRequired.visibility = View.GONE
+        binding.tvMessageRequired.visibility = View.INVISIBLE
         setOnClick()
     }
 
@@ -56,12 +56,13 @@ class LoginActivity : AppCompatActivity() {
             } else {
                 signIn(email, pass)
             }
-            binding.tvMessageRequired.visibility = View.VISIBLE
+
         })
     }
 
     private fun setTextRequired(required: String) {
         binding.tvMessageRequired.text = required
+        binding.tvMessageRequired.visibility = View.VISIBLE
     }
 
     private fun signIn(email: String, pass: String) {
