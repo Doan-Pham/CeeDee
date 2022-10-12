@@ -1,7 +1,9 @@
 package com.haidoan.android.ceedee
 
 import android.content.Intent
+
 import android.os.Bundle
+
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 
@@ -18,7 +20,6 @@ import com.google.firebase.ktx.Firebase
 import com.haidoan.android.ceedee.databinding.ActivityLoginBinding
 import com.haidoan.android.ceedee.ui.login.AuthenticationViewModel
 
-
 class LoginActivity : AppCompatActivity() {
     private lateinit var binding: ActivityLoginBinding
     private lateinit var authViewModel: AuthenticationViewModel
@@ -30,29 +31,40 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         auth = Firebase.auth
         authViewModel = ViewModelProvider(this)[AuthenticationViewModel::class.java]
-        authViewModel.getUserData().observe(this,Observer<FirebaseUser?> { _ ->
-               val i = Intent(this, MainActivity::class.java)
-               startActivity(i)
+        authViewModel.getUserData().observe(this, Observer<FirebaseUser?> { _ ->
+            val i = Intent(this, MainActivity::class.java)
+            startActivity(i)
+        })
+        authViewModel.getRequiredTextMessage().observe(this, Observer<String> { s ->
+            run {
+                setTextRequired(s)
+            }
         })
 
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
+        binding.tvMessageRequired.visibility = View.GONE
         setOnClick()
     }
 
-    private fun setOnClick(){
+    private fun setOnClick() {
         binding.btnLogin.setOnClickListener(View.OnClickListener {
-            signIn()
+            val email = binding.edtUsernameLogin.text.toString()
+            val pass = binding.edtPasswordLogin.text.toString()
+            if (email.isEmpty() || pass.isEmpty()) {
+                setTextRequired("Email or Password cannot be empty")
+            } else {
+                signIn(email, pass)
+            }
+            binding.tvMessageRequired.visibility = View.VISIBLE
         })
     }
 
-    private fun signIn() {
-        val email = binding.edtUsernameLogin.text.toString()
-        val pass = binding.edtPasswordLogin.text.toString()
+    private fun setTextRequired(required: String) {
+        binding.tvMessageRequired.text = required
+    }
 
-        if (email.isNotEmpty() && pass.isNotEmpty()){
-            authViewModel.signIn(email,pass)
-        }
+    private fun signIn(email: String, pass: String) {
+        authViewModel.signIn(email, pass)
     }
 }

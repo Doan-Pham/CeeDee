@@ -1,7 +1,8 @@
 package com.haidoan.android.ceedee.ui.login
 
 import android.app.Application
-import android.widget.Toast
+import android.util.Log
+
 import androidx.lifecycle.MutableLiveData
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -11,10 +12,16 @@ class AuthenticationRepository(private val application: Application) {
     private val userLoggedMutableLiveData: MutableLiveData<Boolean> = MutableLiveData()
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
 
+    private val requiredText:  MutableLiveData<String> = MutableLiveData()
+
     init {
         if (auth.currentUser != null) {
             firebaseUserMutableLiveData.postValue(auth.currentUser)
         }
+    }
+
+    fun getRequiredTextMessage():  MutableLiveData<String> {
+        return requiredText
     }
 
     fun getUserLoggedMutableLiveData(): MutableLiveData<Boolean> {
@@ -29,9 +36,10 @@ class AuthenticationRepository(private val application: Application) {
         auth.signInWithEmailAndPassword(email!!, pass!!).addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 firebaseUserMutableLiveData.postValue(auth.currentUser)
+                Log.d("TAG","success")
             } else {
-                Toast.makeText(application, task.exception?.message, Toast.LENGTH_SHORT)
-                    .show()
+                requiredText.postValue(task.exception?.message.toString())
+                Log.d("TAG",requiredText.value.toString())
             }
         }
     }

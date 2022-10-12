@@ -11,10 +11,16 @@ class AuthenticationViewModel(application: Application) : AndroidViewModel(appli
     private val userData: MutableLiveData<FirebaseUser?>
     private val loggedStatus: MutableLiveData<Boolean>
 
+    private val requiredText: MutableLiveData<String>
     init {
         repository = AuthenticationRepository(application)
         userData = repository.getFirebaseUserMutableLiveData()
         loggedStatus = repository.getUserLoggedMutableLiveData()
+        requiredText = repository.getRequiredTextMessage()
+    }
+
+    fun getRequiredTextMessage():  MutableLiveData<String> {
+        return requiredText
     }
 
     fun getUserData(): LiveData<FirebaseUser?> {
