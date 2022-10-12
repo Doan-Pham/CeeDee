@@ -4,55 +4,84 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".LoginActivity"
-    android:orientation="vertical"
+    android:background="@color/white"
     android:gravity="center"
-    >
+    android:orientation="vertical"
+    tools:context=".LoginActivity">
+
     <ImageView
         android:layout_width="144dp"
         android:layout_height="144dp"
-        android:src="@drawable/ic_launcherplay"
         android:layout_marginTop="40dp"
-        android:contentDescription="@string/login_logo" />
+
+        android:contentDescription="@string/login_logo"
+        android:src="@drawable/ic_app_logo" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/login"
-
-        android:textColor="@color/primary"
         android:letterSpacing="0.01"
-        android:textStyle="bold"
-        android:textSize="36sp"
+
         android:padding="18dp"
-        />
+        android:text="@string/login"
+        android:textColor="@color/primary"
+        android:textSize="36sp"
+        android:textStyle="bold" />
 
     <EditText
         android:id="@+id/edt_username_login"
         style="@style/edt_login_style"
 
         android:layout_marginStart="48dp"
+        android:layout_marginTop="52dp"
         android:layout_marginEnd="48dp"
-        android:layout_marginTop="60dp"
 
+        android:autofillHints=""
         android:drawableStart="@drawable/ic_round_person_24"
-        android:inputType="text"
-        android:hint="@string/username"
-        android:autofillHints="" />
+        android:hint="@string/email"
+        android:inputType="textEmailAddress" />
 
     <EditText
         android:id="@+id/edt_password_login"
         style="@style/edt_login_style"
 
         android:layout_marginStart="48dp"
-        android:layout_marginEnd="48dp"
         android:layout_marginTop="24dp"
+        android:layout_marginEnd="48dp"
 
-        android:drawableStart="@drawable/ic_round_lock_24"
-        android:inputType="textPassword"
-        android:hint="@string/password"
         android:autofillHints=""
-        />
+        android:drawableStart="@drawable/ic_round_lock_24"
+        android:hint="@string/password"
+        android:inputType="textPassword" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:layout_marginTop="8dp">
+        <TextView
+            android:id="@+id/tv_message_required"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="top|left"
+            android:visibility="invisible"
+
+            android:layout_marginStart="48dp"
+            android:layout_marginEnd="48dp"
+            android:letterSpacing="0.01"
+
+            android:padding="4dp"
+            android:text=""
+            android:textColor="@color/secondary"
+            android:textSize="14sp"
+            android:textStyle="normal"
+
+            android:drawablePadding="4dp"
+            android:drawableTint="@color/secondary"
+            android:drawableStart="@drawable/ic_round_info_24"
+            tools:ignore="RtlHardcoded,UseCompatTextViewDrawableXml"
+            tools:targetApi="m" />
+    </LinearLayout>
+
 
     <Button
         android:id="@+id/btn_login"
@@ -60,17 +89,16 @@
         android:layout_height="wrap_content"
 
         android:layout_marginStart="48dp"
+        android:layout_marginTop="4dp"
         android:layout_marginEnd="48dp"
-        android:layout_marginTop="90dp"
 
         android:background="@drawable/login_button_background"
-        app:backgroundTint="@null"
-
-        android:textSize="16sp"
-        android:textStyle="bold"
-        android:textColor="#FFFFFF"
+        android:text="@string/login"
 
         android:textAllCaps="false"
-        android:text="@string/login"
-        />
+        android:textColor="@color/white"
+        android:textSize="16sp"
+
+        android:textStyle="bold"
+        app:backgroundTint="@null" />
 </LinearLayout>

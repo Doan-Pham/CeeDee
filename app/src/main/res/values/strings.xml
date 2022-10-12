@@ -15,4 +15,6 @@
     <string name="login_logo">Login logo</string>
     <string name="username">Username</string>
     <string name="password">Password</string>
+    <string name="required">Required</string>
+    <string name="email">Email</string>
 </resources>
