@@ -11,8 +11,7 @@
     <ImageView
         android:layout_width="144dp"
         android:layout_height="144dp"
-        android:src="@drawable/ic_launcher_background"
-
+        android:src="@drawable/ic_launcherplay"
         android:layout_marginTop="40dp"
         android:contentDescription="@string/login_logo" />
 
