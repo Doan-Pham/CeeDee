@@ -36,10 +36,14 @@ class AuthenticationRepository(private val application: Application) {
         auth.signInWithEmailAndPassword(email!!, pass!!).addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 firebaseUserMutableLiveData.postValue(auth.currentUser)
-                Log.d("TAG","success")
+                Log.d("TAG", "success")
             } else {
-                requiredText.postValue(task.exception?.message.toString())
-                Log.d("TAG",requiredText.value.toString())
+                val networkError = "A network error (such as timeout, interrupted connection or unreachable host) has occurred."
+                if (task.exception?.message.toString() == networkError) {
+                    requiredText.postValue("A network error has occurred.")
+                } else {
+                    requiredText.postValue(task.exception?.message.toString())
+                }
             }
         }
     }
