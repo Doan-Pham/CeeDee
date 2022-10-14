@@ -10,6 +10,8 @@ import com.github.mikephil.charting.data.BarData
 import com.github.mikephil.charting.data.BarDataSet
 import com.github.mikephil.charting.data.BarEntry
 import com.haidoan.android.ceedee.databinding.FragmentReportBinding
+import java.text.SimpleDateFormat
+import java.util.*
 
 class ReportFragment : Fragment() {
 
@@ -46,5 +48,29 @@ class ReportFragment : Fragment() {
         dataSet.valueTextColor = R.color.black
         barChart.data = BarData(dataSet, dataSetB)
         barChart.invalidate()
+
+        val monthFormatter = SimpleDateFormat("MM", Locale.US)
+        val date = Calendar.getInstance().time
+
+        binding.textviewStartMonth.setOnClickListener {
+            MonthYearPickerDialog(date).apply {
+                setListener { _, year, month, _ ->
+                    val displayedTime = "$month/$year"
+                    binding.textviewStartMonth.text = displayedTime
+                }
+                show(this@ReportFragment.parentFragmentManager, "MonthYearPickerDialog")
+            }
+        }
+
+        binding.textviewEndMonth.setOnClickListener {
+            MonthYearPickerDialog(date).apply {
+                setListener { _, year, month, _ ->
+                    val displayedTime = "$month/$year"
+                    binding.textviewEndMonth.text = displayedTime
+                }
+                show(this@ReportFragment.parentFragmentManager, "MonthYearPickerDialog")
+            }
+        }
     }
+
 }
