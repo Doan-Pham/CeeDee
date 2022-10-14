@@ -17,4 +17,6 @@
     <string name="password">Password</string>
     <string name="required">Required</string>
     <string name="email">Email</string>
+    <string name="report_start_month">Start month</string>
+    <string name="report_end_month">End month</string>
 </resources>
