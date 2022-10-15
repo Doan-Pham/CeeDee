@@ -1,4 +1,4 @@
-package com.haidoan.android.ceedee.ui.disk_screen
+package com.haidoan.android.ceedee.ui.disk_screen.disks
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment

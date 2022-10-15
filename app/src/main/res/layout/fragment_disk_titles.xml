@@ -3,16 +3,28 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.disk_screen.DiskTitlesFragment"
-    android:gravity="center"
-    android:orientation="vertical">
-
+    tools:context=".ui.disk_screen.disk_titles.DiskTitlesFragment"
+    android:orientation="vertical"
+    android:padding="24dp">
 
     <TextView
-        android:id="@+id/tv_disk_title"
         android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:text="@string/hello_blank_fragment"
-        android:textSize="30sp"/>
+        android:layout_height="wrap_content"
+        android:text="143 Titles"
+        android:textStyle="bold"
+        android:textSize="18sp"
+
+        android:textColor="@color/black"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rcv_disk_titles"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="16dp"
+        android:paddingBottom="8dp"
+        />
 
 </LinearLayout>
