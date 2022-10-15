@@ -47,32 +47,42 @@ class ReportFragment : Fragment() {
 
         val dataSet = BarDataSet(entries, "Income")
         val dataSetB = BarDataSet(entriesb, "Expenses")
-        dataSetB.color = Color.rgb(255, 255, 255)
+        dataSetB.color = Color.rgb(0, 0, 0)
 
         val barData = BarData(dataSet, dataSetB)
-        barData.barWidth = 0.45f
-        barData.groupBars(0f, 0.06f, 0.02f)
+        val barWidth = 0.45f
+        val groupSpace = 0.06f
+        val barSpace = 0.02f
+        val minXValue = 0f
+        val maxXValue = 2f
 
+        barData.barWidth = barWidth
         barChart.data = barData
-        barChart.setPinchZoom(false)
+        barChart.data = barData
+
+        //barChart.scroll
 
         val xAxis = barChart.xAxis
         xAxis.position = XAxis.XAxisPosition.BOTTOM;
         xAxis.setDrawGridLines(false)
         xAxis.setCenterAxisLabels(true)
-        xAxis.axisMinimum = 0f
+        xAxis.axisMinimum = minXValue
+        xAxis.axisMaximum = maxXValue + 1
         xAxis.granularity = 1f;
-        xAxis.textSize = 14f
+        xAxis.textSize = 12f
 
-        //xAxis.axisLineColor = R.color.primary
-//xAxis.valueFormatter =
         val leftAxis: YAxis = barChart.getAxisLeft()
-        leftAxis.spaceTop = 35f
+        //leftAxis.spaceTop = 35f
         leftAxis.axisMinimum = 0f // this replaces setStartAtZero(true
-        leftAxis.textSize = 14f
+        leftAxis.textSize = 12f
 
         val rightAxis = barChart.axisRight
         rightAxis.isEnabled = false
+
+        barChart.groupBars(minXValue, groupSpace, barSpace)
+
+        barChart.setPinchZoom(false)
+        barChart.description.isEnabled = false
         barChart.invalidate()
 
 
