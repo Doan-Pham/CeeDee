@@ -1,17 +1,21 @@
 package com.haidoan.android.ceedee
 
+import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.github.mikephil.charting.charts.BarChart
+import com.github.mikephil.charting.components.XAxis
+import com.github.mikephil.charting.components.YAxis
 import com.github.mikephil.charting.data.BarData
 import com.github.mikephil.charting.data.BarDataSet
 import com.github.mikephil.charting.data.BarEntry
 import com.haidoan.android.ceedee.databinding.FragmentReportBinding
 import java.text.SimpleDateFormat
 import java.util.*
+
 
 class ReportFragment : Fragment() {
 
@@ -38,16 +42,39 @@ class ReportFragment : Fragment() {
 
         val entriesb = mutableListOf<BarEntry>()
         entriesb.add(BarEntry(0F, 3000F))
-        entriesb.add(BarEntry(1F, 6000F))
+        entriesb.add(BarEntry(1F, 15000F))
         entriesb.add(BarEntry(2F, 800F))
 
-        val dataSet: BarDataSet = BarDataSet(entries, "Income")
-        val dataSetB: BarDataSet = BarDataSet(entriesb, "Expenses")
-        dataSet.color = R.color.primary
-        dataSetB.color = R.color.secondary
-        dataSet.valueTextColor = R.color.black
-        barChart.data = BarData(dataSet, dataSetB)
+        val dataSet = BarDataSet(entries, "Income")
+        val dataSetB = BarDataSet(entriesb, "Expenses")
+        dataSetB.color = Color.rgb(255, 255, 255)
+
+        val barData = BarData(dataSet, dataSetB)
+        barData.barWidth = 0.45f
+        barData.groupBars(0f, 0.06f, 0.02f)
+
+        barChart.data = barData
+        barChart.setPinchZoom(false)
+
+        val xAxis = barChart.xAxis
+        xAxis.position = XAxis.XAxisPosition.BOTTOM;
+        xAxis.setDrawGridLines(false)
+        xAxis.setCenterAxisLabels(true)
+        xAxis.axisMinimum = 0f
+        xAxis.granularity = 1f;
+        xAxis.textSize = 14f
+
+        //xAxis.axisLineColor = R.color.primary
+//xAxis.valueFormatter =
+        val leftAxis: YAxis = barChart.getAxisLeft()
+        leftAxis.spaceTop = 35f
+        leftAxis.axisMinimum = 0f // this replaces setStartAtZero(true
+        leftAxis.textSize = 14f
+
+        val rightAxis = barChart.axisRight
+        rightAxis.isEnabled = false
         barChart.invalidate()
+
 
         val monthFormatter = SimpleDateFormat("MM", Locale.US)
         val date = Calendar.getInstance().time
