@@ -1,4 +1,4 @@
-package com.haidoan.android.ceedee
+package com.haidoan.android.ceedee.ui.report
 
 import android.graphics.Color
 import android.os.Bundle
@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.viewpager2.widget.ViewPager2
 import com.github.mikephil.charting.charts.BarChart
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.components.Legend
@@ -14,8 +15,9 @@ import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.components.YAxis
 import com.github.mikephil.charting.data.*
 import com.github.mikephil.charting.formatter.LargeValueFormatter
+import com.google.android.material.tabs.TabLayoutMediator
+import com.haidoan.android.ceedee.MonthYearPickerDialog
 import com.haidoan.android.ceedee.databinding.FragmentReportBinding
-import com.haidoan.android.ceedee.ui.report.MonthYearXAxisValueFormatter
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -30,11 +32,13 @@ private val CHART_COLOR_FIRST = Color.rgb(228, 86, 33)
 private val CHART_COLOR_SECOND = Color.rgb(251, 173, 86)
 private val CHART_COLOR_THIRD = Color.rgb(160, 215, 113)
 private val CHART_COLOR_FOURTH = Color.rgb(115, 176, 215)
-
+private val TAB_NAME_LIST = listOf("Revenue & Expenses", "Disk")
 
 class ReportFragment : Fragment() {
 
     private lateinit var binding: FragmentReportBinding
+    private lateinit var viewPager: ViewPager2
+
     private lateinit var barChart: BarChart
     private lateinit var lineChart: LineChart
 
@@ -103,6 +107,12 @@ class ReportFragment : Fragment() {
                 show(this@ReportFragment.parentFragmentManager, "MonthYearPickerDialog")
             }
         }
+
+        binding.viewPager.adapter = ReportViewPagerAdapter(this@ReportFragment)
+
+        TabLayoutMediator(binding.tabLayout, binding.viewPager) { tab, position ->
+            tab.text = TAB_NAME_LIST[position]
+        }.attach()
     }
 
     private fun styleAndDrawLineChart() {
