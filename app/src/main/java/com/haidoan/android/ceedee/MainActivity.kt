@@ -12,6 +12,7 @@ import android.view.MenuItem
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.replace
 import com.haidoan.android.ceedee.databinding.ActivityMainBinding
+import fragmentRentalTabs.tabRentalAdapter
 
 class MainActivity : AppCompatActivity() {
 
@@ -26,14 +27,8 @@ class MainActivity : AppCompatActivity() {
 
         setSupportActionBar(binding.toolbar)
 
-        val navController = findNavController(R.id.nav_host_fragment_content_main)
-        appBarConfiguration = AppBarConfiguration(navController.graph)
-        setupActionBarWithNavController(navController, appBarConfiguration)
 
-        binding.fab.setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show()
-        }
+        replaceFragment(FirstFragment())
         binding.bottomNavigationView.setOnItemSelectedListener {
             when(it.itemId)
             {
@@ -41,11 +36,11 @@ class MainActivity : AppCompatActivity() {
                 R.id.disk -> replaceFragment(SecondFragment())
                 R.id.report -> replaceFragment(ThirdFragment())
                 else ->{
-
                 }
             }
             true
         }
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -64,16 +59,13 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    override fun onSupportNavigateUp(): Boolean {
-        val navController = findNavController(R.id.nav_host_fragment_content_main)
-        return navController.navigateUp(appBarConfiguration)
-                || super.onSupportNavigateUp()
-    }
     private fun replaceFragment(fragment : Fragment)
     {
-             val fragmentManager =supportFragmentManager
-             val fragmentTransaction=fragmentManager.beginTransaction()
-             fragmentTransaction.replace(R.id.nav_host_fragment_content_main,fragment)
-             fragmentTransaction.commit()
+        if(fragment!=null) {
+            val fragmentManager = supportFragmentManager
+            val fragmentTransaction = fragmentManager.beginTransaction()
+            fragmentTransaction.replace(R.id.frameRental, fragment)
+            fragmentTransaction.commit()
+        }
     }
 }
