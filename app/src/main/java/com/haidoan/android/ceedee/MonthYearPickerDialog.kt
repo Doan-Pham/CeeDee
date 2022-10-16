@@ -15,6 +15,11 @@ class MonthYearPickerDialog(private val date: Date = Date()) : DialogFragment() 
         private const val MAX_YEAR = 2099
     }
 
+    private var title: String? = null
+    fun setTitle(title: String) {
+        this.title = title
+    }
+
     private lateinit var binding: DialogMonthYearPickerBinding
 
     private var listener: DatePickerDialog.OnDateSetListener? = null
@@ -28,11 +33,9 @@ class MonthYearPickerDialog(private val date: Date = Date()) : DialogFragment() 
         val cal: Calendar = Calendar.getInstance().apply { time = date }
 
         binding.pickerMonth.run {
-            minValue = 0
-            maxValue = 11
-            value = cal.get(Calendar.MONTH)
-            displayedValues = arrayOf("Jan","Feb","Mar","Apr","May","June","July",
-                "Aug","Sep","Oct","Nov","Dec")
+            minValue = 1
+            maxValue = 12
+            value = cal.get(Calendar.MONTH) + 1
         }
 
         binding.pickerYear.run {
@@ -43,9 +46,11 @@ class MonthYearPickerDialog(private val date: Date = Date()) : DialogFragment() 
         }
 
         return AlertDialog.Builder(requireContext())
-            .setTitle("Please Select View Month")
+            .setTitle(title ?: "Please select month and year")
             .setView(binding.root)
-            .setPositiveButton("Ok") { _, _ -> listener?.onDateSet(null, binding.pickerYear.value, binding.pickerMonth.value, 1) }
+            .setPositiveButton("Ok") { _, _ ->
+                listener?.onDateSet(null, binding.pickerMonth.value, binding.pickerYear.value, 1)
+            }
             .setNegativeButton("Cancel") { _, _ -> dialog?.cancel() }
             .create()
     }
