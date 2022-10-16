@@ -13,6 +13,7 @@ import com.github.mikephil.charting.components.YAxis
 import com.github.mikephil.charting.data.BarData
 import com.github.mikephil.charting.data.BarDataSet
 import com.github.mikephil.charting.data.BarEntry
+import com.github.mikephil.charting.formatter.LargeValueFormatter
 import com.haidoan.android.ceedee.databinding.FragmentReportBinding
 import com.haidoan.android.ceedee.ui.report.MonthYearXAxisValueFormatter
 import java.text.SimpleDateFormat
@@ -22,6 +23,14 @@ private const val BAR_CHART_BAR_WIDTH = 0.45f
 private const val BAR_CHART_BAR_SPACE = 0.02f
 private const val BAR_CHAR_GROUP_SPACE = 0.06f
 private const val BAR_CHART_MIN_X_DEFAULT = 0f
+private const val CHART_TEXT_SIZE = 12f
+
+// Some methods for chart styling doesn't allow R.color
+private val CHART_COLOR_FIRST = Color.rgb(228, 86, 33)
+private val CHART_COLOR_SECOND = Color.rgb(251, 173, 86)
+private val CHART_COLOR_THIRD = Color.rgb(160, 215, 113)
+private val CHART_COLOR_FOURTH = Color.rgb(115, 176, 215)
+
 
 class ReportFragment : Fragment() {
 
@@ -48,7 +57,7 @@ class ReportFragment : Fragment() {
         barChart = binding.barChart
 
         fillBarChartData()
-        drawBarChart()
+        styleAndDrawBarChart()
 
         val monthFormatter = SimpleDateFormat("MM", Locale.US)
         val yearFormatter = SimpleDateFormat("yyyy", Locale.US)
@@ -86,32 +95,37 @@ class ReportFragment : Fragment() {
         }
     }
 
-    private fun drawBarChart() {
+    private fun styleAndDrawBarChart() {
 
         val xAxis = barChart.xAxis
         xAxis.position = XAxis.XAxisPosition.BOTTOM;
         xAxis.setDrawGridLines(false)
         xAxis.setCenterAxisLabels(true)
         xAxis.granularity = 1f;
-        xAxis.textSize = 12f
+        xAxis.textSize = 14f
         xAxis.axisMinimum = BAR_CHART_MIN_X_DEFAULT
-
         // Needs to add 1 to show all bars
         xAxis.axisMaximum =
             getMonthCountBetween(startMonth, startYear, endMonth, endYear).toFloat() + 1
         xAxis.valueFormatter = MonthYearXAxisValueFormatter()
 
-        val leftAxis: YAxis = barChart.axisLeft
-        leftAxis.axisMinimum = 0f
-        leftAxis.textSize = 12f
+        val leftAxis = barChart.axisLeft
+        leftAxis.textSize = CHART_TEXT_SIZE
+        //leftAxis.setDrawZeroLine(true)
+        leftAxis.spaceTop = 20f
+        leftAxis.valueFormatter = LargeValueFormatter()
+        barChart.axisRight.isEnabled = false
 
-        val rightAxis = barChart.axisRight
-        rightAxis.isEnabled = false
+        val legend = barChart.legend
+        legend.verticalAlignment = Legend.LegendVerticalAlignment.TOP
+        legend.horizontalAlignment = Legend.LegendHorizontalAlignment.CENTER
+        legend.form = Legend.LegendForm.CIRCLE
+        legend.formSize = CHART_TEXT_SIZE
+        legend.textSize = CHART_TEXT_SIZE
 
-        barChart.legend.form = Legend.LegendForm.CIRCLE
-        barChart.legend.textSize = 12f
-
-        barChart.setPinchZoom(false)
+        barChart.setScaleEnabled(false)
+        barChart.data.setValueTextSize(CHART_TEXT_SIZE)
+        barChart.isHighlightPerTapEnabled = false
         barChart.description.isEnabled = false
         barChart.setVisibleXRangeMaximum(4f)
         barChart.groupBars(BAR_CHART_MIN_X_DEFAULT, BAR_CHAR_GROUP_SPACE, BAR_CHART_BAR_SPACE)
@@ -122,24 +136,26 @@ class ReportFragment : Fragment() {
 
         //TODO: Add logic for retrieving data
         val entries = mutableListOf<BarEntry>()
-        entries.add(BarEntry(0F, 1000F))
-        entries.add(BarEntry(1F, 2000F))
-        entries.add(BarEntry(2F, 500F))
+        entries.add(BarEntry(0F, 2000000F))
+        entries.add(BarEntry(1F, 2000000F))
+        entries.add(BarEntry(2F, 1500000F))
         entries.add(BarEntry(3F, 500F))
         entries.add(BarEntry(4F, 500F))
         entries.add(BarEntry(5F, 500F))
 
         val entriesb = mutableListOf<BarEntry>()
         entriesb.add(BarEntry(0F, 3000F))
-        entriesb.add(BarEntry(1F, 15000F))
+        entriesb.add(BarEntry(1F, -1500000f))
         entriesb.add(BarEntry(2F, 800F))
         entriesb.add(BarEntry(3F, 800F))
         entriesb.add(BarEntry(4F, 800F))
         entriesb.add(BarEntry(5F, 800F))
 
         val dataSet = BarDataSet(entries, "Income")
+
+        dataSet.color = CHART_COLOR_FIRST
         val dataSetB = BarDataSet(entriesb, "Expenses")
-        dataSetB.color = Color.rgb(0, 0, 0)
+        dataSetB.color = CHART_COLOR_SECOND
 
         val barData = BarData(dataSet, dataSetB)
         barData.barWidth = BAR_CHART_BAR_WIDTH
@@ -149,7 +165,7 @@ class ReportFragment : Fragment() {
 
     private fun onMonthYearChanged() {
         if (startYear == endYear && startMonth == endMonth) return
-        drawBarChart()
+        styleAndDrawBarChart()
     }
 
     private fun getMonthCountBetween(
