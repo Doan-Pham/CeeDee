@@ -1,18 +1,12 @@
 package com.haidoan.android.ceedee
 
 import android.os.Bundle
-import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity
-import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.navigateUp
-import androidx.navigation.ui.setupActionBarWithNavController
 import android.view.Menu
 import android.view.MenuItem
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.replace
 import com.haidoan.android.ceedee.databinding.ActivityMainBinding
-import fragmentRentalTabs.tabRentalAdapter
 
 class MainActivity : AppCompatActivity() {
 
@@ -28,11 +22,11 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(binding.toolbar)
 
 
-        replaceFragment(FirstFragment())
+        replaceFragment(RentalFragment())
         binding.bottomNavigationView.setOnItemSelectedListener {
             when(it.itemId)
             {
-                R.id.rental -> replaceFragment(FirstFragment())
+                R.id.rental -> replaceFragment(RentalFragment())
                 R.id.disk -> replaceFragment(SecondFragment())
                 R.id.report -> replaceFragment(ThirdFragment())
                 else ->{

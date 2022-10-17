@@ -6,15 +6,10 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.findFragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.fragment.findNavController
 import androidx.viewpager.widget.ViewPager
-import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayout
-import com.google.android.material.tabs.TabLayoutMediator
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
 import com.haidoan.android.ceedee.databinding.FragmentFirstBinding
 import com.haidoan.android.ceedee.ui.login.AuthenticationViewModel
 import fragmentRentalTabs.*
@@ -22,7 +17,7 @@ import fragmentRentalTabs.*
 /**
  * A simple [Fragment] subclass as the default destination in the navigation.
  */
-class FirstFragment : Fragment() {
+class RentalFragment : Fragment() {
 
     private var _binding: FragmentFirstBinding? = null
 
