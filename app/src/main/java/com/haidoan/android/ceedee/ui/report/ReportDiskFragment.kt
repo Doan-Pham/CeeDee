@@ -46,10 +46,6 @@ class ReportDiskFragment : Fragment() {
         l.horizontalAlignment = Legend.LegendHorizontalAlignment.RIGHT
         l.orientation = Legend.LegendOrientation.VERTICAL
         l.setDrawInside(false)
-//        l.xEntrySpace = 7f
-//        l.yEntrySpace = 0f
-//        l.yOffset = 0f
-
 
         pieChart.setUsePercentValues(true)
         pieChart.isHighlightPerTapEnabled = false;
@@ -69,9 +65,11 @@ class ReportDiskFragment : Fragment() {
         //pieChart.setUsePercentValues(true)
         val dataSet = PieDataSet(entries, "Disks by status")
         dataSet.colors = colors
+
         val data = PieData(dataSet)
+        data.setValueFormatter(PercentFormatter(pieChart))
+        data.setValueTextSize(14f)
+
         pieChart.data = data
-        data.setValueFormatter(PercentFormatter())
-        pieChart.data.setValueTextSize(14f)
     }
 }
