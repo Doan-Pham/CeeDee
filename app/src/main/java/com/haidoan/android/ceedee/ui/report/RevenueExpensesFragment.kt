@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.github.mikephil.charting.charts.BarChart
 import com.github.mikephil.charting.charts.LineChart
@@ -37,11 +38,12 @@ class RevenueExpensesFragment : Fragment() {
     private lateinit var barChart: BarChart
     private lateinit var lineChart: LineChart
 
-    private var startMonth: Int = 10
-    private var startYear: Int = 2022
+    private val currentDate = Calendar.getInstance().time
+    private var startMonth: Int = Calendar.getInstance().get(Calendar.MONTH) + 1
+    private var startYear: Int = Calendar.getInstance().get(Calendar.YEAR)
 
-    private var endMonth: Int = 10
-    private var endYear: Int = 2022
+    private var endMonth: Int = startMonth
+    private var endYear: Int = startYear
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -58,6 +60,14 @@ class RevenueExpensesFragment : Fragment() {
         barChart = binding.barChart
         lineChart = binding.lineChart
 
+        val displayedStartTime = "$startMonth/$startYear"
+        binding.textviewStartMonth.text = displayedStartTime
+
+        val displayedEndTime = "$endMonth/$endYear"
+        binding.textviewEndMonth.text = displayedEndTime
+
+        onMonthYearChanged()
+
         barChart.visibility = View.GONE
 
         if (barChart.visibility != View.GONE) {
@@ -72,13 +82,21 @@ class RevenueExpensesFragment : Fragment() {
 
         binding.textviewStartMonth.setOnClickListener {
             MonthYearPickerDialog(Calendar.getInstance().time).apply {
-                setTitle("Select end month")
+                setTitle("Select start month")
                 setListener { _, month, year, _ ->
-                    val displayedTime = "$month/$year"
-                    binding.textviewStartMonth.text = displayedTime
-                    startMonth = month
-                    startYear = year
-                    onMonthYearChanged()
+                    if (year > endYear || (year == endYear && month > endMonth)) {
+                        Toast.makeText(
+                            requireActivity(),
+                            "Error: Start time should be lower or equal to end time",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    } else {
+                        val displayedTime = "$month/$year"
+                        binding.textviewStartMonth.text = displayedTime
+                        startMonth = month
+                        startYear = year
+                        onMonthYearChanged()
+                    }
                 }
                 show(this@RevenueExpensesFragment.parentFragmentManager, "MonthYearPickerDialog")
             }
@@ -88,13 +106,24 @@ class RevenueExpensesFragment : Fragment() {
             MonthYearPickerDialog(Calendar.getInstance().time).apply {
                 setTitle("Select end month")
                 setListener { _, month, year, _ ->
-                    val displayedTime = "$month/$year"
-                    binding.textviewEndMonth.text = displayedTime
-                    endMonth = month
-                    endYear = year
-                    onMonthYearChanged()
+                    if (year < startYear || (year == startYear && month < startMonth)) {
+                        Toast.makeText(
+                            requireActivity(),
+                            "Error: Start time should be earlier or the same as end time",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    } else {
+                        val displayedTime = "$month/$year"
+                        binding.textviewEndMonth.text = displayedTime
+                        endMonth = month
+                        endYear = year
+                        onMonthYearChanged()
+                    }
                 }
-                show(this@RevenueExpensesFragment.parentFragmentManager, "MonthYearPickerDialog")
+                show(
+                    this@RevenueExpensesFragment.parentFragmentManager,
+                    "MonthYearPickerDialog"
+                )
             }
         }
     }
@@ -133,7 +162,6 @@ class RevenueExpensesFragment : Fragment() {
         lineChart.isHighlightPerDragEnabled = false
         lineChart.description.isEnabled = false
         lineChart.setVisibleXRangeMaximum(4f)
-
         //Have to call notifyDataSetChanged for the UI change to take place immediately
         lineChart.notifyDataSetChanged()
         lineChart.invalidate()
@@ -181,7 +209,7 @@ class RevenueExpensesFragment : Fragment() {
         xAxis.axisMinimum = BAR_CHART_MIN_X_DEFAULT
         // Needs to add 1 to show all bars
         xAxis.axisMaximum =
-            getMonthCountBetween(startMonth, startYear, endMonth, endYear).toFloat() + 1
+            getMonthCountBetween(startMonth, startYear, endMonth, endYear).toFloat()
         xAxis.valueFormatter = MonthYearXAxisValueFormatter()
 
         val leftAxis = barChart.axisLeft
@@ -243,6 +271,8 @@ class RevenueExpensesFragment : Fragment() {
         if (barChart.visibility != View.GONE) {
             styleAndDrawBarChart()
         } else {
+            lineChart.clearValues()
+            fillLineChartData()
             styleAndDrawLineChart()
         }
     }
