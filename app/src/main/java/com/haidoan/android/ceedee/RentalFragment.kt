@@ -11,6 +11,7 @@ import androidx.viewpager.widget.ViewPager
 import com.google.android.material.tabs.TabLayout
 import com.google.firebase.auth.FirebaseAuth
 import com.haidoan.android.ceedee.databinding.FragmentFirstBinding
+import com.haidoan.android.ceedee.databinding.FragmentRentalBinding
 import com.haidoan.android.ceedee.ui.login.AuthenticationViewModel
 import fragmentRentalTabs.*
 
@@ -19,7 +20,7 @@ import fragmentRentalTabs.*
  */
 class RentalFragment : Fragment() {
 
-    private var _binding: FragmentFirstBinding? = null
+    private var _binding: FragmentRentalBinding? = null
 
     private lateinit var authViewModel: AuthenticationViewModel
     // This property is only valid between onCreateView and
@@ -30,18 +31,14 @@ class RentalFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        _binding = FragmentFirstBinding.inflate(inflater, container, false)
+        _binding = FragmentRentalBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
       authViewModel = ViewModelProvider(this)[AuthenticationViewModel::class.java]
-       binding.buttonLogout.setOnClickListener{
-          authViewModel.signOut()
-            val i = Intent(requireActivity(), LoginActivity::class.java)
-           startActivity(i)
-      }
+
         var viewPager=view.findViewById<ViewPager>(R.id.viewPagerRental)
         var tabRental=view.findViewById<TabLayout>(R.id.tabRental)
         var adapter=tabRentalAdapter(childFragmentManager)
