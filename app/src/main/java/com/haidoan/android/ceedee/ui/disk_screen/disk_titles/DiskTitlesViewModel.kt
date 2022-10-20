@@ -4,18 +4,21 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.liveData
 import com.haidoan.android.ceedee.data.DiskTitle
+import kotlinx.coroutines.Dispatchers
 
 class DiskTitlesViewModel(application: Application) : AndroidViewModel(application) {
     private val diskTitlesRepository : DiskTitlesRepository
-    private val diskTitleListMutableLiveData : MutableLiveData<ArrayList<DiskTitle>>
 
     init {
         diskTitlesRepository = DiskTitlesRepository(application)
-        diskTitleListMutableLiveData = diskTitlesRepository.getDiskTitleListMutableLiveData()
     }
 
-    fun getDiskTitleListMutableLiveData() : LiveData<ArrayList<DiskTitle>> {
-        return diskTitleListMutableLiveData
+    fun getDiskTitles() = liveData(Dispatchers.IO) {
+        diskTitlesRepository.getDiskTitlesFromFireStore().collect { response ->
+            emit(response)
+        }
     }
+
 }

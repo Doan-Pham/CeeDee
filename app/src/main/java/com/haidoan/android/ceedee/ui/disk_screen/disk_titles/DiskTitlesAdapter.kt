@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import coil.load
 
 import com.haidoan.android.ceedee.data.DiskTitle
 import com.haidoan.android.ceedee.databinding.DiskTitlesItemBinding
@@ -29,9 +30,10 @@ class DiskTitlesAdapter : RecyclerView.Adapter<DiskTitlesAdapter.DiskTitlesViewH
     inner class DiskTitlesViewHolder : RecyclerView.ViewHolder(binding.root) {
         fun setData(item: DiskTitle) {
             binding.apply {
-                tvDiskTitlesAmount.text = item.author.toString()
-                tvDiskTitlesGenre.text = item.genreId.toString()
-                tvDiskTitlesName.text = item.name.toString()
+                imgDiskTitlesCoverImg.load(item.coverImageURL)
+                tvDiskTitlesAmount.text = item.author
+                tvDiskTitlesGenre.text = item.genreId
+                tvDiskTitlesName.text = item.name
             }
         }
     }

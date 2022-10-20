@@ -3,6 +3,7 @@ package com.haidoan.android.ceedee.ui.disk_screen.disk_titles
 import android.annotation.SuppressLint
 
 import android.os.Bundle
+import android.util.Log
 
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -37,20 +38,34 @@ class DiskTitlesFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        
+
+        diskTitlesViewModel = ViewModelProvider(requireActivity())[DiskTitlesViewModel::class.java]
+        diskTitlesViewModel.getDiskTitles().observe(this) { response ->
+            when (response) {
+                is Response.Loading -> {
+                    //Load a ProgessBar
+                    Log.d("TAG","LOADING...")
+                }
+                is Response.Success -> {
+                    val postList = response.data
+                    //Do what you need to do with your list
+                    //Hide the ProgessBar
+                    diskTitleAdapter.differ().submitList(postList)
+                }
+                is Response.Failure -> {
+                    print(response.errorMessage)
+                    //Hide the ProgessBar
+                    Log.d("TAG","FAILURE")
+                }
+            }
+        }
+
+
     }
 
     @SuppressLint("UseCompatLoadingForDrawables")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        diskTitlesViewModel = ViewModelProvider(requireActivity())[DiskTitlesViewModel::class.java]
-        diskTitlesViewModel.getDiskTitleListMutableLiveData().observe(requireActivity(), Observer<ArrayList<DiskTitle>> {
-            list ->
-            run {
-                diskTitleAdapter.differ().submitList(list)
-            }
-        })
 
         binding.apply {
             rcvDiskTitles.apply {
