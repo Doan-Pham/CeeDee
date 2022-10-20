@@ -1,12 +1,16 @@
 package com.haidoan.android.ceedee.ui.disk_screen.disk_titles
 
 import android.annotation.SuppressLint
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.ImageView
+import androidx.core.net.toUri
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
+import com.haidoan.android.ceedee.R
 
 import com.haidoan.android.ceedee.data.DiskTitle
 import com.haidoan.android.ceedee.databinding.DiskTitlesItemBinding
@@ -30,10 +34,20 @@ class DiskTitlesAdapter : RecyclerView.Adapter<DiskTitlesAdapter.DiskTitlesViewH
     inner class DiskTitlesViewHolder : RecyclerView.ViewHolder(binding.root) {
         fun setData(item: DiskTitle) {
             binding.apply {
-                imgDiskTitlesCoverImg.load(item.coverImageURL)
+                bindImage(imgDiskTitlesCoverImg,item.coverImageUrl)
                 tvDiskTitlesAmount.text = item.author
                 tvDiskTitlesGenre.text = item.genreId
                 tvDiskTitlesName.text = item.name
+            }
+        }
+    }
+
+    fun bindImage(imgView: ImageView, imgUrl: String?) {
+        imgUrl?.let {
+            val imgUri = imgUrl.toUri().buildUpon().scheme("https").build()
+            imgView.load(imgUri) {
+                placeholder(R.drawable.ic_launcher)
+                error(R.drawable.ic_app_logo)
             }
         }
     }

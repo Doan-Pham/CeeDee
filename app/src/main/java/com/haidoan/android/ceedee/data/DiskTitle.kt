@@ -5,6 +5,6 @@ data class DiskTitle(
     val genreId: String = "",
     val name: String = "",
     val author: String = "",
-    val coverImageURL: String = "",
+    val coverImageUrl: String = "",
     val description: String = ""
 )
