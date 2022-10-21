@@ -12,8 +12,6 @@ import java.time.ZoneId
 import java.time.ZoneOffset
 import java.time.temporal.TemporalAdjusters.firstDayOfMonth
 import java.time.temporal.TemporalAdjusters.lastDayOfMonth
-import java.util.*
-import kotlin.collections.HashMap
 
 private const val TAG = "FirestoreApi.kt"
 
@@ -21,42 +19,51 @@ class FirestoreApi {
     private val db = Firebase.firestore
 
     fun getRevenueBetweenMonths(
-        startMonth: Int = 11,
-        startYear: Int = 2022,
-        endMonth: Int = 11,
-        endYear: Int = 2022
-    ): LiveData<Map<Date, Float>> {
+        startTime: LocalDate,
+        endTime: LocalDate
+    ): LiveData<Map<LocalDate, Float>> {
 
-        val startTime = LocalDate.of(startYear, startMonth, 1).with(firstDayOfMonth())
-        val endTime = LocalDate.of(endYear, endMonth, 1).with(lastDayOfMonth())
+        val zoneId = ZoneId.of("Asia/Ho_Chi_Minh")
         val startTimestamp =
-            Timestamp(startTime.atStartOfDay(ZoneId.of("Asia/Ho_Chi_Minh")).toEpochSecond(), 0)
+            Timestamp(startTime.with(firstDayOfMonth()).atStartOfDay(zoneId).toEpochSecond(), 0)
         val endTimestamp =
-            Timestamp(endTime.atTime(LocalTime.MAX).toEpochSecond(ZoneOffset.UTC), 0)
+            Timestamp(endTime.with(lastDayOfMonth()).atTime(LocalTime.MAX).toEpochSecond(ZoneOffset.UTC), 0)
 
-        Log.d(TAG, "startTime: $startTime")
-        Log.d(TAG, "endTime: $endTime")
-        Log.d(TAG, "startTimeStamp: $startTimestamp")
-        Log.d(TAG, "endTimeStamp: $endTimestamp")
+        Log.d(TAG, "startTime: ${startTime.with(firstDayOfMonth())}")
+        Log.d(TAG, "endTime: ${endTime.with(lastDayOfMonth())}")
+//        Log.d(TAG, "startTimeStamp: $startTimestamp")
+//        Log.d(TAG, "endTimeStamp: $endTimestamp")
 
+        val dataMap = HashMap<LocalDate, Float>()
         db.collection("Rental")
             .whereGreaterThanOrEqualTo("returnDate", startTimestamp)
             .whereLessThanOrEqualTo("returnDate", endTimestamp)
             .get()
             .addOnSuccessListener { documents ->
                 for (document in documents) {
-                    Log.d(TAG, "${document.id} => ${document.data}")
+                    val rentalReturnTimestamp = document.get("returnDate") as Timestamp
+                    val rentalReturnDate =
+                        rentalReturnTimestamp.toDate().toInstant().atZone(zoneId).toLocalDate()
+                            .withDayOfMonth(15)
+
+                    val totalPaymentAtCurrentLoop = dataMap[rentalReturnDate]
+
+                    if (totalPaymentAtCurrentLoop == null) {
+                        val totalPaymentAsDouble = document.getDouble("totalPayment")
+                        dataMap[rentalReturnDate] = totalPaymentAsDouble?.toFloat() ?: 0f
+                    } else {
+                        val totalPaymentAsDouble = document.getDouble("totalPayment")
+                        dataMap[rentalReturnDate] =
+                            (totalPaymentAsDouble?.toFloat() ?: 0f) + totalPaymentAtCurrentLoop
+                    }
+//                    Log.d(TAG, "Time: $rentalReturnDate - payment: ${dataMap[rentalReturnDate]} ")
+//                    Log.d(TAG, "${document.id} => ${document.data}")
                 }
             }
             .addOnFailureListener { exception ->
                 Log.d(TAG, "Error getting documents: ", exception)
             }
-        return MutableLiveData(
-            mapOf(
-                Date.from(
-                    startTime.atStartOfDay(ZoneId.systemDefault()).toInstant()
-                ) to 45f
-            )
-        )
+        Log.d(TAG, dataMap.toString())
+        return MutableLiveData(dataMap)
     }
 }
