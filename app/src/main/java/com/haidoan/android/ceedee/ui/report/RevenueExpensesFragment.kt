@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import com.github.mikephil.charting.charts.BarChart
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.components.Legend
@@ -17,6 +18,7 @@ import com.github.mikephil.charting.data.*
 import com.github.mikephil.charting.formatter.LargeValueFormatter
 import com.haidoan.android.ceedee.MonthYearPickerDialog
 import com.haidoan.android.ceedee.databinding.FragmentRevenueExpensesBinding
+import java.time.LocalDate
 import java.util.*
 
 private const val BAR_CHART_BAR_WIDTH = 0.45f
@@ -35,10 +37,24 @@ class RevenueExpensesFragment : Fragment() {
 
     private lateinit var binding: FragmentRevenueExpensesBinding
 
+    private val viewModel: ReportViewModel by lazy {
+        val activity = requireNotNull(this.activity) {
+            "You can only access the viewModel after onActivityCreated()"
+        }
+        ViewModelProvider(
+            this, ReportViewModel.Factory(
+                activity.application, ReportRepository(
+                    FirestoreApi()
+                )
+            )
+        )[ReportViewModel::class.java]
+    }
+
     private lateinit var barChart: BarChart
     private lateinit var lineChart: LineChart
 
-    private val currentDate = Calendar.getInstance().time
+    private val chartEntries = HashMap<LocalDate, Float>()
+
     private var startMonth: Int = Calendar.getInstance().get(Calendar.MONTH) + 1
     private var startYear: Int = Calendar.getInstance().get(Calendar.YEAR)
 
@@ -59,26 +75,13 @@ class RevenueExpensesFragment : Fragment() {
 
         barChart = binding.barChart
         lineChart = binding.lineChart
+        styleLineChart()
 
         val displayedStartTime = "$startMonth/$startYear"
         binding.textviewStartMonth.text = displayedStartTime
 
         val displayedEndTime = "$endMonth/$endYear"
         binding.textviewEndMonth.text = displayedEndTime
-
-        onMonthYearChanged()
-
-        barChart.visibility = View.GONE
-
-        if (barChart.visibility != View.GONE) {
-            Log.d("WHAT", "WHAT")
-            fillBarChartData()
-            styleAndDrawBarChart()
-        } else {
-            Log.d("HE", "HE")
-            fillLineChartData()
-            styleAndDrawLineChart()
-        }
 
         binding.textviewStartMonth.setOnClickListener {
             MonthYearPickerDialog(Calendar.getInstance().time).apply {
@@ -87,7 +90,7 @@ class RevenueExpensesFragment : Fragment() {
                     if (year > endYear || (year == endYear && month > endMonth)) {
                         Toast.makeText(
                             requireActivity(),
-                            "Error: Start time should be lower or equal to end time",
+                            "Error: Start time should be sooner or equal to end time",
                             Toast.LENGTH_SHORT
                         ).show()
                     } else {
@@ -126,13 +129,21 @@ class RevenueExpensesFragment : Fragment() {
                 )
             }
         }
+
+        viewModel.monthlyRevenue.observe(viewLifecycleOwner) {
+            if (lineChart.visibility == View.VISIBLE) {
+                styleLineChart()
+                fillLineChartData(it)
+            } else {
+
+            }
+        }
     }
 
-    private fun styleAndDrawLineChart() {
+    private fun styleLineChart() {
         val xAxis = lineChart.xAxis
         xAxis.position = XAxis.XAxisPosition.BOTTOM;
         xAxis.setDrawGridLines(false)
-        //xAxis.setCenterAxisLabels(true)
         xAxis.granularity = 1f;
         xAxis.textSize = 14f
         xAxis.axisMinimum = BAR_CHART_MIN_X_DEFAULT
@@ -154,9 +165,6 @@ class RevenueExpensesFragment : Fragment() {
         legend.formSize = CHART_TEXT_SIZE
         legend.textSize = CHART_TEXT_SIZE
 
-        lineChart.data.setValueTextSize(CHART_TEXT_SIZE)
-        lineChart.data.setValueFormatter(LargeValueFormatter())
-
         lineChart.setScaleEnabled(false)
         lineChart.isHighlightPerTapEnabled = false
         lineChart.isHighlightPerDragEnabled = false
@@ -166,18 +174,26 @@ class RevenueExpensesFragment : Fragment() {
         lineChart.notifyDataSetChanged()
         lineChart.invalidate()
 
-        Log.d("ReportFragment.kt", "style line called")
+        Log.d("RevenueExpensesFragment", "style line called")
     }
 
-    private fun fillLineChartData() {
-        val entries = mutableListOf<Entry>()
-        entries.add(Entry(0F, 2000000F))
-        entries.add(Entry(1F, 2000000F))
-        entries.add(Entry(2F, 1500000F))
-        entries.add(Entry(3F, 500F))
-        entries.add(Entry(4F, 500F))
-        entries.add(Entry(5F, 500F))
-
+    private fun fillLineChartData(dataEntries: Map<LocalDate, Float>?) {
+        val actualEntries = mutableListOf<Entry>()
+        dataEntries?.forEach { (key, value) ->
+            actualEntries.add(
+                Entry(
+                    getMonthCountBetween(
+                        startMonth,
+                        startYear,
+                        key.monthValue,
+                        key.year,
+                    ).toFloat(),
+                    value
+                )
+            )
+        }
+        Log.d("RevenueExpensesFragment", dataEntries?.entries.toString())
+        Log.d("RevenueExpensesFragment", "something")
         val entriesb = mutableListOf<Entry>()
         entriesb.add(Entry(0F, 3000F))
         entriesb.add(Entry(1F, -1500000f))
@@ -186,7 +202,7 @@ class RevenueExpensesFragment : Fragment() {
         entriesb.add(Entry(4F, 800F))
         entriesb.add(Entry(5F, 800F))
 
-        val dataSet = LineDataSet(entries, "Revenue")
+        val dataSet = LineDataSet(actualEntries, "Revenue")
         dataSet.color = CHART_COLOR_FIRST
         dataSet.axisDependency = YAxis.AxisDependency.LEFT;
 
@@ -194,9 +210,13 @@ class RevenueExpensesFragment : Fragment() {
         dataSetB.color = CHART_COLOR_SECOND
         dataSetB.axisDependency = YAxis.AxisDependency.LEFT;
 
+        lineChart.clear()
         lineChart.data = LineData(dataSet, dataSetB)
-
-        Log.d("ReportFragment.kt", "fill line called")
+        lineChart.data.setValueTextSize(CHART_TEXT_SIZE)
+        lineChart.data.setValueFormatter(LargeValueFormatter())
+        lineChart.notifyDataSetChanged()
+        lineChart.invalidate()
+        Log.d("RevenueExpensesFragment", "fill line called")
     }
 
     private fun styleAndDrawBarChart() {
@@ -268,13 +288,10 @@ class RevenueExpensesFragment : Fragment() {
 
     private fun onMonthYearChanged() {
         if (startYear == endYear && startMonth == endMonth) return
-        if (barChart.visibility != View.GONE) {
-            styleAndDrawBarChart()
-        } else {
-            lineChart.clearValues()
-            fillLineChartData()
-            styleAndDrawLineChart()
-        }
+        viewModel.setMonthsPeriod(
+            LocalDate.of(startYear, startMonth, 15),
+            LocalDate.of(endYear, endMonth, 15)
+        )
     }
 
     private fun getMonthCountBetween(
