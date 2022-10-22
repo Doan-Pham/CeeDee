@@ -18,9 +18,12 @@ class DiskTitlesAdapter : RecyclerView.Adapter<DiskTitlesAdapter.DiskTitlesViewH
 
     private lateinit var binding: DiskTitlesItemBinding
 
+    private lateinit var iOnItemClickListener: IOnItemClickListener
+    private lateinit var iOnItemMoreClickListener: IOnItemClickListener
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DiskTitlesViewHolder {
         binding = DiskTitlesItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return DiskTitlesViewHolder()
+        return DiskTitlesViewHolder(iOnItemClickListener,iOnItemMoreClickListener)
     }
 
     override fun onBindViewHolder(holder: DiskTitlesViewHolder, position: Int) {
@@ -28,15 +31,38 @@ class DiskTitlesAdapter : RecyclerView.Adapter<DiskTitlesAdapter.DiskTitlesViewH
         holder.setIsRecyclable(false)
     }
 
+    fun setIOnItemMoreClickListener(listener: IOnItemClickListener){
+        iOnItemMoreClickListener = listener
+    }
+
+    fun setIOnItemClickListener(listener: IOnItemClickListener){
+        iOnItemClickListener = listener
+    }
+
+    fun getItem(position: Int): DiskTitle {
+        return _differ.currentList[position]
+    }
+
     override fun getItemCount() = _differ.currentList.size
 
-    inner class DiskTitlesViewHolder : RecyclerView.ViewHolder(binding.root) {
+    inner class DiskTitlesViewHolder(listener: IOnItemClickListener,
+                                     listenerMore: IOnItemClickListener) : RecyclerView.ViewHolder(binding.root) {
         fun setData(item: DiskTitle) {
             binding.apply {
                 bindImage(imgDiskTitlesCoverImg,item.coverImageUrl)
                 tvDiskTitlesAmount.text = item.author
                 tvDiskTitlesGenre.text = item.genreId
                 tvDiskTitlesName.text = item.name
+            }
+        }
+
+        init {
+            itemView.setOnClickListener {
+                listener.onItemClick(bindingAdapterPosition)
+            }
+
+            binding.imgDiskTitlesBtnMore.setOnClickListener {
+                listenerMore.onItemClick((bindingAdapterPosition))
             }
         }
     }

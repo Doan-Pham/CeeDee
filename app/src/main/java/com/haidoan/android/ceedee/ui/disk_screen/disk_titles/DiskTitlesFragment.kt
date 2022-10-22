@@ -106,6 +106,17 @@ class DiskTitlesFragment : Fragment() {
                 else -> false
             }
         })
+
+        diskTitleAdapter.setIOnItemClickListener(object: IOnItemClickListener {
+            override fun onItemClick(position: Int) {
+                Log.d("TAG_ADAPTER","pos: "+ position.toString() + "name: " + diskTitleAdapter.getItem(position).name)
+            }
+        })
+        diskTitleAdapter.setIOnItemMoreClickListener(object: IOnItemClickListener {
+            override fun onItemClick(position: Int) {
+                Log.d("TAG_ADAPTER","pos: "+ position.toString() + "name: " + diskTitleAdapter.getItem(position).name)
+            }
+        })
     }
 
     private fun createMenu() {
