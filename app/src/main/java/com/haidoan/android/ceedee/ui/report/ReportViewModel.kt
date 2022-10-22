@@ -7,6 +7,8 @@ import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.temporal.TemporalAdjusters
 
+private const val TAG = "ReportViewModel.kt"
+
 class ReportViewModel(application: Application, private val reportRepository: ReportRepository) :
     AndroidViewModel(application) {
 
@@ -28,7 +30,7 @@ class ReportViewModel(application: Application, private val reportRepository: Re
                 reportRepository.getRevenueBetweenMonths(startTime, endTime).value
         }
         Log.d(
-            "ReportViewModel.kt",
+            TAG,
             "Called refreshMonthlyRevenue(), revenue between $startTime and $endTime after refresh: ${_monthlyRevenue.value.toString()}"
         )
     }
@@ -37,10 +39,9 @@ class ReportViewModel(application: Application, private val reportRepository: Re
         startTime: LocalDate = LocalDate.now(),
         endTime: LocalDate = LocalDate.now()
     ) {
-        this.startTime = startTime
-        this.endTime = endTime
+        this.startTime = startTime.with(TemporalAdjusters.firstDayOfMonth())
+        this.endTime = endTime.with(TemporalAdjusters.lastDayOfMonth())
         refreshMonthlyRevenue()
-
     }
 
     class Factory(val app: Application, private val reportRepository: ReportRepository) :
