@@ -53,7 +53,8 @@ class RevenueExpensesFragment : Fragment() {
     private lateinit var barChart: BarChart
     private lateinit var lineChart: LineChart
 
-    private val chartEntries = HashMap<LocalDate, Float>()
+    private var revenueDataCache: MutableMap<LocalDate, Float> = mutableMapOf()
+    private var expensesDataCache: MutableMap<LocalDate, Float> = mutableMapOf()
 
     private var startMonth: Int = Calendar.getInstance().get(Calendar.MONTH) + 1
     private var startYear: Int = Calendar.getInstance().get(Calendar.YEAR)
@@ -133,7 +134,20 @@ class RevenueExpensesFragment : Fragment() {
         viewModel.monthlyRevenue.observe(viewLifecycleOwner) {
             if (lineChart.visibility == View.VISIBLE) {
                 styleLineChart()
-                fillLineChartData(it)
+                fillLineChartData(it, null)
+                revenueDataCache.clear()
+                revenueDataCache.putAll(it)
+            } else {
+
+            }
+        }
+
+        viewModel.monthlyExpenses.observe(viewLifecycleOwner) {
+            if (lineChart.visibility == View.VISIBLE) {
+                styleLineChart()
+                fillLineChartData(null, it)
+                expensesDataCache.clear()
+                expensesDataCache.putAll(it)
             } else {
 
             }
@@ -177,10 +191,17 @@ class RevenueExpensesFragment : Fragment() {
         Log.d("RevenueExpensesFragment", "style line called")
     }
 
-    private fun fillLineChartData(dataEntries: Map<LocalDate, Float>?) {
-        val actualEntries = mutableListOf<Entry>()
-        dataEntries?.forEach { (key, value) ->
-            actualEntries.add(
+    private fun fillLineChartData(
+        revenueDataNew: Map<LocalDate, Float>?,
+        expensesDataNew: Map<LocalDate, Float>?
+    ) {
+        // Use new data if it exists, else use data cache
+        val revenueDataFinal: Map<LocalDate, Float> = revenueDataNew ?: revenueDataCache
+
+        val revenueChartEntries = mutableListOf<Entry>()
+
+        revenueDataFinal.forEach { (key, value) ->
+            revenueChartEntries.add(
                 Entry(
                     getMonthCountBetween(
                         startMonth,
@@ -192,26 +213,38 @@ class RevenueExpensesFragment : Fragment() {
                 )
             )
         }
-        Log.d("RevenueExpensesFragment", dataEntries?.entries.toString())
-        Log.d("RevenueExpensesFragment", "something")
-        val entriesb = mutableListOf<Entry>()
-        entriesb.add(Entry(0F, 3000F))
-        entriesb.add(Entry(1F, -1500000f))
-        entriesb.add(Entry(2F, 800F))
-        entriesb.add(Entry(3F, 800F))
-        entriesb.add(Entry(4F, 800F))
-        entriesb.add(Entry(5F, 800F))
+        Log.d("RevenueExpensesFragment", revenueDataFinal.entries.toString())
 
-        val dataSet = LineDataSet(actualEntries, "Revenue")
-        dataSet.color = CHART_COLOR_FIRST
-        dataSet.axisDependency = YAxis.AxisDependency.LEFT;
+        val expensesChartEntries = mutableListOf<Entry>()
 
-        val dataSetB = LineDataSet(entriesb, "Expenses")
-        dataSetB.color = CHART_COLOR_SECOND
-        dataSetB.axisDependency = YAxis.AxisDependency.LEFT;
+        // Use new data if it exists, else use cached data
+        val expensesDataFinal: Map<LocalDate, Float> = expensesDataNew ?: expensesDataCache
+
+        expensesDataFinal.forEach { (key, value) ->
+            expensesChartEntries.add(
+                Entry(
+                    getMonthCountBetween(
+                        startMonth,
+                        startYear,
+                        key.monthValue,
+                        key.year,
+                    ).toFloat(),
+                    value
+                )
+            )
+        }
+        Log.d("RevenueExpensesFragment", expensesDataFinal.entries.toString())
+
+        val dataSetRevenue = LineDataSet(revenueChartEntries, "Revenue")
+        dataSetRevenue.color = CHART_COLOR_FIRST
+        dataSetRevenue.axisDependency = YAxis.AxisDependency.LEFT;
+
+        val dataSetExpenses = LineDataSet(expensesChartEntries, "Expenses")
+        dataSetExpenses.color = CHART_COLOR_SECOND
+        dataSetExpenses.axisDependency = YAxis.AxisDependency.LEFT;
 
         lineChart.clear()
-        lineChart.data = LineData(dataSet, dataSetB)
+        lineChart.data = LineData(dataSetRevenue, dataSetExpenses)
         lineChart.data.setValueTextSize(CHART_TEXT_SIZE)
         lineChart.data.setValueFormatter(LargeValueFormatter())
         lineChart.notifyDataSetChanged()
@@ -287,7 +320,6 @@ class RevenueExpensesFragment : Fragment() {
     }
 
     private fun onMonthYearChanged() {
-        if (startYear == endYear && startMonth == endMonth) return
         viewModel.setMonthsPeriod(
             LocalDate.of(startYear, startMonth, 15),
             LocalDate.of(endYear, endMonth, 15)
