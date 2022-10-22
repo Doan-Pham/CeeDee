@@ -3,9 +3,12 @@ package com.haidoan.android.ceedee.ui.report
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.google.android.gms.tasks.Task
 import com.google.firebase.Timestamp
+import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.tasks.await
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneId
@@ -16,54 +19,49 @@ import java.time.temporal.TemporalAdjusters.lastDayOfMonth
 private const val TAG = "FirestoreApi.kt"
 
 class FirestoreApi {
-    private val db = Firebase.firestore
+    private val databaseRef = Firebase.firestore
 
-    fun getRevenueBetweenMonths(
+    suspend fun getRevenueBetweenMonths(
         startTime: LocalDate,
-        endTime: LocalDate
+        endTime: LocalDate,
     ): LiveData<Map<LocalDate, Float>> {
 
         val zoneId = ZoneId.of("Asia/Ho_Chi_Minh")
+
         val startTimestamp =
-            Timestamp(startTime.with(firstDayOfMonth()).atStartOfDay(zoneId).toEpochSecond(), 0)
+            Timestamp(
+                startTime.with(firstDayOfMonth()).atStartOfDay(zoneId).toEpochSecond(),
+                0
+            )
         val endTimestamp =
-            Timestamp(endTime.with(lastDayOfMonth()).atTime(LocalTime.MAX).toEpochSecond(ZoneOffset.UTC), 0)
+            Timestamp(
+                endTime.with(lastDayOfMonth()).atTime(LocalTime.MAX).toEpochSecond(ZoneOffset.UTC),
+                0
+            )
 
-        Log.d(TAG, "startTime: ${startTime.with(firstDayOfMonth())}")
-        Log.d(TAG, "endTime: ${endTime.with(lastDayOfMonth())}")
-//        Log.d(TAG, "startTimeStamp: $startTimestamp")
-//        Log.d(TAG, "endTimeStamp: $endTimestamp")
+        val monthlyRevenue = HashMap<LocalDate, Float>()
 
-        val dataMap = HashMap<LocalDate, Float>()
-        db.collection("Rental")
+        val firebaseQueryRef = databaseRef.collection("Rental")
             .whereGreaterThanOrEqualTo("returnDate", startTimestamp)
             .whereLessThanOrEqualTo("returnDate", endTimestamp)
-            .get()
-            .addOnSuccessListener { documents ->
-                for (document in documents) {
-                    val rentalReturnTimestamp = document.get("returnDate") as Timestamp
-                    val rentalReturnDate =
-                        rentalReturnTimestamp.toDate().toInstant().atZone(zoneId).toLocalDate()
-                            .withDayOfMonth(15)
+        val firebaseQueryAsTask: Task<QuerySnapshot> = firebaseQueryRef.get()
 
-                    val totalPaymentAtCurrentLoop = dataMap[rentalReturnDate]
+        for (document in firebaseQueryAsTask.await().documents) {
+            val currentMonthAsTimestamp = document.get("returnDate") as Timestamp
+            val currentMonthAsLocalDate =
+                currentMonthAsTimestamp.toDate().toInstant().atZone(zoneId).toLocalDate()
+                    .with(firstDayOfMonth())
 
-                    if (totalPaymentAtCurrentLoop == null) {
-                        val totalPaymentAsDouble = document.getDouble("totalPayment")
-                        dataMap[rentalReturnDate] = totalPaymentAsDouble?.toFloat() ?: 0f
-                    } else {
-                        val totalPaymentAsDouble = document.getDouble("totalPayment")
-                        dataMap[rentalReturnDate] =
-                            (totalPaymentAsDouble?.toFloat() ?: 0f) + totalPaymentAtCurrentLoop
-                    }
-//                    Log.d(TAG, "Time: $rentalReturnDate - payment: ${dataMap[rentalReturnDate]} ")
-//                    Log.d(TAG, "${document.id} => ${document.data}")
-                }
-            }
-            .addOnFailureListener { exception ->
-                Log.d(TAG, "Error getting documents: ", exception)
-            }
-        Log.d(TAG, dataMap.toString())
-        return MutableLiveData(dataMap)
+            val revenueAtCurrentMonth = monthlyRevenue[currentMonthAsLocalDate]
+            val currentRentalRevenue = document.getDouble("totalPayment")
+
+            monthlyRevenue[currentMonthAsLocalDate] =
+                (currentRentalRevenue?.toFloat() ?: 0f) + (revenueAtCurrentMonth ?: 0f)
+        }
+        Log.d(
+            TAG,
+            "Called getRevenueBetweenMonths(), revenue between $startTime and $endTime : $monthlyRevenue"
+        )
+        return MutableLiveData(monthlyRevenue)
     }
 }
