@@ -1,7 +1,6 @@
 package com.haidoan.android.ceedee.ui.disk_screen.disk_titles
 
 import android.annotation.SuppressLint
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.ImageView

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/menu_disk_screen_search"
+        android:icon="@drawable/ic_round_search_24"
+        android:orderInCategory="100"
+        android:iconTint="@color/white"
+        android:title="@string/search"
+        app:showAsAction="always"
+        tools:targetApi="o"
+        tools:ignore="AlwaysShowAction">
+
+    </item>
+
+    <item
+        android:id="@+id/menu_disk_screen_filter"
+        android:icon="@drawable/ic_round_filter_alt_24"
+        android:orderInCategory="102"
+        android:iconTint="@color/white"
+        android:title="@string/filter"
+        app:showAsAction="always"
+        tools:targetApi="o">
+
+    </item>
+
+    <item
+        android:id="@+id/menu_disk_screen_cart"
+        android:icon="@drawable/ic_round_shopping_cart_24"
+        android:orderInCategory="104"
+        android:iconTint="@color/white"
+        android:title="@string/cart"
+        app:showAsAction="always"
+        tools:targetApi="o">
+    </item>
+
+</menu>

@@ -19,6 +19,12 @@
         android:paddingBottom="8dp"
         />
 
+    <ProgressBar
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/progressbar_disk_title"
+        android:visibility="visible"/>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rcv_disk_titles"
         android:layout_width="match_parent"
@@ -26,5 +32,4 @@
         android:paddingTop="16dp"
         android:paddingBottom="8dp"
         />
-
 </LinearLayout>
