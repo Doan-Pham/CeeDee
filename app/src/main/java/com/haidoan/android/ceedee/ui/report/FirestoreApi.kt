@@ -64,4 +64,48 @@ class FirestoreApi {
         )
         return MutableLiveData(monthlyRevenue)
     }
+
+    suspend fun getExpensesBetweenMonths(
+        startTime: LocalDate,
+        endTime: LocalDate,
+    ): LiveData<Map<LocalDate, Float>> {
+
+        val zoneId = ZoneId.of("Asia/Ho_Chi_Minh")
+
+        val startTimestamp =
+            Timestamp(
+                startTime.with(firstDayOfMonth()).atStartOfDay(zoneId).toEpochSecond(),
+                0
+            )
+        val endTimestamp =
+            Timestamp(
+                endTime.with(lastDayOfMonth()).atTime(LocalTime.MAX).toEpochSecond(ZoneOffset.UTC),
+                0
+            )
+
+        val monthlyExpenses = HashMap<LocalDate, Float>()
+
+        val firebaseQueryRef = databaseRef.collection("Import")
+            .whereGreaterThanOrEqualTo("date", startTimestamp)
+            .whereLessThanOrEqualTo("date", endTimestamp)
+        val firebaseQueryAsTask: Task<QuerySnapshot> = firebaseQueryRef.get()
+
+        for (document in firebaseQueryAsTask.await().documents) {
+            val currentMonthAsTimestamp = document.get("date") as Timestamp
+            val currentMonthAsLocalDate =
+                currentMonthAsTimestamp.toDate().toInstant().atZone(zoneId).toLocalDate()
+                    .with(firstDayOfMonth())
+
+            val expensesAtCurrentMonth = monthlyExpenses[currentMonthAsLocalDate]
+            val currentRentalExpenses = document.getDouble("totalPayment")
+
+            monthlyExpenses[currentMonthAsLocalDate] =
+                (currentRentalExpenses?.toFloat() ?: 0f) + (expensesAtCurrentMonth ?: 0f)
+        }
+        Log.d(
+            TAG,
+            "Called getExpensesBetweenMonths(), expenses between $startTime and $endTime : $monthlyExpenses"
+        )
+        return MutableLiveData(monthlyExpenses)
+    }
 }

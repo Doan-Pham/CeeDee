@@ -19,8 +19,13 @@ class ReportViewModel(application: Application, private val reportRepository: Re
     val monthlyRevenue: LiveData<Map<LocalDate, Float>>
         get() = _monthlyRevenue
 
+    private val _monthlyExpenses = MutableLiveData<Map<LocalDate, Float>>()
+    val monthlyExpenses: LiveData<Map<LocalDate, Float>>
+        get() = _monthlyExpenses
+
     init {
         refreshMonthlyRevenue()
+        refreshMonthlyExpenses()
     }
 
     private fun refreshMonthlyRevenue(
@@ -35,6 +40,17 @@ class ReportViewModel(application: Application, private val reportRepository: Re
         )
     }
 
+    private fun refreshMonthlyExpenses(
+    ) {
+        viewModelScope.launch {
+            _monthlyExpenses.value =
+                reportRepository.getExpensesBetweenMonths(startTime, endTime).value
+        }
+        Log.d(
+            TAG,
+            "Called refreshMonthlyExpenses(), expenses between $startTime and $endTime after refresh: ${_monthlyExpenses.value.toString()}"
+        )
+    }
     fun setMonthsPeriod(
         startTime: LocalDate = LocalDate.now(),
         endTime: LocalDate = LocalDate.now()
@@ -42,6 +58,7 @@ class ReportViewModel(application: Application, private val reportRepository: Re
         this.startTime = startTime.with(TemporalAdjusters.firstDayOfMonth())
         this.endTime = endTime.with(TemporalAdjusters.lastDayOfMonth())
         refreshMonthlyRevenue()
+        refreshMonthlyExpenses()
     }
 
     class Factory(val app: Application, private val reportRepository: ReportRepository) :
