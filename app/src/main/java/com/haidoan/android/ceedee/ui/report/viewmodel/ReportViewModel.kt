@@ -1,8 +1,9 @@
-package com.haidoan.android.ceedee.ui.report
+package com.haidoan.android.ceedee.ui.report.viewmodel
 
 import android.app.Application
 import android.util.Log
 import androidx.lifecycle.*
+import com.haidoan.android.ceedee.data.report.ReportRepository
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.temporal.TemporalAdjusters

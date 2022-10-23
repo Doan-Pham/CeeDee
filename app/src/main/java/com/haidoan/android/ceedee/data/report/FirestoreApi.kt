@@ -1,4 +1,4 @@
-package com.haidoan.android.ceedee.ui.report
+package com.haidoan.android.ceedee.data.report
 
 import android.util.Log
 import androidx.lifecycle.LiveData
