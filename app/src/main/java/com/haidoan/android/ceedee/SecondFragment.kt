@@ -44,23 +44,13 @@ class SecondFragment : Fragment() {
         menuHost.addMenuProvider(object : MenuProvider {
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
                 // Add menu items here
+                //menu.findItem(R.id.action_settings).isVisible=false
                 menuInflater.inflate(R.menu.menu_disk_titles, menu)
             }
 
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
                 // Handle the menu selection
                 return true
-                /*return when (menuItem.itemId) {
-                        R.id.menu_clear -> {
-                            // clearCompletedTasks()
-                            true
-                        }
-                        R.id.menu_refresh -> {
-                            // loadTasks(true)
-                            true
-                        }
-                        else -> false
-                    }*/
             }
         }, viewLifecycleOwner, Lifecycle.State.RESUMED)
     }

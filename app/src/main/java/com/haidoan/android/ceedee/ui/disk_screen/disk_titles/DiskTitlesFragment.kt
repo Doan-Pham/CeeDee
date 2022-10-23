@@ -24,9 +24,10 @@ import kotlinx.android.synthetic.main.fragment_second.*
 
 class DiskTitlesFragment : Fragment() {
     private var _binding: FragmentDiskTitlesBinding? = null
-    private val diskTitleAdapter by lazy{ DiskTitlesAdapter() }
+    private val diskTitleAdapter by lazy { DiskTitlesAdapter() }
 
     private lateinit var diskTitlesViewModel: DiskTitlesViewModel
+
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
@@ -37,12 +38,8 @@ class DiskTitlesFragment : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         _binding = FragmentDiskTitlesBinding.inflate(inflater, container, false)
-
+        createMenu()
         return binding.root
-    }
-
-    private fun destroyMenu() {
-       // requireActivity().toolbar.removeMenuProvider(menuHost)
     }
 
     @SuppressLint("UseCompatLoadingForDrawables")
@@ -54,103 +51,85 @@ class DiskTitlesFragment : Fragment() {
             when (response) {
                 is Response.Loading -> {
                     //Load a ProgressBar
-                    binding.progressbarDiskTitle.visibility=View.VISIBLE
-                    Log.d("TAG","LOADING...")
+                    binding.progressbarDiskTitle.visibility = View.VISIBLE
+                    Log.d("TAG", "LOADING...")
                 }
                 is Response.Success -> {
                     val postList = response.data
                     //Do what you need to do with your list
                     //Hide the ProgressBar
-                    binding.progressbarDiskTitle.visibility=View.GONE
+                    binding.progressbarDiskTitle.visibility = View.GONE
                     diskTitleAdapter.differ().submitList(postList)
                 }
                 is Response.Failure -> {
                     print(response.errorMessage)
                     //Hide the ProgressBar
-                    binding.progressbarDiskTitle.visibility=View.GONE
-                    Log.d("TAG","FAILURE")
+                    binding.progressbarDiskTitle.visibility = View.GONE
+                    Log.d("TAG", "FAILURE")
                 }
             }
         }
 
         binding.apply {
             rcvDiskTitles.apply {
-                layoutManager= LinearLayoutManager(activity)
-                adapter=diskTitleAdapter
+                layoutManager = LinearLayoutManager(activity)
+                adapter = diskTitleAdapter
             }
         }
-
         addListeners()
     }
 
-    override fun onResume() {
-        super.onResume()
-        addListeners()
-    }
-
-    private fun addListeners(){
-        requireActivity().toolbar.setOnMenuItemClickListener(Toolbar.OnMenuItemClickListener {
-            when (it.itemId) {
-                R.id.menu_disk_screen_cart -> {
-                    Log.d("TAG_MENU","DISKTITLE_CART")
-                    true
-                }
-                R.id.menu_disk_screen_filter -> {
-                    Log.d("TAG_MENU","DISKTITLE_FILTER")
-                    true
-                }
-                R.id.menu_disk_screen_search -> {
-                    Log.d("TAG_MENU","DISKTITLE_SEARCH")
-                    true
-                }
-                else -> false
+    private fun addListeners() {
+        diskTitleAdapter.setIOnItemClickListener(object : IOnItemClickListener {
+            override fun onItemClick(position: Int) {
+                Log.d(
+                    "TAG_ADAPTER",
+                    "pos: " + position.toString() + "name: " + diskTitleAdapter.getItem(position).name
+                )
             }
         })
-
-        diskTitleAdapter.setIOnItemClickListener(object: IOnItemClickListener {
+        diskTitleAdapter.setIOnItemMoreClickListener(object : IOnItemClickListener {
             override fun onItemClick(position: Int) {
-                Log.d("TAG_ADAPTER","pos: "+ position.toString() + "name: " + diskTitleAdapter.getItem(position).name)
-            }
-        })
-        diskTitleAdapter.setIOnItemMoreClickListener(object: IOnItemClickListener {
-            override fun onItemClick(position: Int) {
-                Log.d("TAG_ADAPTER","pos: "+ position.toString() + "name: " + diskTitleAdapter.getItem(position).name)
+                Log.d(
+                    "TAG_ADAPTER",
+                    "pos: " + position.toString() + "name: " + diskTitleAdapter.getItem(position).name
+                )
             }
         })
     }
 
     private fun createMenu() {
-       requireActivity().toolbar.addMenuProvider(object : MenuProvider {
+        requireActivity().toolbar.addMenuProvider(object : MenuProvider {
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
                 // Add menu items here
-                menuInflater.inflate(R.menu.menu_disk_titles, menu)
+                menu.findItem(R.id.menu_disk_tab_filter).isVisible=false
+               menu.findItem(R.id.menu_disk_screen_filter).isVisible = true
             }
 
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
                 // Handle the menu selection
-                return true
-                /*return when (menuItem.itemId) {
-                        R.id.menu_clear -> {
-                            // clearCompletedTasks()
-                            true
-                        }
-                        R.id.menu_refresh -> {
-                            // loadTasks(true)
-                            true
-                        }
-                        else -> false
-                    }*/
+                return when (menuItem.itemId) {
+                    R.id.menu_disk_screen_cart -> {
+                        Log.d("TAG_MENU", "DISKTITLE_CART")
+                        true
+                    }
+                    R.id.menu_disk_screen_filter -> {
+                        Log.d("TAG_MENU", "DISKTITLE_FILTER")
+                        true
+                    }
+                    R.id.menu_disk_screen_search -> {
+                        Log.d("TAG_MENU", "DISKTITLE_SEARCH")
+                        true
+                    }
+                    else -> false
+                }
             }
         }, viewLifecycleOwner, Lifecycle.State.RESUMED)
     }
 
-
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-
-        //destroyMenu()
-        //toolbar.menu.add()
     }
 
 }
