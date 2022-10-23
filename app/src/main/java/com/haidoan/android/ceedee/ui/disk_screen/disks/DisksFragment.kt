@@ -41,23 +41,22 @@ class DisksFragment : Fragment() {
         requireActivity().toolbar.addMenuProvider(object : MenuProvider {
                 override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
                     // Add menu items here
-                    //menu.getItem(R.id.menu_disk_screen_filter).isVisible=false
-                    menu.findItem(R.id.menu_disk_tab_filter).isVisible=true
-                    menu.findItem(R.id.menu_disk_screen_filter).isVisible = false
+                    menu.clear()
+                    menuInflater.inflate(R.menu.menu_disks,menu)
                 }
 
                 override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
                     // Handle the menu selection
                     return when (menuItem.itemId) {
-                        R.id.menu_disk_screen_cart -> {
+                        R.id.menu_disks_cart -> {
                             Log.d("TAG_MENU", "DISK_CART")
                             true
                         }
-                        R.id.menu_disk_tab_filter -> {
+                        R.id.menu_disks_tab_filter -> {
                             Log.d("TAG_MENU", "DISK_FILTER")
                             true
                         }
-                        R.id.menu_disk_screen_search -> {
+                        R.id.menu_disks_search -> {
                             Log.d("TAG_MENU", "DISK_SEARCH")
                             true
                         }

@@ -51,7 +51,7 @@
             android:text="Kid A" />
 
         <TextView
-            android:id="@+id/tv_disk_titles_genre"
+            android:id="@+id/tv_disk_titles_author"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
 

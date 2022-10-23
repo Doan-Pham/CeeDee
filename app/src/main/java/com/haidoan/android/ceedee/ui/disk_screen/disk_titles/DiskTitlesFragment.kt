@@ -102,22 +102,32 @@ class DiskTitlesFragment : Fragment() {
         requireActivity().toolbar.addMenuProvider(object : MenuProvider {
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
                 // Add menu items here
-                menu.findItem(R.id.menu_disk_tab_filter).isVisible=false
-               menu.findItem(R.id.menu_disk_screen_filter).isVisible = true
+                menu.clear()
+                menuInflater.inflate(R.menu.menu_disk_titles,menu)
+            }
+
+            override fun onPrepareMenu(menu: Menu) {
+                super.onPrepareMenu(menu)
+/*
+                val menu1 = menu
+                    .add(Menu.NONE, 1, Menu.NONE, null)
+                    .setIcon(R.drawable.ic_app_logo)
+                    .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_IF_ROOM)
+                menu.findItem(R.id.disk_title_tab_filter_by_genre).subMenu.add(menu1)*/
             }
 
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
                 // Handle the menu selection
                 return when (menuItem.itemId) {
-                    R.id.menu_disk_screen_cart -> {
+                    R.id.menu_disk_titles_cart -> {
                         Log.d("TAG_MENU", "DISKTITLE_CART")
                         true
                     }
-                    R.id.menu_disk_screen_filter -> {
+                    R.id.menu_disk_titles_filter -> {
                         Log.d("TAG_MENU", "DISKTITLE_FILTER")
                         true
                     }
-                    R.id.menu_disk_screen_search -> {
+                    R.id.menu_disk_titles_search -> {
                         Log.d("TAG_MENU", "DISKTITLE_SEARCH")
                         true
                     }

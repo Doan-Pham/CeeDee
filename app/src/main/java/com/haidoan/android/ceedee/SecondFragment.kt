@@ -36,7 +36,7 @@ class SecondFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         createTabLayout()
-        createMenu()
+        //createMenu()
     }
 
     private fun createMenu() {

@@ -24,4 +24,13 @@
     <string name="filter">Filter</string>
     <string name="cart">Cart</string>
     <string name="more">More</string>
+    <string name="sort_by">Sort by</string>
+    <string name="ascending">Ascending</string>
+    <string name="descending">Descending</string>
+    <string name="name">Name</string>
+    <string name="cd_amount">CD amount</string>
+    <string name="genre">Genre</string>
+    <string name="sort_by_name">Sort by name</string>
+    <string name="sort_by_cd_amount">Sort by CD amount</string>
+    <string name="filter_by_genre">Filter by Genre</string>
 </resources>

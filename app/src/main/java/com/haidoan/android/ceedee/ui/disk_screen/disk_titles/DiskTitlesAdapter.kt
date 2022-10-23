@@ -1,7 +1,9 @@
 package com.haidoan.android.ceedee.ui.disk_screen.disk_titles
 
 import android.annotation.SuppressLint
+import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.core.net.toUri
@@ -13,6 +15,8 @@ import com.haidoan.android.ceedee.R
 
 import com.haidoan.android.ceedee.data.DiskTitle
 import com.haidoan.android.ceedee.databinding.DiskTitlesItemBinding
+import com.haidoan.android.ceedee.utils.GenreUtils
+import kotlinx.coroutines.runBlocking
 
 class DiskTitlesAdapter : RecyclerView.Adapter<DiskTitlesAdapter.DiskTitlesViewHolder>() {
 
@@ -50,8 +54,8 @@ class DiskTitlesAdapter : RecyclerView.Adapter<DiskTitlesAdapter.DiskTitlesViewH
         fun setData(item: DiskTitle) {
             binding.apply {
                 bindImage(imgDiskTitlesCoverImg,item.coverImageUrl)
-                tvDiskTitlesAmount.text = item.author
-                tvDiskTitlesGenre.text = item.genreId
+                tvDiskTitlesAmount.text = "amount"
+                tvDiskTitlesAuthor.text = item.author
                 tvDiskTitlesName.text = item.name
             }
         }
