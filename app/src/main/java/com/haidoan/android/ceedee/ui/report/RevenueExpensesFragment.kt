@@ -165,9 +165,8 @@ class RevenueExpensesFragment : Fragment() {
         xAxis.granularity = 1f
         xAxis.textSize = 14f
         xAxis.axisMinimum = BAR_CHART_MIN_X_DEFAULT
-        xAxis.axisMaximum =
-            getMonthCountBetween(startMonth, startYear, endMonth, endYear).toFloat() + 1
-        xAxis.valueFormatter = MonthYearXAxisValueFormatter()
+        xAxis.valueFormatter = MonthYearXAxisValueFormatter(startMonth, startYear)
+        //xAxis.setAvoidFirstLastClipping(true)
 
         val leftAxis = lineChart.axisLeft
         leftAxis.textSize = CHART_TEXT_SIZE
@@ -187,8 +186,6 @@ class RevenueExpensesFragment : Fragment() {
         lineChart.isHighlightPerTapEnabled = false
         lineChart.isHighlightPerDragEnabled = false
         lineChart.description.isEnabled = false
-        //lineChart.clipToOutline = true
-        lineChart.clipToPadding = true
         lineChart.setVisibleXRangeMaximum(4f)
         //Have to call notifyDataSetChanged for the UI change to take place immediately
         lineChart.notifyDataSetChanged()
@@ -272,7 +269,7 @@ class RevenueExpensesFragment : Fragment() {
         // Needs to add 1 to show all bars
         xAxis.axisMaximum =
             getMonthCountBetween(startMonth, startYear, endMonth, endYear).toFloat() + 1
-        xAxis.valueFormatter = MonthYearXAxisValueFormatter()
+        xAxis.valueFormatter = MonthYearXAxisValueFormatter(startMonth, startYear)
 
         val leftAxis = barChart.axisLeft
         leftAxis.textSize = CHART_TEXT_SIZE

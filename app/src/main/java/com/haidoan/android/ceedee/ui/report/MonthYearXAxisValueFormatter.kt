@@ -4,8 +4,8 @@ import com.github.mikephil.charting.components.AxisBase
 import com.github.mikephil.charting.formatter.ValueFormatter
 
 class MonthYearXAxisValueFormatter(
-    private val startMonth: Int = 10,
-    private val startYear: Int = 2022
+    private val startMonth: Int,
+    private val startYear: Int
 ) : ValueFormatter() {
 
     private val MONTH_COUNT_PER_YEAR = 12
