@@ -26,6 +26,7 @@ private const val BAR_CHART_BAR_SPACE = 0.02f
 private const val BAR_CHAR_GROUP_SPACE = 0.06f
 private const val BAR_CHART_MIN_X_DEFAULT = 0f
 private const val CHART_TEXT_SIZE = 12f
+private const val TAG = "RevenueExpensesFragment"
 
 // Some methods for chart styling doesn't allow R.color
 private val CHART_COLOR_FIRST = Color.rgb(228, 86, 33)
@@ -77,6 +78,7 @@ class RevenueExpensesFragment : Fragment() {
         barChart = binding.barChart
         lineChart = binding.lineChart
         styleLineChart()
+        //styleBarChart()
 
         val displayedStartTime = "$startMonth/$startYear"
         binding.textviewStartMonth.text = displayedStartTime
@@ -135,30 +137,32 @@ class RevenueExpensesFragment : Fragment() {
             if (lineChart.visibility == View.VISIBLE) {
                 styleLineChart()
                 fillLineChartData(it, null)
-                revenueDataCache.clear()
-                revenueDataCache.putAll(it)
-            } else {
-
+            } else if (barChart.visibility == View.VISIBLE) {
+                styleBarChart()
+                fillBarChartData(it, null)
             }
+            revenueDataCache.clear()
+            revenueDataCache.putAll(it)
         }
 
         viewModel.monthlyExpenses.observe(viewLifecycleOwner) {
             if (lineChart.visibility == View.VISIBLE) {
                 styleLineChart()
                 fillLineChartData(null, it)
-                expensesDataCache.clear()
-                expensesDataCache.putAll(it)
-            } else {
-
+            } else if (barChart.visibility == View.VISIBLE) {
+                styleBarChart()
+                fillBarChartData(null, it)
             }
+            expensesDataCache.clear()
+            expensesDataCache.putAll(it)
         }
     }
 
     private fun styleLineChart() {
         val xAxis = lineChart.xAxis
-        xAxis.position = XAxis.XAxisPosition.BOTTOM;
+        xAxis.position = XAxis.XAxisPosition.BOTTOM
         xAxis.setDrawGridLines(false)
-        xAxis.granularity = 1f;
+        xAxis.granularity = 1f
         xAxis.textSize = 14f
         xAxis.axisMinimum = BAR_CHART_MIN_X_DEFAULT
         xAxis.axisMaximum =
@@ -183,18 +187,22 @@ class RevenueExpensesFragment : Fragment() {
         lineChart.isHighlightPerTapEnabled = false
         lineChart.isHighlightPerDragEnabled = false
         lineChart.description.isEnabled = false
+        //lineChart.clipToOutline = true
+        lineChart.clipToPadding = true
         lineChart.setVisibleXRangeMaximum(4f)
         //Have to call notifyDataSetChanged for the UI change to take place immediately
         lineChart.notifyDataSetChanged()
         lineChart.invalidate()
 
-        Log.d("RevenueExpensesFragment", "style line called")
+        Log.d(TAG, "style line called")
     }
 
     private fun fillLineChartData(
         revenueDataNew: Map<LocalDate, Float>?,
         expensesDataNew: Map<LocalDate, Float>?
     ) {
+        Log.d(TAG, "Starting fillLineChartData()")
+
         // Use new data if it exists, else use data cache
         val revenueDataFinal: Map<LocalDate, Float> = revenueDataNew ?: revenueDataCache
 
@@ -213,7 +221,7 @@ class RevenueExpensesFragment : Fragment() {
                 )
             )
         }
-        Log.d("RevenueExpensesFragment", revenueDataFinal.entries.toString())
+        Log.d(TAG, "revenueDataFinal: $revenueDataFinal")
 
         val expensesChartEntries = mutableListOf<Entry>()
 
@@ -233,15 +241,15 @@ class RevenueExpensesFragment : Fragment() {
                 )
             )
         }
-        Log.d("RevenueExpensesFragment", expensesDataFinal.entries.toString())
+        Log.d(TAG, "expensesDataFinal: $expensesDataFinal")
 
         val dataSetRevenue = LineDataSet(revenueChartEntries, "Revenue")
         dataSetRevenue.color = CHART_COLOR_FIRST
-        dataSetRevenue.axisDependency = YAxis.AxisDependency.LEFT;
+        dataSetRevenue.axisDependency = YAxis.AxisDependency.LEFT
 
         val dataSetExpenses = LineDataSet(expensesChartEntries, "Expenses")
         dataSetExpenses.color = CHART_COLOR_SECOND
-        dataSetExpenses.axisDependency = YAxis.AxisDependency.LEFT;
+        dataSetExpenses.axisDependency = YAxis.AxisDependency.LEFT
 
         lineChart.clear()
         lineChart.data = LineData(dataSetRevenue, dataSetExpenses)
@@ -249,20 +257,21 @@ class RevenueExpensesFragment : Fragment() {
         lineChart.data.setValueFormatter(LargeValueFormatter())
         lineChart.notifyDataSetChanged()
         lineChart.invalidate()
-        Log.d("RevenueExpensesFragment", "fill line called")
+
+        Log.d(TAG, "fillLineChartData() called")
     }
 
-    private fun styleAndDrawBarChart() {
+    private fun styleBarChart() {
         val xAxis = barChart.xAxis
-        xAxis.position = XAxis.XAxisPosition.BOTTOM;
+        xAxis.position = XAxis.XAxisPosition.BOTTOM
         xAxis.setDrawGridLines(false)
         xAxis.setCenterAxisLabels(true)
-        xAxis.granularity = 1f;
+        xAxis.granularity = 1f
         xAxis.textSize = 14f
         xAxis.axisMinimum = BAR_CHART_MIN_X_DEFAULT
         // Needs to add 1 to show all bars
         xAxis.axisMaximum =
-            getMonthCountBetween(startMonth, startYear, endMonth, endYear).toFloat()
+            getMonthCountBetween(startMonth, startYear, endMonth, endYear).toFloat() + 1
         xAxis.valueFormatter = MonthYearXAxisValueFormatter()
 
         val leftAxis = barChart.axisLeft
@@ -281,48 +290,83 @@ class RevenueExpensesFragment : Fragment() {
         legend.textSize = CHART_TEXT_SIZE
 
         barChart.setScaleEnabled(false)
-        barChart.data.setValueTextSize(CHART_TEXT_SIZE)
         barChart.isHighlightPerTapEnabled = false
+        barChart.isHighlightFullBarEnabled = false
+        barChart.isHighlightPerDragEnabled = false
         barChart.description.isEnabled = false
         barChart.setVisibleXRangeMaximum(4f)
-        barChart.groupBars(BAR_CHART_MIN_X_DEFAULT, BAR_CHAR_GROUP_SPACE, BAR_CHART_BAR_SPACE)
-        barChart.invalidate()
     }
 
-    private fun fillBarChartData() {
+    private fun fillBarChartData(
+        revenueDataNew: Map<LocalDate, Float>?,
+        expensesDataNew: Map<LocalDate, Float>?
+    ) {
+        // Use new data if it exists, else use data cache
+        val revenueDataFinal: Map<LocalDate, Float> = revenueDataNew ?: revenueDataCache
 
-        //TODO: Add logic for retrieving data
-        val entries = mutableListOf<BarEntry>()
-        entries.add(BarEntry(0F, 2000000F))
-        entries.add(BarEntry(1F, 2000000F))
-        entries.add(BarEntry(2F, 1500000F))
-        entries.add(BarEntry(3F, 500F))
-        entries.add(BarEntry(4F, 500F))
-        entries.add(BarEntry(5F, 500F))
+        val revenueChartEntries = mutableListOf<BarEntry>()
 
-        val entriesb = mutableListOf<BarEntry>()
-        entriesb.add(BarEntry(0F, 3000F))
-        entriesb.add(BarEntry(1F, -1500000f))
-        entriesb.add(BarEntry(2F, 800F))
-        entriesb.add(BarEntry(3F, 800F))
-        entriesb.add(BarEntry(4F, 800F))
-        entriesb.add(BarEntry(5F, 800F))
+        revenueDataFinal.forEach { (key, value) ->
+            revenueChartEntries.add(
+                BarEntry(
+                    getMonthCountBetween(
+                        startMonth,
+                        startYear,
+                        key.monthValue,
+                        key.year,
+                    ).toFloat(),
+                    value
+                )
+            )
+        }
+        Log.d(TAG, revenueDataFinal.entries.toString())
 
-        val dataSet = BarDataSet(entries, "Income")
-        dataSet.color = CHART_COLOR_FIRST
-        val dataSetB = BarDataSet(entriesb, "Expenses")
-        dataSetB.color = CHART_COLOR_SECOND
+        val expensesChartEntries = mutableListOf<BarEntry>()
 
-        val barData = BarData(dataSet, dataSetB)
+        // Use new data if it exists, else use cached data
+        val expensesDataFinal: Map<LocalDate, Float> = expensesDataNew ?: expensesDataCache
+
+        expensesDataFinal.forEach { (key, value) ->
+            expensesChartEntries.add(
+                BarEntry(
+                    getMonthCountBetween(
+                        startMonth,
+                        startYear,
+                        key.monthValue,
+                        key.year,
+                    ).toFloat(),
+                    value
+                )
+            )
+        }
+
+        val dataSetRevenue = BarDataSet(revenueChartEntries, "Revenue")
+        dataSetRevenue.color = CHART_COLOR_FIRST
+
+        val dataSetExpenses = BarDataSet(expensesChartEntries, "Expenses")
+        dataSetExpenses.color = CHART_COLOR_SECOND
+
+        val barData = BarData(dataSetRevenue, dataSetExpenses)
         barData.barWidth = BAR_CHART_BAR_WIDTH
 
+        barChart.clear()
         barChart.data = barData
+        barChart.data.setValueTextSize(CHART_TEXT_SIZE)
+        barChart.data.setValueFormatter(LargeValueFormatter())
+
+        barChart.groupBars(BAR_CHART_MIN_X_DEFAULT, BAR_CHAR_GROUP_SPACE, BAR_CHART_BAR_SPACE)
+        barChart.notifyDataSetChanged()
+        barChart.invalidate()
     }
 
     private fun onMonthYearChanged() {
         viewModel.setMonthsPeriod(
             LocalDate.of(startYear, startMonth, 15),
             LocalDate.of(endYear, endMonth, 15)
+        )
+        Log.d(
+            TAG,
+            "onMonthYearChanged() called, startMonth: $startMonth, startYear: $startYear, endMonth: $endMonth, endYear: $endYear"
         )
     }
 
