@@ -36,7 +36,7 @@ class SecondFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         createTabLayout()
-        //createMenu()
+        createMenu()
     }
 
     private fun createMenu() {
@@ -44,8 +44,7 @@ class SecondFragment : Fragment() {
         menuHost.addMenuProvider(object : MenuProvider {
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
                 // Add menu items here
-                //menu.findItem(R.id.action_settings).isVisible=false
-                menuInflater.inflate(R.menu.menu_disk_titles, menu)
+                menu.clear()
             }
 
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean {

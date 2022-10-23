@@ -20,4 +20,10 @@ class DiskTitlesViewModel(application: Application) : AndroidViewModel(applicati
         }
     }
 
+    fun getGenres() = liveData(Dispatchers.IO) {
+        diskTitlesRepository.getGenresFromFireStore().collect { response ->
+            emit(response)
+        }
+    }
+
 }

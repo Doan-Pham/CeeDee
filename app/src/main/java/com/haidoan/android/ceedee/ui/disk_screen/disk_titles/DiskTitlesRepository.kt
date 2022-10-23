@@ -11,6 +11,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QueryDocumentSnapshot
 
 import com.haidoan.android.ceedee.data.DiskTitle
+import com.haidoan.android.ceedee.data.Genre
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.catch
@@ -22,7 +23,7 @@ class DiskTitlesRepository(private val application: Application) {
     private val db: FirebaseFirestore = FirebaseFirestore.getInstance()
 
     private var queryDiskTitle: CollectionReference = db.collection("DiskTitle")
-
+    private var queryGenre: CollectionReference = db.collection("Genre")
     init {
 
     }
@@ -39,22 +40,17 @@ class DiskTitlesRepository(private val application: Application) {
         }
     }
 
-  /*  private fun getDiskTitleFromDocument(document: QueryDocumentSnapshot): DiskTitle {
-        val id = document.id
-        val genreId = document.data["genreId"]
-        val name = document.data["name"]
-        val author = document.data["author"]
-        val description = document.data["description"]
-        val imgUrl = document.data["coverImageUrl"]
-        return DiskTitle(
-            id = id,
-            genreId = genreId as String,
-            name = name as String,
-            author = author as String,
-            description = description as String,
-            coverImageURL = imgUrl as String
-        )
-    }*/
+    fun getGenresFromFireStore() = flow {
+        emit(Response.Loading())
+        emit(Response.Success(queryGenre.get().await().documents.mapNotNull { doc ->
+            Log.d("TAG", "GET POST SUCCESS")
+            doc.toObject(Genre::class.java)
+        }))
+    }. catch { error ->
+        error.message?.let { errorMessage ->
+            emit(Response.Failure(errorMessage))
+        }
+    }
 
 /*
     fun getDiskTitleListMutableLiveData() : MutableLiveData<ArrayList<DiskTitle>> {

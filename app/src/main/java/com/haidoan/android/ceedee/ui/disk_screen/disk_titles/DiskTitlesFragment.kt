@@ -10,16 +10,22 @@ import androidx.core.view.MenuHost
 
 import androidx.fragment.app.Fragment
 import androidx.core.view.MenuProvider
+import androidx.core.view.get
 import androidx.lifecycle.Lifecycle
 
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.haidoan.android.ceedee.MainActivity
 import com.haidoan.android.ceedee.R
-
+import com.haidoan.android.ceedee.data.Genre
 import com.haidoan.android.ceedee.databinding.FragmentDiskTitlesBinding
+import com.haidoan.android.ceedee.utils.GenreUtils
+import com.haidoan.android.ceedee.utils.HashUtils
+
+
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_second.*
+import kotlinx.coroutines.runBlocking
 
 
 class DiskTitlesFragment : Fragment() {
@@ -32,13 +38,14 @@ class DiskTitlesFragment : Fragment() {
     // onDestroyView.
     private val binding get() = _binding!!
 
+    private var listGenre: ArrayList<Genre> = ArrayList()
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
         _binding = FragmentDiskTitlesBinding.inflate(inflater, container, false)
-        createMenu()
         return binding.root
     }
 
@@ -55,16 +62,36 @@ class DiskTitlesFragment : Fragment() {
                     Log.d("TAG", "LOADING...")
                 }
                 is Response.Success -> {
-                    val postList = response.data
+                    val list = response.data
                     //Do what you need to do with your list
                     //Hide the ProgressBar
                     binding.progressbarDiskTitle.visibility = View.GONE
-                    diskTitleAdapter.differ().submitList(postList)
+                    diskTitleAdapter.differ().submitList(list)
                 }
                 is Response.Failure -> {
                     print(response.errorMessage)
                     //Hide the ProgressBar
                     binding.progressbarDiskTitle.visibility = View.GONE
+                    Log.d("TAG", "FAILURE")
+                }
+            }
+        }
+        diskTitlesViewModel.getGenres().observe(viewLifecycleOwner) { response ->
+            when (response) {
+                is Response.Loading -> {
+                    //Load a ProgressBar
+                    Log.d("TAG", "LOADING...")
+                }
+                is Response.Success -> {
+                    val list = response.data
+                    //Do what you need to do with your list
+                    //Hide the ProgressBar
+                    listGenre.addAll(list)
+                    createMenu()
+                }
+                is Response.Failure -> {
+                    print(response.errorMessage)
+                    //Hide the ProgressBar
                     Log.d("TAG", "FAILURE")
                 }
             }
@@ -99,21 +126,30 @@ class DiskTitlesFragment : Fragment() {
     }
 
     private fun createMenu() {
-        requireActivity().toolbar.addMenuProvider(object : MenuProvider {
+        (requireActivity() as MainActivity).toolbar.addMenuProvider(object : MenuProvider {
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
                 // Add menu items here
                 menu.clear()
-                menuInflater.inflate(R.menu.menu_disk_titles,menu)
+                menuInflater.inflate(R.menu.menu_disk_titles, menu)
             }
 
             override fun onPrepareMenu(menu: Menu) {
-                super.onPrepareMenu(menu)
-/*
-                val menu1 = menu
-                    .add(Menu.NONE, 1, Menu.NONE, null)
-                    .setIcon(R.drawable.ic_app_logo)
-                    .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_IF_ROOM)
-                menu.findItem(R.id.disk_title_tab_filter_by_genre).subMenu.add(menu1)*/
+                //super.onPrepareMenu(menu)
+                var id = 1
+                for (item in listGenre) {
+                    try {
+                        if (menu.findItem(id) == null) {
+                            menu.findItem(R.id.disk_title_tab_filter_by_genre)
+                                .subMenu!!
+                                .add(Menu.NONE, id++ , Menu.NONE, item.name)
+                                .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_NEVER)
+                            Log.d("TAG_ID",id.toString())
+                        }
+
+                    } catch (exception: Exception) {
+                        println(exception.message)
+                    }
+                }
             }
 
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
