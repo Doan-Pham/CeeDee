@@ -1,4 +1,4 @@
-package com.haidoan.android.ceedee.ui.report
+package com.haidoan.android.ceedee.data.report
 
 import androidx.lifecycle.LiveData
 import kotlinx.coroutines.Dispatchers

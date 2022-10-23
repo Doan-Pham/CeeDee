@@ -1,4 +1,4 @@
-package com.haidoan.android.ceedee.ui.report
+package com.haidoan.android.ceedee.ui.report.util
 
 import com.github.mikephil.charting.components.AxisBase
 import com.github.mikephil.charting.formatter.ValueFormatter

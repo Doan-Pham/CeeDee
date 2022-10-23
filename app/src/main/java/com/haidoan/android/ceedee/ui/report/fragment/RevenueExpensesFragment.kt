@@ -1,4 +1,4 @@
-package com.haidoan.android.ceedee.ui.report
+package com.haidoan.android.ceedee.ui.report.fragment
 
 import android.graphics.Color
 import android.os.Bundle
@@ -17,7 +17,11 @@ import com.github.mikephil.charting.components.YAxis
 import com.github.mikephil.charting.data.*
 import com.github.mikephil.charting.formatter.LargeValueFormatter
 import com.haidoan.android.ceedee.MonthYearPickerDialog
+import com.haidoan.android.ceedee.data.report.FirestoreApi
+import com.haidoan.android.ceedee.data.report.ReportRepository
 import com.haidoan.android.ceedee.databinding.FragmentRevenueExpensesBinding
+import com.haidoan.android.ceedee.ui.report.util.MonthYearXAxisValueFormatter
+import com.haidoan.android.ceedee.ui.report.viewmodel.ReportViewModel
 import java.time.LocalDate
 import java.util.*
 
@@ -165,6 +169,10 @@ class RevenueExpensesFragment : Fragment() {
         xAxis.granularity = 1f
         xAxis.textSize = 14f
         xAxis.axisMinimum = BAR_CHART_MIN_X_DEFAULT
+        xAxis.axisMaximum =
+            if (getMonthCountBetween(startMonth, startYear, endMonth, endYear).toFloat() > 1)
+                getMonthCountBetween(startMonth, startYear, endMonth, endYear).toFloat() + 1
+            else BAR_CHART_MIN_X_DEFAULT + 1
         xAxis.valueFormatter = MonthYearXAxisValueFormatter(startMonth, startYear)
         //xAxis.setAvoidFirstLastClipping(true)
 
