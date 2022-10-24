@@ -1,15 +1,11 @@
 package com.haidoan.android.ceedee.ui.disk_screen.disk_titles
 
 import android.annotation.SuppressLint
-import android.app.Application
-import android.content.Context
 import android.util.Log
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.core.net.toUri
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
@@ -19,9 +15,7 @@ import com.haidoan.android.ceedee.R
 
 import com.haidoan.android.ceedee.data.DiskTitle
 import com.haidoan.android.ceedee.databinding.DiskTitlesItemBinding
-import com.haidoan.android.ceedee.utils.GenreUtils
 import com.haidoan.android.ceedee.utils.TypeUtils
-import kotlinx.coroutines.runBlocking
 
 class DiskTitlesAdapter(_diskTitlesViewModel: DiskTitlesViewModel,
                         _viewLifecycleOwner: LifecycleOwner
@@ -50,8 +44,16 @@ class DiskTitlesAdapter(_diskTitlesViewModel: DiskTitlesViewModel,
         holder.setIsRecyclable(false)
     }
 
+    fun sortByGenre(title: String) {
+        val list: ArrayList<DiskTitle> = ArrayList()
+        list.addAll(_differ.currentList)
+
+
+        _differ.submitList(list)
+    }
+
     fun sortByName(type: TypeUtils.SORT_BY_NAME) {
-        var list: ArrayList<DiskTitle> = ArrayList()
+        val list: ArrayList<DiskTitle> = ArrayList()
         list.addAll(_differ.currentList)
         when (type) {
             TypeUtils.SORT_BY_NAME.Ascending -> {
@@ -92,6 +94,7 @@ class DiskTitlesAdapter(_diskTitlesViewModel: DiskTitlesViewModel,
                 diskTitlesViewModel.getDiskAmountInDiskTitlesFromFireStore(item.id).observe(viewLifecycleOwner) { response ->
                     when (response) {
                         is Response.Loading -> {
+                            tvDiskTitlesAmount.text = "Loading..."
                         }
                         is Response.Success -> {
                             val it = response.data.count
@@ -100,6 +103,7 @@ class DiskTitlesAdapter(_diskTitlesViewModel: DiskTitlesViewModel,
                             tvDiskTitlesAmount.text = "Amount: " + it.toString() + " CD"
                         }
                         is Response.Failure -> {
+                            tvDiskTitlesAmount.text = "Fail to get amount..."
                             print(response.errorMessage)
                         }
                     }

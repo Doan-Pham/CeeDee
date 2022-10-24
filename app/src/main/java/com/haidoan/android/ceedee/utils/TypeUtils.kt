@@ -5,4 +5,9 @@ object TypeUtils {
         Ascending,
         Descending
     }
+
+    enum class SORT_BY_AMOUNT {
+        Ascending,
+        Descending
+    }
 }

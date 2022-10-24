@@ -6,12 +6,9 @@ import android.os.Bundle
 import android.util.Log
 import android.view.*
 import android.view.MenuItem.OnMenuItemClickListener
-import androidx.appcompat.widget.Toolbar
-import androidx.core.view.MenuHost
 
 import androidx.fragment.app.Fragment
 import androidx.core.view.MenuProvider
-import androidx.core.view.get
 import androidx.lifecycle.Lifecycle
 
 import androidx.lifecycle.ViewModelProvider
@@ -20,14 +17,11 @@ import com.haidoan.android.ceedee.MainActivity
 import com.haidoan.android.ceedee.R
 import com.haidoan.android.ceedee.data.Genre
 import com.haidoan.android.ceedee.databinding.FragmentDiskTitlesBinding
-import com.haidoan.android.ceedee.utils.GenreUtils
-import com.haidoan.android.ceedee.utils.HashUtils
 import com.haidoan.android.ceedee.utils.TypeUtils
 
 
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_second.*
-import kotlinx.coroutines.runBlocking
 
 
 class DiskTitlesFragment : Fragment() {
@@ -133,7 +127,11 @@ class DiskTitlesFragment : Fragment() {
     }
 
     private fun filterByGenre(title: String) {
-        Log.d("TAG_FILTER", title)
+       diskTitleAdapter.sortByGenre(title)
+    }
+
+    private fun sortByName(type: TypeUtils.SORT_BY_NAME) {
+        diskTitleAdapter.sortByName(type)
     }
 
     private var menuItemGenreListener: OnMenuItemClickListener = OnMenuItemClickListener {
@@ -181,11 +179,11 @@ class DiskTitlesFragment : Fragment() {
                         true
                     }
                     R.id.menu_disk_title_tab_sort_by_name_ascending -> {
-                        diskTitleAdapter.sortByName(TypeUtils.SORT_BY_NAME.Ascending)
+                        sortByName(TypeUtils.SORT_BY_NAME.Ascending)
                         true
                     }
                     R.id.menu_disk_title_tab_sort_by_name_descending -> {
-                        diskTitleAdapter.sortByName(TypeUtils.SORT_BY_NAME.Descending)
+                        sortByName(TypeUtils.SORT_BY_NAME.Descending)
                         true
                     }
                     R.id.menu_disk_title_tab_sort_by_CD_amount_ascending -> {
@@ -200,9 +198,7 @@ class DiskTitlesFragment : Fragment() {
         }, viewLifecycleOwner, Lifecycle.State.RESUMED)
     }
 
-    private fun sortByName(type: TypeUtils.SORT_BY_NAME) {
 
-    }
 
     override fun onDestroyView() {
         super.onDestroyView()
