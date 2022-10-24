@@ -18,6 +18,9 @@ import java.time.temporal.TemporalAdjusters.lastDayOfMonth
 
 private const val TAG = "FirestoreApi.kt"
 
+// The zoneId is currently Asia/Ho_Chi_Minh which has an offset of 7 hours
+private var DEFAULT_TIMEZONE_OFFSET_IN_HOURS = 7
+
 class FirestoreApi {
     private val databaseRef = Firebase.firestore
 
@@ -35,7 +38,8 @@ class FirestoreApi {
             )
         val endTimestamp =
             Timestamp(
-                endTime.with(lastDayOfMonth()).atTime(LocalTime.MAX).toEpochSecond(ZoneOffset.UTC),
+                endTime.with(lastDayOfMonth()).atTime(LocalTime.MAX)
+                    .toEpochSecond(ZoneOffset.ofHours(DEFAULT_TIMEZONE_OFFSET_IN_HOURS)),
                 0
             )
 
@@ -79,7 +83,8 @@ class FirestoreApi {
             )
         val endTimestamp =
             Timestamp(
-                endTime.with(lastDayOfMonth()).atTime(LocalTime.MAX).toEpochSecond(ZoneOffset.UTC),
+                endTime.with(lastDayOfMonth()).atTime(LocalTime.MAX)
+                    .toEpochSecond(ZoneOffset.ofHours(DEFAULT_TIMEZONE_OFFSET_IN_HOURS)),
                 0
             )
 
