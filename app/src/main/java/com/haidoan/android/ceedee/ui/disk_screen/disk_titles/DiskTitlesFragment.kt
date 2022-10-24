@@ -126,8 +126,8 @@ class DiskTitlesFragment : Fragment() {
         })
     }
 
-    private fun filterByGenre(title: String) {
-       diskTitleAdapter.sortByGenre(title)
+    private fun filterByGenre(idHash: String) {
+       diskTitleAdapter.sortByGenre(idHash)
     }
 
     private fun sortByName(type: TypeUtils.SORT_BY_NAME) {
@@ -135,7 +135,8 @@ class DiskTitlesFragment : Fragment() {
     }
 
     private var menuItemGenreListener: OnMenuItemClickListener = OnMenuItemClickListener {
-        filterByGenre(it.title.toString())
+        Log.d("TAG_genreIdHash",it.itemId.hashCode().toString())
+        filterByGenre(it.itemId.hashCode().toString())
         true
     }
 
@@ -149,13 +150,13 @@ class DiskTitlesFragment : Fragment() {
 
             override fun onPrepareMenu(menu: Menu) {
                 //super.onPrepareMenu(menu)
-                var id = 1
                 for (item in listGenre) {
                     try {
+                        val id = item.id.hashCode()
                         if (menu.findItem(id) == null) {
                             menu.findItem(R.id.menu_disk_title_tab_filter_by_genre)
                                 .subMenu!!
-                                .add(Menu.NONE, id++, Menu.NONE, item.name)
+                                .add(Menu.NONE, id, Menu.NONE, item.name)
                                 .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_NEVER)
                                 .setOnMenuItemClickListener(menuItemGenreListener)
                             Log.d("TAG_ID", id.toString())

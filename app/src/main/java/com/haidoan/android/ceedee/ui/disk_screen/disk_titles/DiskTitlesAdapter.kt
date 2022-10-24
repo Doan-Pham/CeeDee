@@ -14,6 +14,7 @@ import coil.load
 import com.haidoan.android.ceedee.R
 
 import com.haidoan.android.ceedee.data.DiskTitle
+import com.haidoan.android.ceedee.data.Genre
 import com.haidoan.android.ceedee.databinding.DiskTitlesItemBinding
 import com.haidoan.android.ceedee.utils.TypeUtils
 
@@ -44,11 +45,12 @@ class DiskTitlesAdapter(_diskTitlesViewModel: DiskTitlesViewModel,
         holder.setIsRecyclable(false)
     }
 
-    fun sortByGenre(title: String) {
+    fun sortByGenre(idHash: String) {
         val list: ArrayList<DiskTitle> = ArrayList()
         list.addAll(_differ.currentList)
 
-
+        list.sortByDescending { it.genreId.hashCode().toString() == idHash
+        }
         _differ.submitList(list)
     }
 
