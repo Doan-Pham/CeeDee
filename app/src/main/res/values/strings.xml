@@ -19,4 +19,7 @@
     <string name="email">Email</string>
     <string name="report_start_month">Start month</string>
     <string name="report_end_month">End month</string>
+    <string name="chart_type">Chart type</string>
+    <string name="bar_chart">Bar chart</string>
+    <string name="line_chart">Line chart</string>
 </resources>
