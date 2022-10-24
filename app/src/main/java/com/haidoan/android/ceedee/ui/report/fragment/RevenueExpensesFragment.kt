@@ -16,10 +16,10 @@ import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.components.YAxis
 import com.github.mikephil.charting.data.*
 import com.github.mikephil.charting.formatter.LargeValueFormatter
-import com.haidoan.android.ceedee.ui.report.util.MonthYearPickerDialog
 import com.haidoan.android.ceedee.data.report.FirestoreApi
 import com.haidoan.android.ceedee.data.report.ReportRepository
 import com.haidoan.android.ceedee.databinding.FragmentRevenueExpensesBinding
+import com.haidoan.android.ceedee.ui.report.util.MonthYearPickerDialog
 import com.haidoan.android.ceedee.ui.report.util.MonthYearXAxisValueFormatter
 import com.haidoan.android.ceedee.ui.report.viewmodel.ReportViewModel
 import java.time.LocalDate
@@ -171,14 +171,13 @@ class RevenueExpensesFragment : Fragment() {
         xAxis.axisMinimum = BAR_CHART_MIN_X_DEFAULT
         xAxis.axisMaximum =
             if (getMonthCountBetween(startMonth, startYear, endMonth, endYear).toFloat() > 1)
-                getMonthCountBetween(startMonth, startYear, endMonth, endYear).toFloat() + 1
+                getMonthCountBetween(startMonth, startYear, endMonth, endYear).toFloat()
             else BAR_CHART_MIN_X_DEFAULT + 1
         xAxis.valueFormatter = MonthYearXAxisValueFormatter(startMonth, startYear)
         //xAxis.setAvoidFirstLastClipping(true)
 
         val leftAxis = lineChart.axisLeft
         leftAxis.textSize = CHART_TEXT_SIZE
-        leftAxis.spaceTop = 20f
         leftAxis.valueFormatter = LargeValueFormatter()
 
         lineChart.axisRight.isEnabled = false
@@ -195,6 +194,9 @@ class RevenueExpensesFragment : Fragment() {
         lineChart.isHighlightPerDragEnabled = false
         lineChart.description.isEnabled = false
         lineChart.setVisibleXRangeMaximum(4f)
+        lineChart.extraRightOffset = 40f
+        lineChart.extraBottomOffset = 10f
+
         //Have to call notifyDataSetChanged for the UI change to take place immediately
         lineChart.notifyDataSetChanged()
         lineChart.invalidate()
@@ -300,6 +302,8 @@ class RevenueExpensesFragment : Fragment() {
         barChart.isHighlightPerDragEnabled = false
         barChart.description.isEnabled = false
         barChart.setVisibleXRangeMaximum(4f)
+        barChart.extraRightOffset = 20f
+        barChart.extraBottomOffset = 10f
     }
 
     private fun fillBarChartData(
@@ -359,6 +363,7 @@ class RevenueExpensesFragment : Fragment() {
         barChart.data.setValueTextSize(CHART_TEXT_SIZE)
         barChart.data.setValueFormatter(LargeValueFormatter())
 
+        // Need to call this after setting chart data
         barChart.groupBars(BAR_CHART_MIN_X_DEFAULT, BAR_CHAR_GROUP_SPACE, BAR_CHART_BAR_SPACE)
         barChart.notifyDataSetChanged()
         barChart.invalidate()
