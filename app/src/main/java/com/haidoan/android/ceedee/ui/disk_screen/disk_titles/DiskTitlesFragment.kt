@@ -32,8 +32,7 @@ import kotlinx.coroutines.runBlocking
 
 class DiskTitlesFragment : Fragment() {
     private var _binding: FragmentDiskTitlesBinding? = null
-    private val diskTitleAdapter by lazy { DiskTitlesAdapter() }
-
+    private lateinit var diskTitleAdapter:  DiskTitlesAdapter
     private lateinit var diskTitlesViewModel: DiskTitlesViewModel
 
     // This property is only valid between onCreateView and
@@ -56,6 +55,7 @@ class DiskTitlesFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         diskTitlesViewModel = ViewModelProvider(requireActivity())[DiskTitlesViewModel::class.java]
+        diskTitleAdapter = DiskTitlesAdapter(diskTitlesViewModel,viewLifecycleOwner)
         diskTitlesViewModel.getDiskTitles().observe(viewLifecycleOwner) { response ->
             when (response) {
                 is Response.Loading -> {
@@ -103,7 +103,7 @@ class DiskTitlesFragment : Fragment() {
                 }
             }
         }
-        diskTitleAdapter.setDiskTitlesViewModel(diskTitlesViewModel)
+
         binding.apply {
             rcvDiskTitles.apply {
                 layoutManager = LinearLayoutManager(activity)
@@ -200,7 +200,7 @@ class DiskTitlesFragment : Fragment() {
         }, viewLifecycleOwner, Lifecycle.State.RESUMED)
     }
 
-    private fun sortByName(type: TypeUtils.SORT_BY_NAME){
+    private fun sortByName(type: TypeUtils.SORT_BY_NAME) {
 
     }
 

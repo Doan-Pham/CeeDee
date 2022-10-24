@@ -1,12 +1,16 @@
 package com.haidoan.android.ceedee.ui.disk_screen.disk_titles
 
 import android.annotation.SuppressLint
+import android.app.Application
+import android.content.Context
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.core.net.toUri
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -19,16 +23,26 @@ import com.haidoan.android.ceedee.utils.GenreUtils
 import com.haidoan.android.ceedee.utils.TypeUtils
 import kotlinx.coroutines.runBlocking
 
-class DiskTitlesAdapter : RecyclerView.Adapter<DiskTitlesAdapter.DiskTitlesViewHolder>() {
-    private lateinit var diskTitlesViewModel: DiskTitlesViewModel
+class DiskTitlesAdapter(_diskTitlesViewModel: DiskTitlesViewModel,
+                        _viewLifecycleOwner: LifecycleOwner
+                        ) : RecyclerView.Adapter<DiskTitlesAdapter.DiskTitlesViewHolder>() {
+
     private lateinit var binding: DiskTitlesItemBinding
 
     private lateinit var iOnItemClickListener: IOnItemClickListener
     private lateinit var iOnItemMoreClickListener: IOnItemClickListener
 
+    private var viewLifecycleOwner: LifecycleOwner
+    private var diskTitlesViewModel: DiskTitlesViewModel
+
+    init {
+        diskTitlesViewModel=_diskTitlesViewModel
+        viewLifecycleOwner=_viewLifecycleOwner
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DiskTitlesViewHolder {
         binding = DiskTitlesItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return DiskTitlesViewHolder(iOnItemClickListener,iOnItemMoreClickListener)
+        return DiskTitlesViewHolder(iOnItemClickListener, iOnItemMoreClickListener)
     }
 
     override fun onBindViewHolder(holder: DiskTitlesViewHolder, position: Int) {
@@ -37,11 +51,11 @@ class DiskTitlesAdapter : RecyclerView.Adapter<DiskTitlesAdapter.DiskTitlesViewH
     }
 
     fun sortByName(type: TypeUtils.SORT_BY_NAME) {
-        var list : ArrayList<DiskTitle> = ArrayList()
+        var list: ArrayList<DiskTitle> = ArrayList()
         list.addAll(_differ.currentList)
-        when (type){
+        when (type) {
             TypeUtils.SORT_BY_NAME.Ascending -> {
-               list.sortBy { it.name }
+                list.sortBy { it.name }
             }
             TypeUtils.SORT_BY_NAME.Descending -> {
                 list.sortByDescending { it.name }
@@ -50,15 +64,11 @@ class DiskTitlesAdapter : RecyclerView.Adapter<DiskTitlesAdapter.DiskTitlesViewH
         _differ.submitList(list)
     }
 
-    fun setDiskTitlesViewModel(viewModel: DiskTitlesViewModel) {
-        diskTitlesViewModel = viewModel
-    }
-
-    fun setIOnItemMoreClickListener(listener: IOnItemClickListener){
+    fun setIOnItemMoreClickListener(listener: IOnItemClickListener) {
         iOnItemMoreClickListener = listener
     }
 
-    fun setIOnItemClickListener(listener: IOnItemClickListener){
+    fun setIOnItemClickListener(listener: IOnItemClickListener) {
         iOnItemClickListener = listener
     }
 
@@ -68,21 +78,40 @@ class DiskTitlesAdapter : RecyclerView.Adapter<DiskTitlesAdapter.DiskTitlesViewH
 
     override fun getItemCount() = _differ.currentList.size
 
-    inner class DiskTitlesViewHolder(listener: IOnItemClickListener,
-                                     listenerMore: IOnItemClickListener) : RecyclerView.ViewHolder(binding.root) {
+    inner class DiskTitlesViewHolder(
+        listener: IOnItemClickListener,
+        listenerMore: IOnItemClickListener
+    ) : RecyclerView.ViewHolder(binding.root) {
         fun setData(item: DiskTitle) {
             binding.apply {
-                bindImage(imgDiskTitlesCoverImg,item.coverImageUrl)
-                tvDiskTitlesAmount.text = "amount"
+                bindImage(imgDiskTitlesCoverImg, item.coverImageUrl)
+
                 tvDiskTitlesAuthor.text = item.author
                 tvDiskTitlesName.text = item.name
+                Log.d("TAG_AMOUNT", item.id)
+                diskTitlesViewModel.getDiskAmountInDiskTitlesFromFireStore(item.id).observe(viewLifecycleOwner) { response ->
+                    when (response) {
+                        is Response.Loading -> {
+                        }
+                        is Response.Success -> {
+                            val it = response.data.count
+
+                            Log.d("TAG_AMOUNT", "it "+ it.toString())
+                            tvDiskTitlesAmount.text = "Amount: " + it.toString() + " CD"
+                        }
+                        is Response.Failure -> {
+                            print(response.errorMessage)
+                        }
+                    }
+
+                }
             }
         }
 
         init {
             itemView.setOnClickListener {
                 listener.onItemClick(bindingAdapterPosition)
-                Log.d("TAG_ITEM",_differ.currentList[bindingAdapterPosition].name)
+                Log.d("TAG_ITEM", _differ.currentList[bindingAdapterPosition].name)
             }
 
             binding.imgDiskTitlesBtnMore.setOnClickListener {

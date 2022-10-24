@@ -1,3 +1,8 @@
 package com.haidoan.android.ceedee.data
 
-data class Genre(val id: String = "", val name: String = "")
+import com.google.firebase.firestore.DocumentId
+
+data class Genre(
+    @DocumentId
+    val id: String = "",
+    val name: String = "")
