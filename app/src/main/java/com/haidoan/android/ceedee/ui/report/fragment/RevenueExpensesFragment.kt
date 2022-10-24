@@ -23,6 +23,9 @@ import com.haidoan.android.ceedee.ui.report.util.MonthYearPickerDialog
 import com.haidoan.android.ceedee.ui.report.util.MonthYearXAxisValueFormatter
 import com.haidoan.android.ceedee.ui.report.viewmodel.ReportViewModel
 import java.time.LocalDate
+import java.time.YearMonth
+import java.time.temporal.ChronoUnit
+import java.time.temporal.TemporalAdjusters
 import java.util.*
 
 private const val BAR_CHART_BAR_WIDTH = 0.45f
@@ -61,11 +64,10 @@ class RevenueExpensesFragment : Fragment() {
     private var revenueDataCache: MutableMap<LocalDate, Float> = mutableMapOf()
     private var expensesDataCache: MutableMap<LocalDate, Float> = mutableMapOf()
 
-    private var startMonth: Int = Calendar.getInstance().get(Calendar.MONTH) + 1
-    private var startYear: Int = Calendar.getInstance().get(Calendar.YEAR)
+    private var startTime: LocalDate = LocalDate.now().with(TemporalAdjusters.firstDayOfMonth())
+    private var endTime: LocalDate = LocalDate.now().with(TemporalAdjusters.lastDayOfMonth())
 
-    private var endMonth: Int = startMonth
-    private var endYear: Int = startYear
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -84,17 +86,17 @@ class RevenueExpensesFragment : Fragment() {
         styleLineChart()
         //styleBarChart()
 
-        val displayedStartTime = "$startMonth/$startYear"
+        val displayedStartTime = "${startTime.monthValue}/${startTime.year}"
         binding.textviewStartMonth.text = displayedStartTime
 
-        val displayedEndTime = "$endMonth/$endYear"
+        val displayedEndTime = "${endTime.monthValue}/${endTime.year}"
         binding.textviewEndMonth.text = displayedEndTime
 
         binding.textviewStartMonth.setOnClickListener {
             MonthYearPickerDialog(Calendar.getInstance().time).apply {
                 setTitle("Select start month")
                 setListener { _, month, year, _ ->
-                    if (year > endYear || (year == endYear && month > endMonth)) {
+                    if (year > endTime.year || (year == endTime.year && month > endTime.monthValue)) {
                         Toast.makeText(
                             requireActivity(),
                             "Error: Start time should be sooner or equal to end time",
@@ -103,8 +105,7 @@ class RevenueExpensesFragment : Fragment() {
                     } else {
                         val displayedTime = "$month/$year"
                         binding.textviewStartMonth.text = displayedTime
-                        startMonth = month
-                        startYear = year
+                        startTime = startTime.withMonth(month).withYear(year)
                         onMonthYearChanged()
                     }
                 }
@@ -116,7 +117,7 @@ class RevenueExpensesFragment : Fragment() {
             MonthYearPickerDialog(Calendar.getInstance().time).apply {
                 setTitle("Select end month")
                 setListener { _, month, year, _ ->
-                    if (year < startYear || (year == startYear && month < startMonth)) {
+                    if (year < startTime.year || (year == startTime.year && month < startTime.monthValue)) {
                         Toast.makeText(
                             requireActivity(),
                             "Error: Start time should be earlier or the same as end time",
@@ -125,8 +126,7 @@ class RevenueExpensesFragment : Fragment() {
                     } else {
                         val displayedTime = "$month/$year"
                         binding.textviewEndMonth.text = displayedTime
-                        endMonth = month
-                        endYear = year
+                        endTime = endTime.withMonth(month).withYear(year)
                         onMonthYearChanged()
                     }
                 }
@@ -170,10 +170,12 @@ class RevenueExpensesFragment : Fragment() {
         xAxis.textSize = 14f
         xAxis.axisMinimum = BAR_CHART_MIN_X_DEFAULT
         xAxis.axisMaximum =
-            if (getMonthCountBetween(startMonth, startYear, endMonth, endYear).toFloat() > 1)
-                getMonthCountBetween(startMonth, startYear, endMonth, endYear).toFloat()
+            if (getMonthCountBetween(startTime, endTime).toFloat() > 1)
+                getMonthCountBetween(startTime, endTime).toFloat()
             else BAR_CHART_MIN_X_DEFAULT + 1
-        xAxis.valueFormatter = MonthYearXAxisValueFormatter(startMonth, startYear)
+
+        Log.d(TAG, "Line chart xAxis max: ${xAxis.axisMaximum}")
+        xAxis.valueFormatter = MonthYearXAxisValueFormatter(startTime)
         //xAxis.setAvoidFirstLastClipping(true)
 
         val leftAxis = lineChart.axisLeft
@@ -218,12 +220,7 @@ class RevenueExpensesFragment : Fragment() {
         revenueDataFinal.forEach { (key, value) ->
             revenueChartEntries.add(
                 Entry(
-                    getMonthCountBetween(
-                        startMonth,
-                        startYear,
-                        key.monthValue,
-                        key.year,
-                    ).toFloat(),
+                    getMonthCountBetween(startTime, key).toFloat(),
                     value
                 )
             )
@@ -239,10 +236,7 @@ class RevenueExpensesFragment : Fragment() {
             expensesChartEntries.add(
                 Entry(
                     getMonthCountBetween(
-                        startMonth,
-                        startYear,
-                        key.monthValue,
-                        key.year,
+                        startTime, key
                     ).toFloat(),
                     value
                 )
@@ -276,10 +270,9 @@ class RevenueExpensesFragment : Fragment() {
         xAxis.granularity = 1f
         xAxis.textSize = 14f
         xAxis.axisMinimum = BAR_CHART_MIN_X_DEFAULT
-        // Needs to add 1 to show all bars
         xAxis.axisMaximum =
-            getMonthCountBetween(startMonth, startYear, endMonth, endYear).toFloat() + 1
-        xAxis.valueFormatter = MonthYearXAxisValueFormatter(startMonth, startYear)
+            getMonthCountBetween(startTime, endTime).toFloat() + 1
+        xAxis.valueFormatter = MonthYearXAxisValueFormatter(startTime)
 
         val leftAxis = barChart.axisLeft
         leftAxis.textSize = CHART_TEXT_SIZE
@@ -319,10 +312,7 @@ class RevenueExpensesFragment : Fragment() {
             revenueChartEntries.add(
                 BarEntry(
                     getMonthCountBetween(
-                        startMonth,
-                        startYear,
-                        key.monthValue,
-                        key.year,
+                        startTime, key
                     ).toFloat(),
                     value
                 )
@@ -338,12 +328,7 @@ class RevenueExpensesFragment : Fragment() {
         expensesDataFinal.forEach { (key, value) ->
             expensesChartEntries.add(
                 BarEntry(
-                    getMonthCountBetween(
-                        startMonth,
-                        startYear,
-                        key.monthValue,
-                        key.year,
-                    ).toFloat(),
+                    getMonthCountBetween(startTime, key).toFloat(),
                     value
                 )
             )
@@ -370,23 +355,18 @@ class RevenueExpensesFragment : Fragment() {
     }
 
     private fun onMonthYearChanged() {
-        viewModel.setMonthsPeriod(
-            LocalDate.of(startYear, startMonth, 15),
-            LocalDate.of(endYear, endMonth, 15)
-        )
+        viewModel.setMonthsPeriod(startTime, endTime)
         Log.d(
             TAG,
-            "onMonthYearChanged() called, startMonth: $startMonth, startYear: $startYear, endMonth: $endMonth, endYear: $endYear"
+            "onMonthYearChanged() called, startTime.monthValue: ${startTime.monthValue}, startTime.year: ${startTime.year}, endTime.monthValue: ${endTime.monthValue}, endTime.year: ${endTime.year}"
         )
     }
 
-    private fun getMonthCountBetween(
-        startMonth: Int,
-        startYear: Int,
-        endMonth: Int,
-        endYear: Int
-    ): Int {
-        return (endYear - startYear) * 12 + (endMonth - startMonth)
+    private fun getMonthCountBetween(startTime: LocalDate, endTime: LocalDate): Long {
+        return ChronoUnit.MONTHS.between(
+            YearMonth.from(startTime),
+            YearMonth.from(endTime)
+        )
     }
 }
 
