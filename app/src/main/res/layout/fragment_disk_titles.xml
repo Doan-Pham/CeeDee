@@ -11,6 +11,7 @@
     >
 
     <TextView
+        android:id="@+id/tv_disk_titles_total"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="143 Titles"

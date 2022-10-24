@@ -16,10 +16,11 @@ import com.haidoan.android.ceedee.R
 import com.haidoan.android.ceedee.data.DiskTitle
 import com.haidoan.android.ceedee.databinding.DiskTitlesItemBinding
 import com.haidoan.android.ceedee.utils.GenreUtils
+import com.haidoan.android.ceedee.utils.TypeUtils
 import kotlinx.coroutines.runBlocking
 
 class DiskTitlesAdapter : RecyclerView.Adapter<DiskTitlesAdapter.DiskTitlesViewHolder>() {
-
+    private lateinit var diskTitlesViewModel: DiskTitlesViewModel
     private lateinit var binding: DiskTitlesItemBinding
 
     private lateinit var iOnItemClickListener: IOnItemClickListener
@@ -33,6 +34,24 @@ class DiskTitlesAdapter : RecyclerView.Adapter<DiskTitlesAdapter.DiskTitlesViewH
     override fun onBindViewHolder(holder: DiskTitlesViewHolder, position: Int) {
         holder.setData(_differ.currentList[position])
         holder.setIsRecyclable(false)
+    }
+
+    fun sortByName(type: TypeUtils.SORT_BY_NAME) {
+        var list : ArrayList<DiskTitle> = ArrayList()
+        list.addAll(_differ.currentList)
+        when (type){
+            TypeUtils.SORT_BY_NAME.Ascending -> {
+               list.sortBy { it.name }
+            }
+            TypeUtils.SORT_BY_NAME.Descending -> {
+                list.sortByDescending { it.name }
+            }
+        }
+        _differ.submitList(list)
+    }
+
+    fun setDiskTitlesViewModel(viewModel: DiskTitlesViewModel) {
+        diskTitlesViewModel = viewModel
     }
 
     fun setIOnItemMoreClickListener(listener: IOnItemClickListener){
@@ -63,6 +82,7 @@ class DiskTitlesAdapter : RecyclerView.Adapter<DiskTitlesAdapter.DiskTitlesViewH
         init {
             itemView.setOnClickListener {
                 listener.onItemClick(bindingAdapterPosition)
+                Log.d("TAG_ITEM",_differ.currentList[bindingAdapterPosition].name)
             }
 
             binding.imgDiskTitlesBtnMore.setOnClickListener {
@@ -83,12 +103,12 @@ class DiskTitlesAdapter : RecyclerView.Adapter<DiskTitlesAdapter.DiskTitlesViewH
 
     private val differCallback = object : DiffUtil.ItemCallback<DiskTitle>() {
         override fun areItemsTheSame(oldItem: DiskTitle, newItem: DiskTitle): Boolean {
-            return oldItem.id == newItem.id
+            return oldItem == newItem
         }
 
         @SuppressLint("DiffUtilEquals")
         override fun areContentsTheSame(oldItem: DiskTitle, newItem: DiskTitle): Boolean {
-            return oldItem == newItem
+            return oldItem.id == newItem.id
         }
 
     }

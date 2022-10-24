@@ -4,8 +4,11 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 
 import androidx.lifecycle.liveData
+import com.google.firebase.firestore.Query
+import com.haidoan.android.ceedee.utils.TypeUtils
 
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.catch
 
 class DiskTitlesViewModel(application: Application) : AndroidViewModel(application) {
     private val diskTitlesRepository : DiskTitlesRepository

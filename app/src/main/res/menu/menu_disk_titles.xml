@@ -31,11 +31,11 @@
                 >
                 <menu>
                     <item
-                        android:id="@+id/disk_title_tab_sort_by_name_ascending"
+                        android:id="@+id/menu_disk_title_tab_sort_by_name_ascending"
                         android:title="@string/ascending" />
 
                     <item
-                        android:id="@+id/disk_title_tab_sort_by_name_descending"
+                        android:id="@+id/menu_disk_title_tab_sort_by_name_descending"
                         android:title="@string/descending" />
                 </menu>
             </item>
@@ -44,17 +44,17 @@
                 >
                 <menu>
                     <item
-                        android:id="@+id/disk_title_tab_sort_by_CD_amount_ascending"
+                        android:id="@+id/menu_disk_title_tab_sort_by_CD_amount_ascending"
                         android:title="@string/ascending" />
 
                     <item
-                        android:id="@+id/disk_title_tab_sort_by_CD_amount_descending"
+                        android:id="@+id/menu_disk_title_tab_sort_by_CD_amount_descending"
                         android:title="@string/descending" />
                 </menu>
             </item>
 
             <item android:title="@string/filter_by_genre"
-                android:id="@+id/disk_title_tab_filter_by_genre"
+                android:id="@+id/menu_disk_title_tab_filter_by_genre"
                 >
                 <menu/>
             </item>

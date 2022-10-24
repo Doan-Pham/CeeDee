@@ -5,6 +5,7 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import android.view.*
+import android.view.MenuItem.OnMenuItemClickListener
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.MenuHost
 
@@ -21,6 +22,7 @@ import com.haidoan.android.ceedee.data.Genre
 import com.haidoan.android.ceedee.databinding.FragmentDiskTitlesBinding
 import com.haidoan.android.ceedee.utils.GenreUtils
 import com.haidoan.android.ceedee.utils.HashUtils
+import com.haidoan.android.ceedee.utils.TypeUtils
 
 
 import kotlinx.android.synthetic.main.activity_main.*
@@ -67,6 +69,11 @@ class DiskTitlesFragment : Fragment() {
                     //Hide the ProgressBar
                     binding.progressbarDiskTitle.visibility = View.GONE
                     diskTitleAdapter.differ().submitList(list)
+                    if (diskTitleAdapter.itemCount >= 2)
+                        binding.tvDiskTitlesTotal.text =
+                            diskTitleAdapter.itemCount.toString() + " Titles"
+                    else binding.tvDiskTitlesTotal.text =
+                        diskTitleAdapter.itemCount.toString() + " Title"
                 }
                 is Response.Failure -> {
                     print(response.errorMessage)
@@ -96,7 +103,7 @@ class DiskTitlesFragment : Fragment() {
                 }
             }
         }
-
+        diskTitleAdapter.setDiskTitlesViewModel(diskTitlesViewModel)
         binding.apply {
             rcvDiskTitles.apply {
                 layoutManager = LinearLayoutManager(activity)
@@ -125,6 +132,15 @@ class DiskTitlesFragment : Fragment() {
         })
     }
 
+    private fun filterByGenre(title: String) {
+        Log.d("TAG_FILTER", title)
+    }
+
+    private var menuItemGenreListener: OnMenuItemClickListener = OnMenuItemClickListener {
+        filterByGenre(it.title.toString())
+        true
+    }
+
     private fun createMenu() {
         (requireActivity() as MainActivity).toolbar.addMenuProvider(object : MenuProvider {
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
@@ -139,11 +155,12 @@ class DiskTitlesFragment : Fragment() {
                 for (item in listGenre) {
                     try {
                         if (menu.findItem(id) == null) {
-                            menu.findItem(R.id.disk_title_tab_filter_by_genre)
+                            menu.findItem(R.id.menu_disk_title_tab_filter_by_genre)
                                 .subMenu!!
-                                .add(Menu.NONE, id++ , Menu.NONE, item.name)
+                                .add(Menu.NONE, id++, Menu.NONE, item.name)
                                 .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_NEVER)
-                            Log.d("TAG_ID",id.toString())
+                                .setOnMenuItemClickListener(menuItemGenreListener)
+                            Log.d("TAG_ID", id.toString())
                         }
 
                     } catch (exception: Exception) {
@@ -159,18 +176,32 @@ class DiskTitlesFragment : Fragment() {
                         Log.d("TAG_MENU", "DISKTITLE_CART")
                         true
                     }
-                    R.id.menu_disk_titles_filter -> {
-                        Log.d("TAG_MENU", "DISKTITLE_FILTER")
-                        true
-                    }
                     R.id.menu_disk_titles_search -> {
                         Log.d("TAG_MENU", "DISKTITLE_SEARCH")
+                        true
+                    }
+                    R.id.menu_disk_title_tab_sort_by_name_ascending -> {
+                        diskTitleAdapter.sortByName(TypeUtils.SORT_BY_NAME.Ascending)
+                        true
+                    }
+                    R.id.menu_disk_title_tab_sort_by_name_descending -> {
+                        diskTitleAdapter.sortByName(TypeUtils.SORT_BY_NAME.Descending)
+                        true
+                    }
+                    R.id.menu_disk_title_tab_sort_by_CD_amount_ascending -> {
+                        true
+                    }
+                    R.id.menu_disk_title_tab_sort_by_CD_amount_descending -> {
                         true
                     }
                     else -> false
                 }
             }
         }, viewLifecycleOwner, Lifecycle.State.RESUMED)
+    }
+
+    private fun sortByName(type: TypeUtils.SORT_BY_NAME){
+
     }
 
     override fun onDestroyView() {

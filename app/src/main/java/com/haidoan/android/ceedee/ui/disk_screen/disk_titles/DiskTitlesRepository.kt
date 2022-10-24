@@ -1,29 +1,27 @@
 package com.haidoan.android.ceedee.ui.disk_screen.disk_titles
 
 import android.app.Application
-
 import android.util.Log
-
-import androidx.lifecycle.MutableLiveData
 
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.QueryDocumentSnapshot
 
 import com.haidoan.android.ceedee.data.DiskTitle
 import com.haidoan.android.ceedee.data.Genre
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.FlowCollector
+import com.haidoan.android.ceedee.utils.TypeUtils
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 
 import kotlinx.coroutines.tasks.await
+import com.google.firebase.firestore.Query
+
 
 class DiskTitlesRepository(private val application: Application) {
     private val db: FirebaseFirestore = FirebaseFirestore.getInstance()
 
     private var queryDiskTitle: CollectionReference = db.collection("DiskTitle")
     private var queryGenre: CollectionReference = db.collection("Genre")
+
     init {
 
     }
@@ -34,7 +32,7 @@ class DiskTitlesRepository(private val application: Application) {
             Log.d("TAG", "GET POST SUCCESS")
             doc.toObject(DiskTitle::class.java)
         }))
-    }. catch { error ->
+    }.catch { error ->
         error.message?.let { errorMessage ->
             emit(Response.Failure(errorMessage))
         }
@@ -46,7 +44,7 @@ class DiskTitlesRepository(private val application: Application) {
             Log.d("TAG", "GET POST SUCCESS")
             doc.toObject(Genre::class.java)
         }))
-    }. catch { error ->
+    }.catch { error ->
         error.message?.let { errorMessage ->
             emit(Response.Failure(errorMessage))
         }
