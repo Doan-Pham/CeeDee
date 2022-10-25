@@ -2,13 +2,16 @@ package com.haidoan.android.ceedee.ui.report.fragment
 
 import android.Manifest
 import android.content.pm.PackageManager
-import android.graphics.Color
+import android.graphics.*
+import android.graphics.pdf.PdfDocument
 import android.os.Bundle
+import android.os.Environment
 import android.util.Log
 import android.view.*
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
@@ -28,11 +31,16 @@ import com.haidoan.android.ceedee.databinding.FragmentRevenueExpensesBinding
 import com.haidoan.android.ceedee.ui.report.util.MonthYearPickerDialog
 import com.haidoan.android.ceedee.ui.report.util.MonthYearXAxisValueFormatter
 import com.haidoan.android.ceedee.ui.report.viewmodel.ReportViewModel
+import java.io.File
+import java.io.FileOutputStream
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.YearMonth
+import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import java.time.temporal.TemporalAdjusters
 import java.util.*
+
 
 private const val BAR_CHART_BAR_WIDTH = 0.45f
 private const val BAR_CHART_BAR_SPACE = 0.02f
@@ -47,10 +55,13 @@ private val CHART_COLOR_SECOND = Color.rgb(251, 173, 86)
 private val CHART_COLOR_THIRD = Color.rgb(160, 215, 113)
 private val CHART_COLOR_FOURTH = Color.rgb(115, 176, 215)
 
-val PERMISSIONS = arrayOf(
+private val PERMISSIONS = arrayOf(
     Manifest.permission.WRITE_EXTERNAL_STORAGE,
     Manifest.permission.READ_EXTERNAL_STORAGE
 )
+
+private const val STANDARD_REPORT_PAGE_HEIGHT = 1120
+private const val STANDARD_REPORT_PAGE_WIDTH = 792
 
 class RevenueExpensesFragment : Fragment() {
 
@@ -193,25 +204,75 @@ class RevenueExpensesFragment : Fragment() {
         binding.buttonPrint.setOnClickListener {
             // on below line we are checking permission
             if (!handlePermission()) return@setOnClickListener
+
+            val chartAsBitmap = BitmapFactory.decodeResource(resources, R.drawable.test1)
+
+            val chartAsScaledBitmap = Bitmap.createScaledBitmap(chartAsBitmap, 300, 300, false)
+
+            val reportAsPdf = PdfDocument()
+
+            // two variables for paint "paint" is used
+            // for drawing shapes and we will use "title"
+            // for adding text in our PDF file.
+            val imagePaint = Paint()
+            val textPaint = Paint()
+
+            val pageInfo: PdfDocument.PageInfo? = PdfDocument.PageInfo.Builder(
+                STANDARD_REPORT_PAGE_WIDTH, STANDARD_REPORT_PAGE_HEIGHT, 1
+            ).create()
+
+            val firstPage: PdfDocument.Page = reportAsPdf.startPage(pageInfo)
+            val pageCanvas: Canvas = firstPage.canvas
+
+            pageCanvas.drawBitmap(chartAsScaledBitmap, 50f, 50f, imagePaint)
+            textPaint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.NORMAL)
+            textPaint.textSize = 15f
+            textPaint.color = ContextCompat.getColor(requireActivity(), R.color.black)
+            textPaint.textAlign = Paint.Align.CENTER
+
+            pageCanvas.drawText(
+                "Revenue and expenses from $startTime to $endTime",
+                209F,
+                100F,
+                textPaint
+            )
+            pageCanvas.drawText("Date: ${LocalDate.now()}", 209F, 120F, textPaint)
+
+            reportAsPdf.finishPage(firstPage)
+
+            val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm")
+            val fileOutput = File(
+                Environment.getExternalStorageDirectory(),
+                "Report_Revenue_Expenses_${formatter.format(LocalDateTime.now())}"
+            )
+
+            try {
+                reportAsPdf.writeTo(FileOutputStream(fileOutput))
+                Toast.makeText(requireActivity(), "PDF file generated..", Toast.LENGTH_SHORT).show()
+            } catch (e: Exception) {
+                Log.e(TAG, "Error generating report: ${e.message}")
+                // on below line we are displaying a toast message as fail to generate PDF
+                Toast.makeText(requireActivity(), "Fail to generate PDF file..", Toast.LENGTH_SHORT)
+                    .show()
+            }
+
+            reportAsPdf.close()
         }
     }
 
-    private fun hasPermissions(permissions: Array<String>?): Boolean {
-        if (permissions != null) {
-            for (permission in permissions) {
-                if (ActivityCompat.checkSelfPermission(
-                        requireActivity(),
-                        permission
-                    ) != PackageManager.PERMISSION_GRANTED
-                ) {
-                    Log.d("PERMISSIONS", "Permission is not granted: $permission")
-                    return false
-                }
-                Log.d("PERMISSIONS", "Permission already granted: $permission")
+    private fun hasPermissions(permissions: Array<String>): Boolean {
+        for (permission in permissions) {
+            if (ActivityCompat.checkSelfPermission(
+                    requireActivity(),
+                    permission
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                Log.d("PERMISSIONS", "Permission is not granted: $permission")
+                return false
             }
-            return true
+            Log.d("PERMISSIONS", "Permission already granted: $permission")
         }
-        return false
+        return true
     }
 
     // on below line we are creating a function to request permission.
