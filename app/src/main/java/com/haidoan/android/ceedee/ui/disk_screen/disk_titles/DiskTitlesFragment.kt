@@ -6,6 +6,8 @@ import android.os.Bundle
 import android.util.Log
 import android.view.*
 import android.view.MenuItem.OnMenuItemClickListener
+import android.widget.SearchView
+import android.widget.SearchView.OnQueryTextListener
 
 import androidx.fragment.app.Fragment
 import androidx.core.view.MenuProvider
@@ -26,7 +28,7 @@ import kotlinx.android.synthetic.main.fragment_second.*
 
 class DiskTitlesFragment : Fragment() {
     private var _binding: FragmentDiskTitlesBinding? = null
-    private lateinit var diskTitleAdapter:  DiskTitlesAdapter
+    private lateinit var diskTitleAdapter: DiskTitlesAdapter
     private lateinit var diskTitlesViewModel: DiskTitlesViewModel
 
     // This property is only valid between onCreateView and
@@ -49,7 +51,7 @@ class DiskTitlesFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         diskTitlesViewModel = ViewModelProvider(requireActivity())[DiskTitlesViewModel::class.java]
-        diskTitleAdapter = DiskTitlesAdapter(diskTitlesViewModel,viewLifecycleOwner)
+        diskTitleAdapter = DiskTitlesAdapter(diskTitlesViewModel, viewLifecycleOwner)
         diskTitlesViewModel.getDiskTitles().observe(viewLifecycleOwner) { response ->
             when (response) {
                 is Response.Loading -> {
@@ -89,6 +91,7 @@ class DiskTitlesFragment : Fragment() {
                     //Hide the ProgressBar
                     listGenre.addAll(list)
                     createMenu()
+                    createSearchView()
                 }
                 is Response.Failure -> {
                     print(response.errorMessage)
@@ -126,8 +129,24 @@ class DiskTitlesFragment : Fragment() {
         })
     }
 
+    private fun createSearchView() {
+        val searchView: SearchView =
+            (requireActivity().toolbar.menu.findItem(R.id.menu_disk_titles_search).actionView as SearchView)
+        searchView.setOnQueryTextListener(object : OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                return false
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                diskTitleAdapter.filter.filter(newText)
+                return false
+            }
+        })
+
+    }
+
     private fun filterByGenre(idHash: String) {
-       diskTitleAdapter.sortByGenre(idHash)
+        diskTitleAdapter.sortByGenre(idHash)
     }
 
     private fun sortByName(type: TypeUtils.SORT_BY_NAME) {
@@ -135,7 +154,7 @@ class DiskTitlesFragment : Fragment() {
     }
 
     private var menuItemGenreListener: OnMenuItemClickListener = OnMenuItemClickListener {
-        Log.d("TAG_genreIdHash",it.itemId.hashCode().toString())
+        Log.d("TAG_genreIdHash", it.itemId.hashCode().toString())
         filterByGenre(it.itemId.hashCode().toString())
         true
     }
@@ -198,7 +217,6 @@ class DiskTitlesFragment : Fragment() {
             }
         }, viewLifecycleOwner, Lifecycle.State.RESUMED)
     }
-
 
 
     override fun onDestroyView() {

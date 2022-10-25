@@ -54,10 +54,22 @@ class LoginActivity : AppCompatActivity() {
         binding.btnLogin.setOnClickListener(View.OnClickListener {
             val email = binding.edtUsernameLogin.text.toString()
             val pass = binding.edtPasswordLogin.text.toString()
-            if (email.isEmpty() || pass.isEmpty()) {
-                setTextRequired("Email or Password cannot be empty")
-            } else {
-                signIn(email, pass)
+
+            authViewModel.signIn(email, pass).observe(this) { response ->
+                when (response) {
+                    is Response.Loading -> {
+                        binding.progressbarLogin.visibility = View.VISIBLE
+                    }
+                    is Response.Success -> {
+                        binding.progressbarLogin.visibility = View.INVISIBLE
+                        val i = Intent(this, MainActivity::class.java)
+                        startActivity(i)
+                    }
+                    is Response.Failure -> {
+                        binding.progressbarLogin.visibility = View.INVISIBLE
+                    }
+
+                }
             }
 
         })

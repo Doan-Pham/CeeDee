@@ -29,8 +29,10 @@ class AuthenticationViewModel(application: Application) : AndroidViewModel(appli
         return userData
     }
 
-    fun signIn(email: String?, pass: String?) {
-        repository.login(email, pass)
+    fun signIn(email: String?, pass: String?) = liveData(Dispatchers.IO) {
+        repository.loginFromFireStore(email,pass).collect { response ->
+            emit(response)
+        }
     }
 
     fun signOut() {
