@@ -3,11 +3,12 @@ package com.haidoan.android.ceedee.ui.report.fragment
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.Toast
+import androidx.core.view.MenuHost
+import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import com.github.mikephil.charting.charts.BarChart
 import com.github.mikephil.charting.charts.LineChart
@@ -16,6 +17,7 @@ import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.components.YAxis
 import com.github.mikephil.charting.data.*
 import com.github.mikephil.charting.formatter.LargeValueFormatter
+import com.haidoan.android.ceedee.R
 import com.haidoan.android.ceedee.data.report.FirestoreApi
 import com.haidoan.android.ceedee.data.report.ReportRepository
 import com.haidoan.android.ceedee.databinding.FragmentRevenueExpensesBinding
@@ -67,7 +69,7 @@ class RevenueExpensesFragment : Fragment() {
     private var startTime: LocalDate = LocalDate.now().with(TemporalAdjusters.firstDayOfMonth())
     private var endTime: LocalDate = LocalDate.now().with(TemporalAdjusters.lastDayOfMonth())
 
-
+    private var currentChartTime: ChartType = ChartType.BAR_CHART
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -83,15 +85,37 @@ class RevenueExpensesFragment : Fragment() {
 
         barChart = binding.barChart
         lineChart = binding.lineChart
-        styleLineChart()
-        //styleBarChart()
 
+        styleLineChart()
+        styleBarChart()
+
+        lineChart.visibility = View.GONE
+
+        setUpTextViewStartTime()
+        setUpTextViewEndTime()
+        setUpOptionMenu()
+
+        viewModel.monthlyRevenue.observe(viewLifecycleOwner) {
+            styleLineChart()
+            fillLineChartData(it, null)
+            styleBarChart()
+            fillBarChartData(it, null)
+            revenueDataCache.clear()
+            revenueDataCache.putAll(it)
+        }
+        viewModel.monthlyExpenses.observe(viewLifecycleOwner) {
+            styleLineChart()
+            fillLineChartData(null, it)
+            styleBarChart()
+            fillBarChartData(null, it)
+            expensesDataCache.clear()
+            expensesDataCache.putAll(it)
+        }
+    }
+
+    private fun setUpTextViewStartTime() {
         val displayedStartTime = "${startTime.monthValue}/${startTime.year}"
         binding.textviewStartMonth.text = displayedStartTime
-
-        val displayedEndTime = "${endTime.monthValue}/${endTime.year}"
-        binding.textviewEndMonth.text = displayedEndTime
-
         binding.textviewStartMonth.setOnClickListener {
             MonthYearPickerDialog(Calendar.getInstance().time).apply {
                 setTitle("Select start month")
@@ -112,7 +136,11 @@ class RevenueExpensesFragment : Fragment() {
                 show(this@RevenueExpensesFragment.parentFragmentManager, "MonthYearPickerDialog")
             }
         }
+    }
 
+    private fun setUpTextViewEndTime() {
+        val displayedEndTime = "${endTime.monthValue}/${endTime.year}"
+        binding.textviewEndMonth.text = displayedEndTime
         binding.textviewEndMonth.setOnClickListener {
             MonthYearPickerDialog(Calendar.getInstance().time).apply {
                 setTitle("Select end month")
@@ -136,30 +164,56 @@ class RevenueExpensesFragment : Fragment() {
                 )
             }
         }
+    }
 
-        viewModel.monthlyRevenue.observe(viewLifecycleOwner) {
-            if (lineChart.visibility == View.VISIBLE) {
-                styleLineChart()
-                fillLineChartData(it, null)
-            } else if (barChart.visibility == View.VISIBLE) {
-                styleBarChart()
-                fillBarChartData(it, null)
+    private fun setUpOptionMenu() {
+        val menuHost: MenuHost = requireActivity()
+        menuHost.addMenuProvider(object : MenuProvider {
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                // Add menu items here
+                menuInflater.inflate(R.menu.menu_report_fragment, menu)
+                menu.findItem(R.id.menu_item_rpfragment_chart_type).subMenu?.setHeaderTitle("Choose chart type")
             }
-            revenueDataCache.clear()
-            revenueDataCache.putAll(it)
-        }
 
-        viewModel.monthlyExpenses.observe(viewLifecycleOwner) {
-            if (lineChart.visibility == View.VISIBLE) {
-                styleLineChart()
-                fillLineChartData(null, it)
-            } else if (barChart.visibility == View.VISIBLE) {
-                styleBarChart()
-                fillBarChartData(null, it)
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                // Handle the menu selection
+                return when (menuItem.itemId) {
+                    R.id.menu_item_rpfragment_barchart -> {
+                        if (currentChartTime != ChartType.BAR_CHART) {
+                            currentChartTime = ChartType.BAR_CHART
+                            barChart.visibility = View.VISIBLE
+                            lineChart.visibility = View.GONE
+                            requireActivity().invalidateOptionsMenu()
+                        }
+                        true
+                    }
+                    R.id.menu_item_rpfragment_linechart -> {
+                        if (currentChartTime != ChartType.LINE_CHART) {
+                            currentChartTime = ChartType.LINE_CHART
+                            lineChart.visibility = View.VISIBLE
+                            barChart.visibility = View.GONE
+                            requireActivity().invalidateOptionsMenu()
+                        }
+                        true
+                    }
+                    else -> false
+                }
             }
-            expensesDataCache.clear()
-            expensesDataCache.putAll(it)
-        }
+
+            override fun onPrepareMenu(menu: Menu) {
+                super.onPrepareMenu(menu)
+                menu.findItem(R.id.menu_item_rpfragment_chart_type).subMenu?.setHeaderTitle("Choose chart type")
+
+                if (currentChartTime == ChartType.BAR_CHART) {
+                    menu.findItem(R.id.menu_item_rpfragment_chart_type)
+                        .setIcon(R.drawable.ic_barchart_black_24dp)
+                } else if (currentChartTime == ChartType.LINE_CHART) {
+                    menu.findItem(R.id.menu_item_rpfragment_chart_type)
+                        .setIcon(R.drawable.ic_linechart_black_24dp)
+                }
+
+            }
+        }, viewLifecycleOwner, Lifecycle.State.RESUMED)
     }
 
     private fun styleLineChart() {
@@ -368,6 +422,10 @@ class RevenueExpensesFragment : Fragment() {
             YearMonth.from(endTime)
         )
     }
+}
+
+private enum class ChartType {
+    BAR_CHART, LINE_CHART
 }
 
 
