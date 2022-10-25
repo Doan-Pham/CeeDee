@@ -1,10 +1,14 @@
 package com.haidoan.android.ceedee.ui.report.fragment
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.*
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.app.ActivityCompat
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
@@ -43,6 +47,11 @@ private val CHART_COLOR_SECOND = Color.rgb(251, 173, 86)
 private val CHART_COLOR_THIRD = Color.rgb(160, 215, 113)
 private val CHART_COLOR_FOURTH = Color.rgb(115, 176, 215)
 
+val PERMISSIONS = arrayOf(
+    Manifest.permission.WRITE_EXTERNAL_STORAGE,
+    Manifest.permission.READ_EXTERNAL_STORAGE
+)
+
 class RevenueExpensesFragment : Fragment() {
 
     private lateinit var binding: FragmentRevenueExpensesBinding
@@ -60,6 +69,18 @@ class RevenueExpensesFragment : Fragment() {
         )[ReportViewModel::class.java]
     }
 
+    private val multiplePermissionLauncher =
+        registerForActivityResult(
+            ActivityResultContracts.RequestMultiplePermissions()
+        ) { isGranted: Map<String, Boolean> ->
+            if (isGranted.containsValue(false)) {
+                Toast.makeText(
+                    requireActivity(),
+                    "Application needs permission to print report",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        }
     private lateinit var barChart: BarChart
     private lateinit var lineChart: LineChart
 
@@ -70,6 +91,7 @@ class RevenueExpensesFragment : Fragment() {
     private var endTime: LocalDate = LocalDate.now().with(TemporalAdjusters.lastDayOfMonth())
 
     private var currentChartTime: ChartType = ChartType.BAR_CHART
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -94,6 +116,7 @@ class RevenueExpensesFragment : Fragment() {
         setUpTextViewStartTime()
         setUpTextViewEndTime()
         setUpOptionMenu()
+        setUpButtonPrint()
 
         viewModel.monthlyRevenue.observe(viewLifecycleOwner) {
             styleLineChart()
@@ -162,6 +185,48 @@ class RevenueExpensesFragment : Fragment() {
                     this@RevenueExpensesFragment.parentFragmentManager,
                     "MonthYearPickerDialog"
                 )
+            }
+        }
+    }
+
+    private fun setUpButtonPrint() {
+        binding.buttonPrint.setOnClickListener {
+            // on below line we are checking permission
+            if (!handlePermission()) return@setOnClickListener
+        }
+    }
+
+    private fun hasPermissions(permissions: Array<String>?): Boolean {
+        if (permissions != null) {
+            for (permission in permissions) {
+                if (ActivityCompat.checkSelfPermission(
+                        requireActivity(),
+                        permission
+                    ) != PackageManager.PERMISSION_GRANTED
+                ) {
+                    Log.d("PERMISSIONS", "Permission is not granted: $permission")
+                    return false
+                }
+                Log.d("PERMISSIONS", "Permission already granted: $permission")
+            }
+            return true
+        }
+        return false
+    }
+
+    // on below line we are creating a function to request permission.
+    private fun handlePermission(): Boolean {
+        return when {
+            hasPermissions(PERMISSIONS) -> {
+                true
+            }
+            else -> {
+                // You can directly ask for the permission.
+                // The registered ActivityResultCallback gets the result of this request.
+                multiplePermissionLauncher.launch(
+                    PERMISSIONS
+                )
+                false
             }
         }
     }
