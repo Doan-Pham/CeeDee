@@ -243,7 +243,7 @@ class RevenueExpensesFragment : Fragment() {
             val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm")
             val fileOutput = File(
                 Environment.getExternalStorageDirectory(),
-                "Report_Revenue_Expenses_${formatter.format(LocalDateTime.now())}"
+                "Report_Revenue_Expenses_${formatter.format(LocalDateTime.now())}.pdf"
             )
 
             try {
