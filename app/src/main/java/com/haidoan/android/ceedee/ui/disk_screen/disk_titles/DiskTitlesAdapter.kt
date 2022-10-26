@@ -3,6 +3,7 @@ package com.haidoan.android.ceedee.ui.disk_screen.disk_titles
 import android.annotation.SuppressLint
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.Filter
 import android.widget.Filterable
@@ -22,9 +23,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class DiskTitlesAdapter(_diskTitlesViewModel: DiskTitlesViewModel,
-                        _viewLifecycleOwner: LifecycleOwner
-                        ) : RecyclerView.Adapter<DiskTitlesAdapter.DiskTitlesViewHolder>(), Filterable {
+class DiskTitlesAdapter(
+    _diskTitlesViewModel: DiskTitlesViewModel,
+    _viewLifecycleOwner: LifecycleOwner
+) : RecyclerView.Adapter<DiskTitlesAdapter.DiskTitlesViewHolder>(), Filterable {
 
     private lateinit var binding: DiskTitlesItemBinding
 
@@ -34,34 +36,40 @@ class DiskTitlesAdapter(_diskTitlesViewModel: DiskTitlesViewModel,
     private var viewLifecycleOwner: LifecycleOwner
     private var diskTitlesViewModel: DiskTitlesViewModel
 
-    private var listAmount = hashMapOf<String, Long>()
+    private var mapDiskTitleAmount = hashMapOf<DiskTitle, Long>()
+
     init {
-        diskTitlesViewModel=_diskTitlesViewModel
-        viewLifecycleOwner=_viewLifecycleOwner
+        diskTitlesViewModel = _diskTitlesViewModel
+        viewLifecycleOwner = _viewLifecycleOwner
     }
 
-    fun sortByGenre(idHash: String) {
-        val list = arrayListOf<DiskTitle>()
-        list.addAll(_differ.currentList)
-        list.sortByDescending { it.genreId.hashCode().toString() == idHash
+    fun sortByCDAmount(type: TypeUtils.SORT_BY_AMOUNT) {
+        val listResult = arrayListOf<DiskTitle>()
+        when (type) {
+            TypeUtils.SORT_BY_AMOUNT.Ascending -> {
+                val list = mapDiskTitleAmount.toList().sortedBy { it.second }
+                list.forEach { listResult.add(it.first) }
+            }
+            TypeUtils.SORT_BY_AMOUNT.Descending -> {
+                val list = mapDiskTitleAmount.toList().sortedByDescending { it.second }
+                list.forEach { listResult.add(it.first) }
+            }
         }
-        _differ.submitList(list)
+        _differ.submitList(listResult)
     }
 
     fun sortByName(type: TypeUtils.SORT_BY_NAME) {
-        CoroutineScope(Dispatchers.Default).launch {
-            val list = arrayListOf<DiskTitle>()
-            list.addAll(_differ.currentList)
-            when (type) {
-                TypeUtils.SORT_BY_NAME.Ascending -> {
-                    list.sortBy { it.name }
-                }
-                TypeUtils.SORT_BY_NAME.Descending -> {
-                    list.sortByDescending { it.name }
-                }
+        val list = arrayListOf<DiskTitle>()
+        list.addAll(_differ.currentList)
+        when (type) {
+            TypeUtils.SORT_BY_NAME.Ascending -> {
+                list.sortBy { it.name }
             }
-            _differ.submitList(list)
+            TypeUtils.SORT_BY_NAME.Descending -> {
+                list.sortByDescending { it.name }
+            }
         }
+        _differ.submitList(list)
     }
 
     fun setIOnItemMoreClickListener(listener: IOnItemClickListener) {
@@ -99,24 +107,25 @@ class DiskTitlesAdapter(_diskTitlesViewModel: DiskTitlesViewModel,
                 tvDiskTitlesAuthor.text = item.author
                 tvDiskTitlesName.text = item.name
                 Log.d("TAG_AMOUNT", item.id)
-                diskTitlesViewModel.getDiskAmountInDiskTitlesFromFireStore(item.id).observe(viewLifecycleOwner) { response ->
-                    when (response) {
-                        is Response.Loading -> {
-                            tvDiskTitlesAmount.text = "Loading..."
+                diskTitlesViewModel.getDiskAmountInDiskTitles(item.id)
+                    .observe(viewLifecycleOwner) { response ->
+                        when (response) {
+                            is Response.Loading -> {
+                                tvDiskTitlesAmount.text = "Loading..."
+                            }
+                            is Response.Success -> {
+                                val it = response.data.count
+                                mapDiskTitleAmount[item] = it
+                                Log.d("TAG_AMOUNT", "it $it")
+                                tvDiskTitlesAmount.text = "Amount: $it CD"
+                            }
+                            is Response.Failure -> {
+                                tvDiskTitlesAmount.text = "Fail to get amount..."
+                                print(response.errorMessage)
+                            }
                         }
-                        is Response.Success -> {
-                            val it = response.data.count
-                            listAmount[item.id] = it
-                            Log.d("TAG_AMOUNT", "it $it")
-                            tvDiskTitlesAmount.text = "Amount: $it CD"
-                        }
-                        is Response.Failure -> {
-                            tvDiskTitlesAmount.text = "Fail to get amount..."
-                            print(response.errorMessage)
-                        }
-                    }
 
-                }
+                    }
             }
         }
 

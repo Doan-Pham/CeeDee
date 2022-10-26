@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.liveData
 import com.haidoan.android.ceedee.ui.disk_screen.disks.DisksRepository
+import com.haidoan.android.ceedee.utils.TypeUtils
 import kotlinx.coroutines.Dispatchers
 
 class DiskTitlesViewModel(application: Application) : AndroidViewModel(application) {
@@ -17,8 +18,14 @@ class DiskTitlesViewModel(application: Application) : AndroidViewModel(applicati
         genreRepository = GenreRepository(application)
     }
 
-    fun getDiskAmountInDiskTitlesFromFireStore(diskTitleId : String) = liveData(Dispatchers.IO) {
+    fun getDiskAmountInDiskTitles(diskTitleId : String) = liveData(Dispatchers.IO) {
         disksRepository.getDiskAmountInDiskTitlesFromFireStore(diskTitleId).collect { response ->
+            emit(response)
+        }
+    }
+
+    fun getDiskTitlesSortByName(type: TypeUtils.SORT_BY_NAME) = liveData(Dispatchers.IO) {
+        diskTitlesRepository.getDiskTitlesSortByNameFromFireStore(type).collect { response ->
             emit(response)
         }
     }

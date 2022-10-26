@@ -15,7 +15,6 @@ import androidx.lifecycle.Lifecycle
 
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.haidoan.android.ceedee.MainActivity
 import com.haidoan.android.ceedee.R
 import com.haidoan.android.ceedee.data.Genre
 import com.haidoan.android.ceedee.databinding.FragmentDiskTitlesBinding
@@ -24,6 +23,9 @@ import com.haidoan.android.ceedee.utils.TypeUtils
 
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_second.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 
 class DiskTitlesFragment : Fragment() {
@@ -132,6 +134,8 @@ class DiskTitlesFragment : Fragment() {
     private fun createSearchView() {
         val searchView: SearchView =
             (requireActivity().toolbar.menu.findItem(R.id.menu_disk_titles_search).actionView as SearchView)
+        searchView.queryHint = "Type here to search"
+        searchView.maxWidth= Int.MAX_VALUE
         searchView.setOnQueryTextListener(object : OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 return false
@@ -146,7 +150,13 @@ class DiskTitlesFragment : Fragment() {
     }
 
     private fun filterByGenre(idHash: String) {
-        diskTitleAdapter.sortByGenre(idHash)
+        //TODO: sort by genre
+
+    }
+
+
+    private fun sortByCDAmount(type: TypeUtils.SORT_BY_AMOUNT) {
+        diskTitleAdapter.sortByCDAmount(type)
     }
 
     private fun sortByName(type: TypeUtils.SORT_BY_NAME) {
@@ -160,7 +170,7 @@ class DiskTitlesFragment : Fragment() {
     }
 
     private fun createMenu() {
-        (requireActivity() as MainActivity).toolbar.addMenuProvider(object : MenuProvider {
+        requireActivity().toolbar.addMenuProvider(object : MenuProvider {
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
                 // Add menu items here
                 menu.clear()
@@ -207,9 +217,11 @@ class DiskTitlesFragment : Fragment() {
                         true
                     }
                     R.id.menu_disk_title_tab_sort_by_CD_amount_ascending -> {
+                        sortByCDAmount(TypeUtils.SORT_BY_AMOUNT.Ascending)
                         true
                     }
                     R.id.menu_disk_title_tab_sort_by_CD_amount_descending -> {
+                        sortByCDAmount(TypeUtils.SORT_BY_AMOUNT.Descending)
                         true
                     }
                     else -> false
@@ -217,7 +229,6 @@ class DiskTitlesFragment : Fragment() {
             }
         }, viewLifecycleOwner, Lifecycle.State.RESUMED)
     }
-
 
     override fun onDestroyView() {
         super.onDestroyView()

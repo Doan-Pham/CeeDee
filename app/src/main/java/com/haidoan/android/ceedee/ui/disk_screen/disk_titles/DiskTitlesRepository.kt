@@ -7,9 +7,11 @@ import com.google.firebase.firestore.AggregateSource
 
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 
 import com.haidoan.android.ceedee.data.DiskTitle
 import com.haidoan.android.ceedee.data.Genre
+import com.haidoan.android.ceedee.utils.TypeUtils
 
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
@@ -24,6 +26,34 @@ class DiskTitlesRepository(private val application: Application) {
 
     init {
 
+    }
+
+    fun getDiskTitlesSortByNameFromFireStore(type: TypeUtils.SORT_BY_NAME) = flow {
+        emit(Response.Loading())
+        emit(
+            Response.Success(queryDiskTitle
+                .orderBy(
+                    "name", when (type) {
+                        TypeUtils.SORT_BY_NAME.Ascending -> {
+                            Query.Direction.ASCENDING
+                        }
+                        TypeUtils.SORT_BY_NAME.Descending -> {
+                            Query.Direction.DESCENDING
+                        }
+                    }
+                )
+                .get()
+                .await()
+                .documents
+                .mapNotNull { doc ->
+                    Log.d("TAG", "GET POST SUCCESS")
+                    doc.toObject(DiskTitle::class.java)
+                })
+        )
+    }.catch { error ->
+        error.message?.let { errorMessage ->
+            emit(Response.Failure(errorMessage))
+        }
     }
 
     fun getDiskTitlesFromFireStore() = flow {
