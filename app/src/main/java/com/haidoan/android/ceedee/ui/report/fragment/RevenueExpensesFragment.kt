@@ -60,8 +60,9 @@ private val PERMISSIONS = arrayOf(
     Manifest.permission.READ_EXTERNAL_STORAGE
 )
 
-private const val STANDARD_REPORT_PAGE_HEIGHT = 1120
-private const val STANDARD_REPORT_PAGE_WIDTH = 792
+// Unit of measurement is pt, 1 pt = 1/72 inch
+private const val STANDARD_REPORT_PAGE_HEIGHT = 842
+private const val STANDARD_REPORT_PAGE_WIDTH = 595
 
 class RevenueExpensesFragment : Fragment() {
 
@@ -101,7 +102,7 @@ class RevenueExpensesFragment : Fragment() {
     private var startTime: LocalDate = LocalDate.now().with(TemporalAdjusters.firstDayOfMonth())
     private var endTime: LocalDate = LocalDate.now().with(TemporalAdjusters.lastDayOfMonth())
 
-    private var currentChartTime: ChartType = ChartType.BAR_CHART
+    private var currentChartTypeShown: ChartType = ChartType.BAR_CHART
 
 
     override fun onCreateView(
@@ -206,6 +207,9 @@ class RevenueExpensesFragment : Fragment() {
             if (!handlePermission()) return@setOnClickListener
 
             val chartAsBitmap = BitmapFactory.decodeResource(resources, R.drawable.test1)
+//            val chartAsBitmap =
+//                if (currentChartTypeShown == ChartType.LINE_CHART) lineChart.chartBitmap
+//                else barChart.chartBitmap
 
             val chartAsScaledBitmap = Bitmap.createScaledBitmap(chartAsBitmap, 300, 300, false)
 
@@ -224,19 +228,21 @@ class RevenueExpensesFragment : Fragment() {
             val firstPage: PdfDocument.Page = reportAsPdf.startPage(pageInfo)
             val pageCanvas: Canvas = firstPage.canvas
 
-            pageCanvas.drawBitmap(chartAsScaledBitmap, 50f, 50f, imagePaint)
+            pageCanvas.drawBitmap(chartAsScaledBitmap, 209f, 140f, imagePaint)
             textPaint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.NORMAL)
-            textPaint.textSize = 15f
             textPaint.color = ContextCompat.getColor(requireActivity(), R.color.black)
             textPaint.textAlign = Paint.Align.CENTER
 
+            textPaint.textSize = 30f
             pageCanvas.drawText(
                 "Revenue and expenses from $startTime to $endTime",
                 209F,
                 100F,
                 textPaint
             )
-            pageCanvas.drawText("Date: ${LocalDate.now()}", 209F, 120F, textPaint)
+
+            textPaint.textSize = 15f
+            pageCanvas.drawText("Report Date: ${LocalDate.now()}", 209F, 120F, textPaint)
 
             reportAsPdf.finishPage(firstPage)
 
@@ -245,17 +251,19 @@ class RevenueExpensesFragment : Fragment() {
                 Environment.getExternalStorageDirectory(),
                 "Report_Revenue_Expenses_${formatter.format(LocalDateTime.now())}.pdf"
             )
-
+            val outputStream = FileOutputStream(fileOutput)
             try {
-                reportAsPdf.writeTo(FileOutputStream(fileOutput))
+                reportAsPdf.writeTo(outputStream)
                 Toast.makeText(requireActivity(), "PDF file generated..", Toast.LENGTH_SHORT).show()
+
             } catch (e: Exception) {
                 Log.e(TAG, "Error generating report: ${e.message}")
                 // on below line we are displaying a toast message as fail to generate PDF
                 Toast.makeText(requireActivity(), "Fail to generate PDF file..", Toast.LENGTH_SHORT)
                     .show()
             }
-
+            outputStream.flush()
+            outputStream.close()
             reportAsPdf.close()
         }
     }
@@ -305,8 +313,8 @@ class RevenueExpensesFragment : Fragment() {
                 // Handle the menu selection
                 return when (menuItem.itemId) {
                     R.id.menu_item_rpfragment_barchart -> {
-                        if (currentChartTime != ChartType.BAR_CHART) {
-                            currentChartTime = ChartType.BAR_CHART
+                        if (currentChartTypeShown != ChartType.BAR_CHART) {
+                            currentChartTypeShown = ChartType.BAR_CHART
                             barChart.visibility = View.VISIBLE
                             lineChart.visibility = View.GONE
                             requireActivity().invalidateOptionsMenu()
@@ -314,8 +322,8 @@ class RevenueExpensesFragment : Fragment() {
                         true
                     }
                     R.id.menu_item_rpfragment_linechart -> {
-                        if (currentChartTime != ChartType.LINE_CHART) {
-                            currentChartTime = ChartType.LINE_CHART
+                        if (currentChartTypeShown != ChartType.LINE_CHART) {
+                            currentChartTypeShown = ChartType.LINE_CHART
                             lineChart.visibility = View.VISIBLE
                             barChart.visibility = View.GONE
                             requireActivity().invalidateOptionsMenu()
@@ -330,10 +338,10 @@ class RevenueExpensesFragment : Fragment() {
                 super.onPrepareMenu(menu)
                 menu.findItem(R.id.menu_item_rpfragment_chart_type).subMenu?.setHeaderTitle("Choose chart type")
 
-                if (currentChartTime == ChartType.BAR_CHART) {
+                if (currentChartTypeShown == ChartType.BAR_CHART) {
                     menu.findItem(R.id.menu_item_rpfragment_chart_type)
                         .setIcon(R.drawable.ic_barchart_black_24dp)
-                } else if (currentChartTime == ChartType.LINE_CHART) {
+                } else if (currentChartTypeShown == ChartType.LINE_CHART) {
                     menu.findItem(R.id.menu_item_rpfragment_chart_type)
                         .setIcon(R.drawable.ic_linechart_black_24dp)
                 }
