@@ -16,6 +16,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.haidoan.android.ceedee.R
+import com.haidoan.android.ceedee.data.DiskTitle
 import com.haidoan.android.ceedee.data.Genre
 import com.haidoan.android.ceedee.databinding.FragmentDiskTitlesBinding
 import com.haidoan.android.ceedee.utils.TypeUtils
@@ -26,6 +27,8 @@ import kotlinx.android.synthetic.main.fragment_second.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.util.*
+import kotlin.collections.ArrayList
 
 
 class DiskTitlesFragment : Fragment() {
@@ -33,11 +36,12 @@ class DiskTitlesFragment : Fragment() {
     private lateinit var diskTitleAdapter: DiskTitlesAdapter
     private lateinit var diskTitlesViewModel: DiskTitlesViewModel
 
+    private var listAllItem: ArrayList<DiskTitle> = ArrayList()
+    //private var listAllItemTerm: ArrayList<DiskTitle> = ArrayList()
+
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
-
-    private var listGenre: ArrayList<Genre> = ArrayList()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -66,12 +70,18 @@ class DiskTitlesFragment : Fragment() {
                     //Do what you need to do with your list
                     //Hide the ProgressBar
                     binding.progressbarDiskTitle.visibility = View.GONE
-                    diskTitleAdapter.differ().submitList(list)
+                    listAllItem.addAll(list)
+                    diskTitleAdapter.setListData(listAllItem)
+                    //listAllItemTerm.addAll(list)
+                    //diskTitleAdapter.setListData(listAllItemTerm)
                     if (diskTitleAdapter.itemCount >= 2)
                         binding.tvDiskTitlesTotal.text =
                             diskTitleAdapter.itemCount.toString() + " Titles"
                     else binding.tvDiskTitlesTotal.text =
                         diskTitleAdapter.itemCount.toString() + " Title"
+
+                    createMenu()
+                    //createSearchView()
                 }
                 is Response.Failure -> {
                     print(response.errorMessage)
@@ -79,30 +89,9 @@ class DiskTitlesFragment : Fragment() {
                     binding.progressbarDiskTitle.visibility = View.GONE
                     Log.d("TAG", "FAILURE")
                 }
+                else -> print(response.toString())
             }
         }
-        diskTitlesViewModel.getGenres().observe(viewLifecycleOwner) { response ->
-            when (response) {
-                is Response.Loading -> {
-                    //Load a ProgressBar
-                    Log.d("TAG", "LOADING...")
-                }
-                is Response.Success -> {
-                    val list = response.data
-                    //Do what you need to do with your list
-                    //Hide the ProgressBar
-                    listGenre.addAll(list)
-                    createMenu()
-                    createSearchView()
-                }
-                is Response.Failure -> {
-                    print(response.errorMessage)
-                    //Hide the ProgressBar
-                    Log.d("TAG", "FAILURE")
-                }
-            }
-        }
-
         binding.apply {
             rcvDiskTitles.apply {
                 layoutManager = LinearLayoutManager(activity)
@@ -130,6 +119,7 @@ class DiskTitlesFragment : Fragment() {
             }
         })
     }
+/*
 
     private fun createSearchView() {
         val searchView: SearchView =
@@ -142,18 +132,27 @@ class DiskTitlesFragment : Fragment() {
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
-                diskTitleAdapter.filter.filter(newText)
+                listAllItemTerm.clear()
+                val searchText = newText!!.lowercase(Locale.getDefault())
+                if (searchText.isNotEmpty()){
+                    listAllItemTerm.forEach{
+                        if (it.name.lowercase(Locale.getDefault()).contains(searchText)){
+                            listAllItemTerm.add(it)
+                        }
+                    }
+
+                }
+                else {
+                    listAllItemTerm.clear()
+                    listAllItemTerm.addAll(listAllItem)
+                }
+
                 return false
             }
         })
 
     }
-
-    private fun filterByGenre(idHash: String) {
-        //TODO: sort by genre
-
-    }
-
+*/
 
     private fun sortByCDAmount(type: TypeUtils.SORT_BY_AMOUNT) {
         diskTitleAdapter.sortByCDAmount(type)
@@ -163,10 +162,12 @@ class DiskTitlesFragment : Fragment() {
         diskTitleAdapter.sortByName(type)
     }
 
-    private var menuItemGenreListener: OnMenuItemClickListener = OnMenuItemClickListener {
-        Log.d("TAG_genreIdHash", it.itemId.hashCode().toString())
-        filterByGenre(it.itemId.hashCode().toString())
-        true
+    private fun filterByGenre(isEnabled: Boolean) {
+        if (isEnabled) {
+        }
+        else {
+
+        }
     }
 
     private fun createMenu() {
@@ -175,26 +176,35 @@ class DiskTitlesFragment : Fragment() {
                 // Add menu items here
                 menu.clear()
                 menuInflater.inflate(R.menu.menu_disk_titles, menu)
-            }
 
-            override fun onPrepareMenu(menu: Menu) {
-                //super.onPrepareMenu(menu)
-                for (item in listGenre) {
-                    try {
-                        val id = item.id.hashCode()
-                        if (menu.findItem(id) == null) {
-                            menu.findItem(R.id.menu_disk_title_tab_filter_by_genre)
-                                .subMenu!!
-                                .add(Menu.NONE, id, Menu.NONE, item.name)
-                                .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_NEVER)
-                                .setOnMenuItemClickListener(menuItemGenreListener)
-                            Log.d("TAG_ID", id.toString())
-                        }
-
-                    } catch (exception: Exception) {
-                        println(exception.message)
+                val searchView: SearchView =
+                    (menu.findItem(R.id.menu_disk_titles_search).actionView as SearchView)
+                searchView.queryHint = "Type here to search"
+                searchView.maxWidth= Int.MAX_VALUE
+                searchView.setOnQueryTextListener(object : OnQueryTextListener {
+                    override fun onQueryTextSubmit(query: String?): Boolean {
+                        return false
                     }
-                }
+
+                    override fun onQueryTextChange(newText: String?): Boolean {
+                        val listAllItemTerm = arrayListOf<DiskTitle>()
+                        val searchText = newText!!.lowercase(Locale.getDefault())
+                        if (searchText.isNotEmpty()){
+                            listAllItem.forEach{
+                                if (it.name.lowercase(Locale.getDefault()).contains(searchText)){
+                                    listAllItemTerm.add(it)
+                                }
+                            }
+
+                        }
+                        else {
+                            listAllItemTerm.clear()
+                            listAllItemTerm.addAll(listAllItem)
+                        }
+                        diskTitleAdapter.setListData(listAllItemTerm)
+                        return false
+                    }
+                })
             }
 
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
@@ -204,8 +214,8 @@ class DiskTitlesFragment : Fragment() {
                         Log.d("TAG_MENU", "DISKTITLE_CART")
                         true
                     }
-                    R.id.menu_disk_titles_search -> {
-                        Log.d("TAG_MENU", "DISKTITLE_SEARCH")
+                    R.id.menu_disk_title_tab_filter_by_genre -> {
+                        filterByGenre(true)
                         true
                     }
                     R.id.menu_disk_title_tab_sort_by_name_ascending -> {
