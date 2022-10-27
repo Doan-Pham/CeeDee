@@ -2,7 +2,10 @@ package com.haidoan.android.ceedee.ui.report.fragment
 
 import android.Manifest
 import android.content.pm.PackageManager
-import android.graphics.*
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Paint
+import android.graphics.Typeface
 import android.graphics.pdf.PdfDocument
 import android.os.Bundle
 import android.os.Environment
@@ -61,8 +64,8 @@ private val PERMISSIONS = arrayOf(
 )
 
 // Unit of measurement is pt, 1 pt = 1/72 inch
-private const val STANDARD_REPORT_PAGE_HEIGHT = 842
-private const val STANDARD_REPORT_PAGE_WIDTH = 595
+private const val STANDARD_REPORT_PAGE_HEIGHT = 595
+private const val STANDARD_REPORT_PAGE_WIDTH = 842
 
 class RevenueExpensesFragment : Fragment() {
 
@@ -206,12 +209,24 @@ class RevenueExpensesFragment : Fragment() {
             // on below line we are checking permission
             if (!handlePermission()) return@setOnClickListener
 
-            val chartAsBitmap = BitmapFactory.decodeResource(resources, R.drawable.test1)
-//            val chartAsBitmap =
-//                if (currentChartTypeShown == ChartType.LINE_CHART) lineChart.chartBitmap
-//                else barChart.chartBitmap
+//            val chartAsBitmap = BitmapFactory.decodeResource(resources, R.drawable.test1)
 
-            val chartAsScaledBitmap = Bitmap.createScaledBitmap(chartAsBitmap, 300, 300, false)
+            barChart.setVisibleXRangeMaximum(1000f)
+            //barChart.notifyDataSetChanged()
+            //barChart.clear()
+            //barChart.invalidate()
+            Log.d(
+                TAG,
+                "chartAsView - highestVisibleX-before: ${barChart}"
+            )
+
+            val chartAsBitmap =
+                if (currentChartTypeShown == ChartType.LINE_CHART) lineChart.chartBitmap
+                else barChart.chartBitmap
+
+
+            val chartAsScaledBitmap = chartAsBitmap
+//                Bitmap.createScaledBitmap(chartAsBitmap, 300, 300, false)
 
             val reportAsPdf = PdfDocument()
 
@@ -228,7 +243,7 @@ class RevenueExpensesFragment : Fragment() {
             val firstPage: PdfDocument.Page = reportAsPdf.startPage(pageInfo)
             val pageCanvas: Canvas = firstPage.canvas
 
-            pageCanvas.drawBitmap(chartAsScaledBitmap, 209f, 140f, imagePaint)
+            pageCanvas.drawBitmap(chartAsScaledBitmap, 0f, 0f, imagePaint)
             textPaint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.NORMAL)
             textPaint.color = ContextCompat.getColor(requireActivity(), R.color.black)
             textPaint.textAlign = Paint.Align.CENTER
@@ -384,7 +399,7 @@ class RevenueExpensesFragment : Fragment() {
         lineChart.isHighlightPerDragEnabled = false
         lineChart.description.isEnabled = false
         lineChart.setVisibleXRangeMaximum(4f)
-        lineChart.extraRightOffset = 40f
+        lineChart.extraRightOffset = 50f
         lineChart.extraBottomOffset = 10f
 
         //Have to call notifyDataSetChanged for the UI change to take place immediately
@@ -398,7 +413,7 @@ class RevenueExpensesFragment : Fragment() {
         revenueDataNew: Map<LocalDate, Float>?,
         expensesDataNew: Map<LocalDate, Float>?
     ) {
-        Log.d(TAG, "Starting fillLineChartData()")
+        //Log.d(TAG, "Starting fillLineChartData()")
 
         // Use new data if it exists, else use data cache
         val revenueDataFinal: Map<LocalDate, Float> = revenueDataNew ?: revenueDataCache
@@ -413,7 +428,7 @@ class RevenueExpensesFragment : Fragment() {
                 )
             )
         }
-        Log.d(TAG, "revenueDataFinal: $revenueDataFinal")
+        //Log.d(TAG, "revenueDataFinal: $revenueDataFinal")
 
         val expensesChartEntries = mutableListOf<Entry>()
 
@@ -430,7 +445,7 @@ class RevenueExpensesFragment : Fragment() {
                 )
             )
         }
-        Log.d(TAG, "expensesDataFinal: $expensesDataFinal")
+        //Log.d(TAG, "expensesDataFinal: $expensesDataFinal")
 
         val dataSetRevenue = LineDataSet(revenueChartEntries, "Revenue")
         dataSetRevenue.color = CHART_COLOR_FIRST
@@ -447,7 +462,7 @@ class RevenueExpensesFragment : Fragment() {
         lineChart.notifyDataSetChanged()
         lineChart.invalidate()
 
-        Log.d(TAG, "fillLineChartData() called")
+        //Log.d(TAG, "fillLineChartData() called")
     }
 
     private fun styleBarChart() {
@@ -461,7 +476,7 @@ class RevenueExpensesFragment : Fragment() {
         xAxis.axisMaximum =
             getMonthCountBetween(startTime, endTime).toFloat() + 1
         xAxis.valueFormatter = MonthYearXAxisValueFormatter(startTime)
-
+        xAxis.labelRotationAngle = -60f
         val leftAxis = barChart.axisLeft
         leftAxis.textSize = CHART_TEXT_SIZE
         //leftAxis.setDrawZeroLine(true)
@@ -483,6 +498,7 @@ class RevenueExpensesFragment : Fragment() {
         barChart.isHighlightPerDragEnabled = false
         barChart.description.isEnabled = false
         barChart.setVisibleXRangeMaximum(4f)
+        //barChart.setVisibleXRangeMaximum(1000f)
         barChart.extraRightOffset = 20f
         barChart.extraBottomOffset = 10f
     }
@@ -491,6 +507,10 @@ class RevenueExpensesFragment : Fragment() {
         revenueDataNew: Map<LocalDate, Float>?,
         expensesDataNew: Map<LocalDate, Float>?
     ) {
+
+        Log.d(TAG, "Starting fillBarChartData()")
+
+
         // Use new data if it exists, else use data cache
         val revenueDataFinal: Map<LocalDate, Float> = revenueDataNew ?: revenueDataCache
 
@@ -506,7 +526,7 @@ class RevenueExpensesFragment : Fragment() {
                 )
             )
         }
-        Log.d(TAG, revenueDataFinal.entries.toString())
+        Log.d(TAG, "revenueDataFinal: $revenueDataFinal")
 
         val expensesChartEntries = mutableListOf<BarEntry>()
 
@@ -521,6 +541,7 @@ class RevenueExpensesFragment : Fragment() {
                 )
             )
         }
+        Log.d(TAG, "expensesDataFinal: $expensesDataFinal")
 
         val dataSetRevenue = BarDataSet(revenueChartEntries, "Revenue")
         dataSetRevenue.color = CHART_COLOR_FIRST
@@ -540,6 +561,7 @@ class RevenueExpensesFragment : Fragment() {
         barChart.groupBars(BAR_CHART_MIN_X_DEFAULT, BAR_CHAR_GROUP_SPACE, BAR_CHART_BAR_SPACE)
         barChart.notifyDataSetChanged()
         barChart.invalidate()
+        Log.d(TAG, "fillBarChartData() called")
     }
 
     private fun onMonthYearChanged() {
