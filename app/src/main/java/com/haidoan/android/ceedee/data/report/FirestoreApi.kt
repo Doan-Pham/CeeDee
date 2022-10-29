@@ -15,6 +15,7 @@ import java.time.ZoneId
 import java.time.ZoneOffset
 import java.time.temporal.TemporalAdjusters.firstDayOfMonth
 import java.time.temporal.TemporalAdjusters.lastDayOfMonth
+import java.util.TreeMap
 
 private const val TAG = "FirestoreApi.kt"
 
@@ -43,7 +44,7 @@ class FirestoreApi {
                 0
             )
 
-        val monthlyRevenue = HashMap<LocalDate, Float>()
+        val monthlyRevenue = TreeMap<LocalDate, Float>()
         var iteratorLocalDate = startTime
 
         while (iteratorLocalDate.isBefore(endTime) || iteratorLocalDate.isEqual(endTime)) {
@@ -94,7 +95,7 @@ class FirestoreApi {
                 0
             )
 
-        val monthlyExpenses = HashMap<LocalDate, Float>()
+        val monthlyExpenses = TreeMap<LocalDate, Float>()
         var iteratorLocalDate = startTime
 
         while (iteratorLocalDate.isBefore(endTime) || iteratorLocalDate.isEqual(endTime)) {
