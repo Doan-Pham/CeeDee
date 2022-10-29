@@ -1,25 +1,27 @@
 package com.haidoan.android.ceedee
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
+import android.view.*
+import android.widget.SearchView
+import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager.widget.ViewPager
 import com.google.android.material.tabs.TabLayout
 import com.google.firebase.auth.FirebaseAuth
-import com.haidoan.android.ceedee.databinding.FragmentFirstBinding
+import com.haidoan.android.ceedee.databinding.FragmentRentalBinding
 import com.haidoan.android.ceedee.ui.login.AuthenticationViewModel
 import fragmentRentalTabs.*
+
 
 /**
  * A simple [Fragment] subclass as the default destination in the navigation.
  */
 class RentalFragment : Fragment() {
 
-    private var _binding: FragmentFirstBinding? = null
+    private var _binding: FragmentRentalBinding? = null
 
     private lateinit var authViewModel: AuthenticationViewModel
     // This property is only valid between onCreateView and
@@ -30,10 +32,11 @@ class RentalFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        _binding = FragmentFirstBinding.inflate(inflater, container, false)
+        _binding = FragmentRentalBinding.inflate(inflater, container, false)
+
         return binding.root
     }
-
+    private lateinit var searchViewModel : SearchViewModel
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
       authViewModel = ViewModelProvider(this)[AuthenticationViewModel::class.java]
@@ -54,6 +57,7 @@ class RentalFragment : Fragment() {
 
     }
 
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
@@ -66,6 +70,7 @@ class RentalFragment : Fragment() {
         val currentUser = FirebaseAuth.getInstance().currentUser
 
     }
+
 
 
 
