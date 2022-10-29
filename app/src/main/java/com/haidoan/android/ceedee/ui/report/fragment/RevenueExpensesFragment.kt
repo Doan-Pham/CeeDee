@@ -3,10 +3,8 @@ package com.haidoan.android.ceedee.ui.report.fragment
 import android.Manifest
 import android.app.AlertDialog
 import android.content.pm.PackageManager
-import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.Paint
-import android.graphics.Typeface
+import android.graphics.*
+import android.graphics.Paint.FILTER_BITMAP_FLAG
 import android.graphics.pdf.PdfDocument
 import android.os.Bundle
 import android.os.Environment
@@ -37,6 +35,7 @@ import com.haidoan.android.ceedee.ui.report.util.MonthYearXAxisValueFormatter
 import com.haidoan.android.ceedee.ui.report.viewmodel.ReportViewModel
 import java.io.File
 import java.io.FileOutputStream
+import java.text.DecimalFormat
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.YearMonth
@@ -65,8 +64,8 @@ private val PERMISSIONS = arrayOf(
 )
 
 // Unit of measurement is pt, 1 pt = 1/72 inch
-private const val STANDARD_REPORT_PAGE_HEIGHT = 595
-private const val STANDARD_REPORT_PAGE_WIDTH = 842
+private const val STANDARD_REPORT_PAGE_WIDTH = 595
+private const val STANDARD_REPORT_PAGE_HEIGHT = 842
 
 class RevenueExpensesFragment : Fragment() {
 
@@ -206,11 +205,9 @@ class RevenueExpensesFragment : Fragment() {
     }
 
     private fun setUpButtonPrint() {
-
         binding.buttonPrint.setOnClickListener {
             // on below line we are checking permission
             if (!handlePermission()) return@setOnClickListener
-
 
             AlertDialog.Builder(requireContext())
                 .setTitle("Important Note")
@@ -220,56 +217,92 @@ class RevenueExpensesFragment : Fragment() {
                 .create()
                 .show()
 
-
         }
     }
 
     private fun printReportAsPdf() {
-        val chartAsBitmap =
-            if (currentChartTypeShown == ChartType.LINE_CHART) lineChart.chartBitmap
-            else barChart.chartBitmap
-
-        val chartAsScaledBitmap = chartAsBitmap
-//                Bitmap.createScaledBitmap(chartAsBitmap, 300, 300, false)
 
         val reportAsPdf = PdfDocument()
+        val pageInfo: PdfDocument.PageInfo? = PdfDocument.PageInfo.Builder(
+            STANDARD_REPORT_PAGE_WIDTH, STANDARD_REPORT_PAGE_HEIGHT, 1
+        ).create()
+        val firstPage: PdfDocument.Page = reportAsPdf.startPage(pageInfo)
+        val pageCanvas: Canvas = firstPage.canvas
 
         // two variables for paint "paint" is used
         // for drawing shapes and we will use "title"
         // for adding text in our PDF file.
-        val imagePaint = Paint()
+        val imagePaint = Paint(FILTER_BITMAP_FLAG)
         val textPaint = Paint()
 
-        val pageInfo: PdfDocument.PageInfo? = PdfDocument.PageInfo.Builder(
-            STANDARD_REPORT_PAGE_WIDTH, STANDARD_REPORT_PAGE_HEIGHT, 1
-        ).create()
+        val chartAsBitmap =
+            if (currentChartTypeShown == ChartType.LINE_CHART) lineChart.chartBitmap
+            else barChart.chartBitmap
 
-        val firstPage: PdfDocument.Page = reportAsPdf.startPage(pageInfo)
-        val pageCanvas: Canvas = firstPage.canvas
+        val chartAsScaledBitmap =
+            resizeBitmap(
+                chartAsBitmap,
+                pageCanvas.width - 2 * 40,
+                pageCanvas.height * 2 / 3
+            )
 
-        pageCanvas.drawBitmap(chartAsScaledBitmap, 0f, 0f, imagePaint)
+        pageCanvas.drawBitmap(
+            chartAsScaledBitmap,
+            (pageCanvas.width - chartAsScaledBitmap.width) / 2f,
+            (pageCanvas.height - chartAsScaledBitmap.height) / 2f,
+            imagePaint
+        )
+
         textPaint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.NORMAL)
         textPaint.color = ContextCompat.getColor(requireActivity(), R.color.black)
         textPaint.textAlign = Paint.Align.CENTER
 
         textPaint.textSize = 20f
         textPaint.isFakeBoldText = true
+
+        val monthYearFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("MM-yyyy")
         pageCanvas.drawText(
-            "Revenue and expenses from $startTime to $endTime",
+            "Revenue and expenses from ${monthYearFormatter.format(startTime)} to ${
+                monthYearFormatter.format(
+                    endTime
+                )
+            }",
             pageCanvas.width / 2f,
-            100F,
+            60f,
             textPaint
         )
 
         textPaint.textSize = 15f
         textPaint.isFakeBoldText = false
         pageCanvas.drawText(
-            "Report Date: ${LocalDate.now()}",
+            "Report Date: ${DateTimeFormatter.ofPattern("dd-MM-yyyy").format(LocalDate.now())}",
             pageCanvas.width / 2f,
-            120F,
+            80f,
             textPaint
         )
 
+        textPaint.textSize = 20f
+        textPaint.isFakeBoldText = true
+        pageCanvas.drawText(
+            "Total Revenue: ${
+                DecimalFormat("#,###").format(
+                    revenueDataCache.values.sum().toInt()
+                )
+            } VND",
+            pageCanvas.width / 2f,
+            pageCanvas.height - 100f,
+            textPaint
+        )
+        pageCanvas.drawText(
+            "Total Expenses: ${
+                DecimalFormat("#,###").format(
+                    expensesDataCache.values.sum().toInt()
+                )
+            } VND",
+            pageCanvas.width / 2f,
+            pageCanvas.height -70f,
+            textPaint
+        )
         reportAsPdf.finishPage(firstPage)
 
         val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm")
@@ -594,6 +627,27 @@ class RevenueExpensesFragment : Fragment() {
             YearMonth.from(startTime),
             YearMonth.from(endTime)
         )
+    }
+
+    private fun resizeBitmap(inputImage: Bitmap, resultWidth: Int, resultHeight: Int): Bitmap {
+        var resultImage = inputImage
+        return if (resultHeight > 0 && resultWidth > 0) {
+            val width = inputImage.width
+            val height = inputImage.height
+            val ratioBitmap = width.toFloat() / height.toFloat()
+            val ratioMax = resultWidth.toFloat() / resultHeight.toFloat()
+            var finalWidth = resultWidth
+            var finalHeight = resultHeight
+            if (ratioMax > ratioBitmap) {
+                finalWidth = (resultHeight.toFloat() * ratioBitmap).toInt()
+            } else {
+                finalHeight = (resultWidth.toFloat() / ratioBitmap).toInt()
+            }
+            resultImage = Bitmap.createScaledBitmap(inputImage, finalWidth, finalHeight, true)
+            resultImage
+        } else {
+            resultImage
+        }
     }
 }
 
