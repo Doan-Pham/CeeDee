@@ -5,7 +5,6 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import android.view.*
-import android.view.MenuItem.OnMenuItemClickListener
 import android.widget.SearchView
 import android.widget.SearchView.OnQueryTextListener
 
@@ -16,28 +15,17 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.haidoan.android.ceedee.R
-import com.haidoan.android.ceedee.data.DiskTitle
-import com.haidoan.android.ceedee.data.Genre
 import com.haidoan.android.ceedee.databinding.FragmentDiskTitlesBinding
 import com.haidoan.android.ceedee.utils.TypeUtils
 
-
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_second.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import java.util.*
-import kotlin.collections.ArrayList
-
 
 class DiskTitlesFragment : Fragment() {
     private var _binding: FragmentDiskTitlesBinding? = null
     private lateinit var diskTitleAdapter: DiskTitlesAdapter
     private lateinit var diskTitlesViewModel: DiskTitlesViewModel
-
-    private var listAllItem: ArrayList<DiskTitle> = ArrayList()
-    //private var listAllItemTerm: ArrayList<DiskTitle> = ArrayList()
 
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -56,6 +44,11 @@ class DiskTitlesFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        init()
+        addListeners()
+    }
+
+    private fun init() {
         diskTitlesViewModel = ViewModelProvider(requireActivity())[DiskTitlesViewModel::class.java]
         diskTitleAdapter = DiskTitlesAdapter(diskTitlesViewModel, viewLifecycleOwner)
         diskTitlesViewModel.getDiskTitles().observe(viewLifecycleOwner) { response ->
@@ -70,10 +63,7 @@ class DiskTitlesFragment : Fragment() {
                     //Do what you need to do with your list
                     //Hide the ProgressBar
                     binding.progressbarDiskTitle.visibility = View.GONE
-                    listAllItem.addAll(list)
-                    diskTitleAdapter.setListData(listAllItem)
-                    //listAllItemTerm.addAll(list)
-                    //diskTitleAdapter.setListData(listAllItemTerm)
+                    diskTitleAdapter.submitList(list.toMutableList())
                     if (diskTitleAdapter.itemCount >= 2)
                         binding.tvDiskTitlesTotal.text =
                             diskTitleAdapter.itemCount.toString() + " Titles"
@@ -81,7 +71,6 @@ class DiskTitlesFragment : Fragment() {
                         diskTitleAdapter.itemCount.toString() + " Title"
 
                     createMenu()
-                    //createSearchView()
                 }
                 is Response.Failure -> {
                     print(response.errorMessage)
@@ -96,9 +85,9 @@ class DiskTitlesFragment : Fragment() {
             rcvDiskTitles.apply {
                 layoutManager = LinearLayoutManager(activity)
                 adapter = diskTitleAdapter
+                setHasFixedSize(true)
             }
         }
-        addListeners()
     }
 
     private fun addListeners() {
@@ -106,7 +95,7 @@ class DiskTitlesFragment : Fragment() {
             override fun onItemClick(position: Int) {
                 Log.d(
                     "TAG_ADAPTER",
-                    "pos: " + position.toString() + "name: " + diskTitleAdapter.getItem(position).name
+                    "pos: " + position.toString() + "name: " + diskTitleAdapter.getItemAt(position).name
                 )
             }
         })
@@ -114,45 +103,11 @@ class DiskTitlesFragment : Fragment() {
             override fun onItemClick(position: Int) {
                 Log.d(
                     "TAG_ADAPTER",
-                    "pos: " + position.toString() + "name: " + diskTitleAdapter.getItem(position).name
+                    "pos: " + position.toString() + "name: " + diskTitleAdapter.getItemAt(position).name
                 )
             }
         })
     }
-/*
-
-    private fun createSearchView() {
-        val searchView: SearchView =
-            (requireActivity().toolbar.menu.findItem(R.id.menu_disk_titles_search).actionView as SearchView)
-        searchView.queryHint = "Type here to search"
-        searchView.maxWidth= Int.MAX_VALUE
-        searchView.setOnQueryTextListener(object : OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String?): Boolean {
-                return false
-            }
-
-            override fun onQueryTextChange(newText: String?): Boolean {
-                listAllItemTerm.clear()
-                val searchText = newText!!.lowercase(Locale.getDefault())
-                if (searchText.isNotEmpty()){
-                    listAllItemTerm.forEach{
-                        if (it.name.lowercase(Locale.getDefault()).contains(searchText)){
-                            listAllItemTerm.add(it)
-                        }
-                    }
-
-                }
-                else {
-                    listAllItemTerm.clear()
-                    listAllItemTerm.addAll(listAllItem)
-                }
-
-                return false
-            }
-        })
-
-    }
-*/
 
     private fun sortByCDAmount(type: TypeUtils.SORT_BY_AMOUNT) {
         diskTitleAdapter.sortByCDAmount(type)
@@ -160,12 +115,12 @@ class DiskTitlesFragment : Fragment() {
 
     private fun sortByName(type: TypeUtils.SORT_BY_NAME) {
         diskTitleAdapter.sortByName(type)
+        Log.d("TAG_SORTBYNAME", "sortByName in main")
     }
 
     private fun filterByGenre(isEnabled: Boolean) {
         if (isEnabled) {
-        }
-        else {
+        } else {
 
         }
     }
@@ -180,28 +135,14 @@ class DiskTitlesFragment : Fragment() {
                 val searchView: SearchView =
                     (menu.findItem(R.id.menu_disk_titles_search).actionView as SearchView)
                 searchView.queryHint = "Type here to search"
-                searchView.maxWidth= Int.MAX_VALUE
+                searchView.maxWidth = Int.MAX_VALUE
                 searchView.setOnQueryTextListener(object : OnQueryTextListener {
                     override fun onQueryTextSubmit(query: String?): Boolean {
                         return false
                     }
 
                     override fun onQueryTextChange(newText: String?): Boolean {
-                        val listAllItemTerm = arrayListOf<DiskTitle>()
-                        val searchText = newText!!.lowercase(Locale.getDefault())
-                        if (searchText.isNotEmpty()){
-                            listAllItem.forEach{
-                                if (it.name.lowercase(Locale.getDefault()).contains(searchText)){
-                                    listAllItemTerm.add(it)
-                                }
-                            }
-
-                        }
-                        else {
-                            listAllItemTerm.clear()
-                            listAllItemTerm.addAll(listAllItem)
-                        }
-                        diskTitleAdapter.setListData(listAllItemTerm)
+                        diskTitleAdapter.filter.filter(newText)
                         return false
                     }
                 })

@@ -4,8 +4,8 @@ import androidx.recyclerview.widget.DiffUtil
 import com.haidoan.android.ceedee.data.DiskTitle
 
 class DiskTitleDifferCallBack(
-    private val oldList: ArrayList<DiskTitle>,
-    private val newList: ArrayList<DiskTitle>
+    private val oldList: List<DiskTitle>,
+    private val newList: List<DiskTitle>
 ) : DiffUtil.Callback() {
     override fun getOldListSize(): Int = oldList.size
     override fun getNewListSize(): Int = newList.size

@@ -1,81 +1,82 @@
 package com.haidoan.android.ceedee.ui.disk_screen.disk_titles
 
+import android.annotation.SuppressLint
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.Filter
+import android.widget.Filterable
 import android.widget.ImageView
 import androidx.core.net.toUri
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import com.haidoan.android.ceedee.R
 import com.haidoan.android.ceedee.data.DiskTitle
 import com.haidoan.android.ceedee.databinding.DiskTitlesItemBinding
 import com.haidoan.android.ceedee.utils.TypeUtils
+import java.util.*
 
-
+@SuppressLint("NotifyDataSetChanged")
 class DiskTitlesAdapter(
-    _diskTitlesViewModel: DiskTitlesViewModel,
-    _viewLifecycleOwner: LifecycleOwner
-) : RecyclerView.Adapter<DiskTitlesAdapter.DiskTitlesViewHolder>() {
+    private val diskTitlesViewModel: DiskTitlesViewModel,
+    private val viewLifecycleOwner: LifecycleOwner
+) : ListAdapter<DiskTitle, DiskTitlesAdapter.DiskTitlesViewHolder>(DiskTitleUtils()),
+    Filterable {
 
-    private lateinit var binding: DiskTitlesItemBinding
-
-    private val listData = ArrayList<DiskTitle>()
+    private val displayedDiskTitles = arrayListOf<DiskTitle>()
+    private val allDiskTitles = arrayListOf<DiskTitle>()
 
     private lateinit var iOnItemClickListener: IOnItemClickListener
     private lateinit var iOnItemMoreClickListener: IOnItemClickListener
 
-    private var viewLifecycleOwner: LifecycleOwner
-    private var diskTitlesViewModel: DiskTitlesViewModel
-
-    private var mapDiskTitleAmount = hashMapOf<DiskTitle, Long>()
+    private val mapDiskTitleAmount = hashMapOf<DiskTitle, Long>()
 
     init {
-        diskTitlesViewModel = _diskTitlesViewModel
-        viewLifecycleOwner = _viewLifecycleOwner
     }
 
-    fun setListData(newList: ArrayList<DiskTitle>) {
-        val diffCallback = DiskTitleDifferCallBack(listData, newList)
-        val diffResult = DiffUtil.calculateDiff(diffCallback)
-        diffResult.dispatchUpdatesTo(this)
-        listData.clear()
-        listData.addAll(newList)
+    override fun submitList(newList: MutableList<DiskTitle>?) {
+        super.submitList(newList!!.toList())
+        allDiskTitles.addAll(newList.toList())
+        displayedDiskTitles.clear()
+        displayedDiskTitles.addAll(newList.toList())
     }
 
     fun getListData(): ArrayList<DiskTitle> {
-        return listData
+        return displayedDiskTitles
     }
 
     fun sortByCDAmount(type: TypeUtils.SORT_BY_AMOUNT) {
-        val listResult = arrayListOf<DiskTitle>()
+        displayedDiskTitles.clear()
         when (type) {
             TypeUtils.SORT_BY_AMOUNT.Ascending -> {
                 val list = mapDiskTitleAmount.toList().sortedBy { it.second }
-                list.forEach { listResult.add(it.first) }
+                list.forEach { displayedDiskTitles.add(it.first) }
             }
             TypeUtils.SORT_BY_AMOUNT.Descending -> {
                 val list = mapDiskTitleAmount.toList().sortedByDescending { it.second }
-                list.forEach { listResult.add(it.first) }
+                list.forEach { displayedDiskTitles.add(it.first) }
             }
         }
-        setListData(listResult)
+        notifyDataSetChanged()
     }
 
     fun sortByName(type: TypeUtils.SORT_BY_NAME) {
-        val list = arrayListOf<DiskTitle>()
-        list.addAll(listData)
         when (type) {
             TypeUtils.SORT_BY_NAME.Ascending -> {
-                list.sortBy { it.name }
+                displayedDiskTitles.sortBy { it.name }
             }
             TypeUtils.SORT_BY_NAME.Descending -> {
-                list.sortByDescending { it.name }
+                displayedDiskTitles.sortByDescending { it.name }
             }
         }
-        setListData(list)
+        notifyDataSetChanged()
+     /*   Log.d("TAG_SORTBYNAME", "sortByName in adapter")
+        listResult.forEach {
+            Log.d("TAG_SORTBYNAME", "${it.name}")
+        }*/
     }
 
     fun setIOnItemMoreClickListener(listener: IOnItemClickListener) {
@@ -86,25 +87,45 @@ class DiskTitlesAdapter(
         iOnItemClickListener = listener
     }
 
-    fun getItem(position: Int): DiskTitle {
-        return listData[position]
+    fun getItemAt(position: Int): DiskTitle {
+        return displayedDiskTitles[position]
     }
 
-    override fun getItemCount() = listData.size
+    override fun getItemCount() = displayedDiskTitles.size
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DiskTitlesViewHolder {
-        binding = DiskTitlesItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return DiskTitlesViewHolder(iOnItemClickListener, iOnItemMoreClickListener)
+        val binding =
+            DiskTitlesItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return DiskTitlesViewHolder(
+            binding = binding,
+            viewLifecycleOwner = viewLifecycleOwner,
+            diskTitlesViewModel = diskTitlesViewModel,
+            itemClickListeners = iOnItemClickListener,
+            moreBtnClickListeners = iOnItemMoreClickListener
+        )
     }
 
     override fun onBindViewHolder(holder: DiskTitlesViewHolder, position: Int) {
-        holder.setData(listData[position])
+        holder.setData(displayedDiskTitles[position])
         holder.setIsRecyclable(true)
     }
 
+    private class DiskTitleUtils : DiffUtil.ItemCallback<DiskTitle>() {
+        override fun areItemsTheSame(oldItem: DiskTitle, newItem: DiskTitle): Boolean {
+            return oldItem == newItem
+        }
+
+        override fun areContentsTheSame(oldItem: DiskTitle, newItem: DiskTitle): Boolean {
+            return oldItem.id == newItem.id
+        }
+    }
+
     inner class DiskTitlesViewHolder(
-        listener: IOnItemClickListener,
-        listenerMore: IOnItemClickListener
+        private val binding: DiskTitlesItemBinding,
+        private val diskTitlesViewModel: DiskTitlesViewModel,
+        private val viewLifecycleOwner: LifecycleOwner,
+        private val itemClickListeners: IOnItemClickListener,
+        private val moreBtnClickListeners: IOnItemClickListener
     ) : RecyclerView.ViewHolder(binding.root) {
         fun setData(item: DiskTitle) {
             binding.apply {
@@ -112,6 +133,7 @@ class DiskTitlesAdapter(
 
                 tvDiskTitlesAuthor.text = item.author
                 tvDiskTitlesName.text = item.name
+
                 Log.d("TAG_AMOUNT", item.id)
                 diskTitlesViewModel.getDiskAmountInDiskTitles(item.id)
                     .observe(viewLifecycleOwner) { response ->
@@ -135,59 +157,56 @@ class DiskTitlesAdapter(
             }
         }
 
+        private fun bindImage(imgView: ImageView, imgUrl: String?) {
+            imgUrl?.let {
+                val imgUri = imgUrl.toUri().buildUpon().scheme("https").build()
+                imgView.load(imgUri) {
+                    placeholder(R.drawable.ic_launcher)
+                    error(R.drawable.ic_app_logo)
+                }
+            }
+        }
+
         init {
             itemView.setOnClickListener {
-                listener.onItemClick(bindingAdapterPosition)
-                Log.d("TAG_ITEM", listData[bindingAdapterPosition].name)
+                itemClickListeners.onItemClick(bindingAdapterPosition)
+                Log.d("TAG_ITEM", displayedDiskTitles[bindingAdapterPosition].name)
             }
 
             binding.imgDiskTitlesBtnMore.setOnClickListener {
-                listenerMore.onItemClick((bindingAdapterPosition))
+                moreBtnClickListeners.onItemClick((bindingAdapterPosition))
             }
         }
     }
 
-    fun bindImage(imgView: ImageView, imgUrl: String?) {
-        imgUrl?.let {
-            val imgUri = imgUrl.toUri().buildUpon().scheme("https").build()
-            imgView.load(imgUri) {
-                placeholder(R.drawable.ic_launcher)
-                error(R.drawable.ic_app_logo)
-            }
-        }
-    }
-
-   /*
     override fun getFilter(): Filter {
         return object : Filter() {
             override fun performFiltering(constraint: CharSequence?): FilterResults {
-                val list = arrayListOf<DiskTitle>()
-                list.addAll(_differ.currentList)
-
                 val filteredList = arrayListOf<DiskTitle>()
                 if (constraint == null || constraint.isEmpty()) {
-                    filteredList.addAll(list)
+                    filteredList.addAll(allDiskTitles)
                 } else {
-                    val filterPattern = constraint.toString().toLowerCase().trim()
-
-                    for (item in list) {
-                        if (item.name.toLowerCase().contains(filterPattern)) {
+                    val filterPattern: String =
+                        constraint.toString().lowercase(Locale.getDefault()).trim()
+                    allDiskTitles.forEach { item ->
+                        if (item.name.lowercase(Locale.getDefault()).trim()
+                                .contains(filterPattern)
+                        ) {
                             filteredList.add(item)
                         }
                     }
                 }
-                val results = FilterResults()
-                results.values = filteredList
-                return results
+                val filterResults = FilterResults()
+                filterResults.values = filteredList
+                return filterResults
             }
 
             @Suppress("UNCHECKED_CAST")
             override fun publishResults(constraint: CharSequence?, results: FilterResults?) {
-                val list = arrayListOf<DiskTitle>()
-                list.addAll(results?.values as ArrayList<DiskTitle>)
-                list.forEach{it -> Log.d("TAG_FILTER_SEARCH","LIST: ${it.name}")}
-                _differ.submitList(list)
+                displayedDiskTitles.clear()
+                displayedDiskTitles.addAll(results?.values as List<DiskTitle>)
+                notifyDataSetChanged()
             }
         }
-    }*/
+    }
 }
