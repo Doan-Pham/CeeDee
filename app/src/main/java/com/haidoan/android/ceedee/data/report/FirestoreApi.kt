@@ -44,6 +44,12 @@ class FirestoreApi {
             )
 
         val monthlyRevenue = HashMap<LocalDate, Float>()
+        var iteratorLocalDate = startTime
+
+        while (iteratorLocalDate.isBefore(endTime) || iteratorLocalDate.isEqual(endTime)) {
+            monthlyRevenue[iteratorLocalDate] = 0f
+            iteratorLocalDate = iteratorLocalDate.plusMonths(1)
+        }
 
         val firebaseQueryRef = databaseRef.collection("Rental")
             .whereGreaterThanOrEqualTo("returnDate", startTimestamp)
@@ -89,6 +95,12 @@ class FirestoreApi {
             )
 
         val monthlyExpenses = HashMap<LocalDate, Float>()
+        var iteratorLocalDate = startTime
+
+        while (iteratorLocalDate.isBefore(endTime) || iteratorLocalDate.isEqual(endTime)) {
+            monthlyExpenses[iteratorLocalDate] = 0f
+            iteratorLocalDate = iteratorLocalDate.plusMonths(1)
+        }
 
         val firebaseQueryRef = databaseRef.collection("Import")
             .whereGreaterThanOrEqualTo("date", startTimestamp)
