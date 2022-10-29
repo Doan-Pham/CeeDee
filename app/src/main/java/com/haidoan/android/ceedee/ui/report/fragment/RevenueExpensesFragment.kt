@@ -1,6 +1,7 @@
 package com.haidoan.android.ceedee.ui.report.fragment
 
 import android.Manifest
+import android.app.AlertDialog
 import android.content.pm.PackageManager
 import android.graphics.Canvas
 import android.graphics.Color
@@ -49,7 +50,7 @@ private const val BAR_CHART_BAR_WIDTH = 0.45f
 private const val BAR_CHART_BAR_SPACE = 0.02f
 private const val BAR_CHAR_GROUP_SPACE = 0.06f
 private const val BAR_CHART_MIN_X_DEFAULT = 0f
-private const val CHART_TEXT_SIZE = 12f
+private const val CHART_TEXT_SIZE = 14f
 private const val TAG = "RevenueExpensesFragment"
 
 // Some methods for chart styling doesn't allow R.color
@@ -205,82 +206,99 @@ class RevenueExpensesFragment : Fragment() {
     }
 
     private fun setUpButtonPrint() {
+
         binding.buttonPrint.setOnClickListener {
             // on below line we are checking permission
             if (!handlePermission()) return@setOnClickListener
 
-//            val chartAsBitmap = BitmapFactory.decodeResource(resources, R.drawable.test1)
 
-            barChart.setVisibleXRangeMaximum(1000f)
-            //barChart.notifyDataSetChanged()
-            //barChart.clear()
-            //barChart.invalidate()
-            Log.d(
-                TAG,
-                "chartAsView - highestVisibleX-before: ${barChart}"
-            )
-
-            val chartAsBitmap =
-                if (currentChartTypeShown == ChartType.LINE_CHART) lineChart.chartBitmap
-                else barChart.chartBitmap
+            AlertDialog.Builder(requireContext())
+                .setTitle("Important Note")
+                .setMessage(R.string.chart_print_note)
+                .setPositiveButton("Print") { _, _ -> printReportAsPdf() }
+                .setNegativeButton("Cancel") { dialog, _ -> dialog.cancel() }
+                .create()
+                .show()
 
 
-            val chartAsScaledBitmap = chartAsBitmap
+        }
+    }
+
+    private fun printReportAsPdf() {
+        val chartAsBitmap =
+            if (currentChartTypeShown == ChartType.LINE_CHART) lineChart.chartBitmap
+            else barChart.chartBitmap
+
+        val chartAsScaledBitmap = chartAsBitmap
 //                Bitmap.createScaledBitmap(chartAsBitmap, 300, 300, false)
 
-            val reportAsPdf = PdfDocument()
+        val reportAsPdf = PdfDocument()
 
-            // two variables for paint "paint" is used
-            // for drawing shapes and we will use "title"
-            // for adding text in our PDF file.
-            val imagePaint = Paint()
-            val textPaint = Paint()
+        // two variables for paint "paint" is used
+        // for drawing shapes and we will use "title"
+        // for adding text in our PDF file.
+        val imagePaint = Paint()
+        val textPaint = Paint()
 
-            val pageInfo: PdfDocument.PageInfo? = PdfDocument.PageInfo.Builder(
-                STANDARD_REPORT_PAGE_WIDTH, STANDARD_REPORT_PAGE_HEIGHT, 1
-            ).create()
+        val pageInfo: PdfDocument.PageInfo? = PdfDocument.PageInfo.Builder(
+            STANDARD_REPORT_PAGE_WIDTH, STANDARD_REPORT_PAGE_HEIGHT, 1
+        ).create()
 
-            val firstPage: PdfDocument.Page = reportAsPdf.startPage(pageInfo)
-            val pageCanvas: Canvas = firstPage.canvas
+        val firstPage: PdfDocument.Page = reportAsPdf.startPage(pageInfo)
+        val pageCanvas: Canvas = firstPage.canvas
 
-            pageCanvas.drawBitmap(chartAsScaledBitmap, 0f, 0f, imagePaint)
-            textPaint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.NORMAL)
-            textPaint.color = ContextCompat.getColor(requireActivity(), R.color.black)
-            textPaint.textAlign = Paint.Align.CENTER
+        pageCanvas.drawBitmap(chartAsScaledBitmap, 0f, 0f, imagePaint)
+        textPaint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.NORMAL)
+        textPaint.color = ContextCompat.getColor(requireActivity(), R.color.black)
+        textPaint.textAlign = Paint.Align.CENTER
 
-            textPaint.textSize = 30f
-            pageCanvas.drawText(
-                "Revenue and expenses from $startTime to $endTime",
-                209F,
-                100F,
-                textPaint
+        textPaint.textSize = 20f
+        textPaint.isFakeBoldText = true
+        pageCanvas.drawText(
+            "Revenue and expenses from $startTime to $endTime",
+            pageCanvas.width / 2f,
+            100F,
+            textPaint
+        )
+
+        textPaint.textSize = 15f
+        textPaint.isFakeBoldText = false
+        pageCanvas.drawText(
+            "Report Date: ${LocalDate.now()}",
+            pageCanvas.width / 2f,
+            120F,
+            textPaint
+        )
+
+        reportAsPdf.finishPage(firstPage)
+
+        val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm")
+        val fileOutput = File(
+            Environment.getExternalStorageDirectory(),
+            "Report_Revenue_Expenses_${formatter.format(LocalDateTime.now())}.pdf"
+        )
+        val outputStream = FileOutputStream(fileOutput)
+        try {
+            reportAsPdf.writeTo(outputStream)
+            Toast.makeText(
+                requireActivity(),
+                "PDF file generated..",
+                Toast.LENGTH_SHORT
+            ).show()
+
+        } catch (e: Exception) {
+            Log.e(TAG, "Error generating report: ${e.message}")
+            // on below line we are displaying a toast message as fail to generate PDF
+            Toast.makeText(
+                requireActivity(),
+                "Fail to generate PDF file..",
+                Toast.LENGTH_SHORT
             )
-
-            textPaint.textSize = 15f
-            pageCanvas.drawText("Report Date: ${LocalDate.now()}", 209F, 120F, textPaint)
-
-            reportAsPdf.finishPage(firstPage)
-
-            val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm")
-            val fileOutput = File(
-                Environment.getExternalStorageDirectory(),
-                "Report_Revenue_Expenses_${formatter.format(LocalDateTime.now())}.pdf"
-            )
-            val outputStream = FileOutputStream(fileOutput)
-            try {
-                reportAsPdf.writeTo(outputStream)
-                Toast.makeText(requireActivity(), "PDF file generated..", Toast.LENGTH_SHORT).show()
-
-            } catch (e: Exception) {
-                Log.e(TAG, "Error generating report: ${e.message}")
-                // on below line we are displaying a toast message as fail to generate PDF
-                Toast.makeText(requireActivity(), "Fail to generate PDF file..", Toast.LENGTH_SHORT)
-                    .show()
-            }
-            outputStream.flush()
-            outputStream.close()
-            reportAsPdf.close()
+                .show()
         }
+        outputStream.flush()
+        outputStream.close()
+        reportAsPdf.close()
     }
 
     private fun hasPermissions(permissions: Array<String>): Boolean {
@@ -376,10 +394,8 @@ class RevenueExpensesFragment : Fragment() {
             if (getMonthCountBetween(startTime, endTime).toFloat() > 1)
                 getMonthCountBetween(startTime, endTime).toFloat()
             else BAR_CHART_MIN_X_DEFAULT + 1
-
-        Log.d(TAG, "Line chart xAxis max: ${xAxis.axisMaximum}")
         xAxis.valueFormatter = MonthYearXAxisValueFormatter(startTime)
-        //xAxis.setAvoidFirstLastClipping(true)
+        xAxis.labelRotationAngle = -60f
 
         val leftAxis = lineChart.axisLeft
         leftAxis.textSize = CHART_TEXT_SIZE
@@ -395,10 +411,10 @@ class RevenueExpensesFragment : Fragment() {
         legend.textSize = CHART_TEXT_SIZE
 
         lineChart.setScaleEnabled(false)
+        lineChart.isScaleXEnabled = true
         lineChart.isHighlightPerTapEnabled = false
         lineChart.isHighlightPerDragEnabled = false
         lineChart.description.isEnabled = false
-        lineChart.setVisibleXRangeMaximum(4f)
         lineChart.extraRightOffset = 50f
         lineChart.extraBottomOffset = 10f
 
@@ -477,6 +493,7 @@ class RevenueExpensesFragment : Fragment() {
             getMonthCountBetween(startTime, endTime).toFloat() + 1
         xAxis.valueFormatter = MonthYearXAxisValueFormatter(startTime)
         xAxis.labelRotationAngle = -60f
+
         val leftAxis = barChart.axisLeft
         leftAxis.textSize = CHART_TEXT_SIZE
         //leftAxis.setDrawZeroLine(true)
@@ -493,11 +510,11 @@ class RevenueExpensesFragment : Fragment() {
         legend.textSize = CHART_TEXT_SIZE
 
         barChart.setScaleEnabled(false)
+        barChart.isScaleXEnabled = true
         barChart.isHighlightPerTapEnabled = false
         barChart.isHighlightFullBarEnabled = false
         barChart.isHighlightPerDragEnabled = false
         barChart.description.isEnabled = false
-        barChart.setVisibleXRangeMaximum(4f)
         //barChart.setVisibleXRangeMaximum(1000f)
         barChart.extraRightOffset = 20f
         barChart.extraBottomOffset = 10f
