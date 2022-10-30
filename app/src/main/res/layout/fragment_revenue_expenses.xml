@@ -7,6 +7,22 @@
     tools:context=".ui.report.fragment.RevenueExpensesFragment">
 
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Start time"
+        app:layout_constraintBottom_toTopOf="@+id/textview_start_month"
+        app:layout_constraintStart_toStartOf="@+id/textview_start_month"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/end_time"
+        app:layout_constraintBottom_toTopOf="@+id/textview_end_month"
+        app:layout_constraintStart_toStartOf="@+id/textview_end_month"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/textview_start_month"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
@@ -30,7 +46,6 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="15dp"
-        android:layout_marginTop="30dp"
         android:background="@drawable/background_textview_round_outline"
         android:drawablePadding="10dp"
         android:gravity="center_vertical"
@@ -46,8 +61,9 @@
         android:id="@+id/barChart"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="30dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp"
+        app:layout_constraintBottom_toTopOf="@id/button_print"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textview_start_month" />
@@ -56,9 +72,9 @@
         android:id="@+id/lineChart"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="30dp"
-        android:layout_marginBottom="80dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp"
+        app:layout_constraintBottom_toTopOf="@id/button_print"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textview_start_month" />
@@ -70,12 +86,10 @@
         android:layout_marginHorizontal="30dp"
         android:layout_marginTop="20dp"
         android:layout_marginBottom="70dp"
-        android:textStyle="bold"
-        android:textSize="16sp"
         android:background="@drawable/background_button_default"
-        app:backgroundTint="@color/primary"
         android:text="@string/print"
         android:textAllCaps="false"
+        app:backgroundTint="@color/primary"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

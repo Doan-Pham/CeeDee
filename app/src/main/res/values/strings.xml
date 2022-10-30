@@ -23,4 +23,6 @@
     <string name="bar_chart">Bar chart</string>
     <string name="line_chart">Line chart</string>
     <string name="print">Print</string>
+    <string name="chart_print_note">Only the visible part of the chart will be printed, please zoom out if you want to print the whole chart</string>
+    <string name="end_time">End time</string>
 </resources>
