@@ -26,9 +26,9 @@ private const val ARG_PARAM2 = "param2"
  */
 private lateinit var viewModel : RentalViewModel
 private lateinit var rentalRecyclerView: RecyclerView
-lateinit var rental_adapter: RentalAdapter
-lateinit var rentalList:ArrayList<Rental>
-lateinit var tempRentalList:ArrayList<Rental>
+private lateinit var rental_adapter: RentalAdapter
+private lateinit var rentalList:ArrayList<Rental>
+private lateinit var tempRentalList:ArrayList<Rental>
 
 class tabAll : Fragment() {
 

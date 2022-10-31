@@ -4,16 +4,14 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 
-class RentalViewModel : ViewModel() {
-
+class tabInProgressViewModel :ViewModel(){
     private val repository : RentalRepository
-    private val _allRentals = MutableLiveData<ArrayList<Rental>>()
+    private val _completeRentals = MutableLiveData<ArrayList<Rental>>()
 
-    val allRentals : LiveData<ArrayList<Rental>> = _allRentals
+    val completeRentals : LiveData<ArrayList<Rental>> = _completeRentals
 
     init {
         repository = RentalRepository().getInstance()
-        repository.loadUsers(_allRentals,"All")
+        repository.loadUsers(_completeRentals,"In progress")
     }
-
 }
