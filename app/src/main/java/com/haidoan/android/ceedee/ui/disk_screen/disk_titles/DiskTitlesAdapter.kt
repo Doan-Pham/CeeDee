@@ -20,15 +20,14 @@ import com.haidoan.android.ceedee.utils.TypeUtils
 import java.util.*
 
 @SuppressLint("NotifyDataSetChanged")
-class DiskTitlesAdapter(
-    private val diskTitlesViewModel: DiskTitlesViewModel,
-    private val viewLifecycleOwner: LifecycleOwner
-) : ListAdapter<DiskTitle, DiskTitlesAdapter.DiskTitlesViewHolder>(DiskTitleUtils()),
+class DiskTitlesAdapter: ListAdapter<DiskTitle, DiskTitlesAdapter.DiskTitlesViewHolder>(DiskTitleUtils()),
     Filterable {
 
     private val displayedDiskTitles = arrayListOf<DiskTitle>()
     private val allDiskTitles = arrayListOf<DiskTitle>()
 
+    private lateinit var diskTitlesViewModel: DiskTitlesViewModel
+    private lateinit var viewLifecycleOwner: LifecycleOwner
     private lateinit var iOnItemClickListener: IOnItemClickListener
     private lateinit var iOnItemMoreClickListener: IOnItemClickListener
 
@@ -42,6 +41,14 @@ class DiskTitlesAdapter(
         allDiskTitles.addAll(newList.toList())
         displayedDiskTitles.clear()
         displayedDiskTitles.addAll(newList.toList())
+    }
+
+    fun setLifecycleOwner(lco: LifecycleOwner){
+        viewLifecycleOwner=lco
+    }
+
+    fun setDiskTitlesViewModel(viewModel: DiskTitlesViewModel){
+        diskTitlesViewModel=viewModel
     }
 
     fun getListData(): ArrayList<DiskTitle> {

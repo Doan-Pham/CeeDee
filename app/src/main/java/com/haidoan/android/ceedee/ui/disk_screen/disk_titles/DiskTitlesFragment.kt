@@ -14,18 +14,24 @@ import androidx.lifecycle.Lifecycle
 
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.SimpleItemAnimator
 import com.haidoan.android.ceedee.R
+import com.haidoan.android.ceedee.data.DiskTitle
+import com.haidoan.android.ceedee.data.Genre
 import com.haidoan.android.ceedee.databinding.FragmentDiskTitlesBinding
 import com.haidoan.android.ceedee.utils.TypeUtils
 
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_second.*
+import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
 import java.util.*
 
 class DiskTitlesFragment : Fragment() {
     private var _binding: FragmentDiskTitlesBinding? = null
+
     private lateinit var diskTitleAdapter: DiskTitlesAdapter
     private lateinit var diskTitlesViewModel: DiskTitlesViewModel
+    private lateinit var genreAdapter: GenreAdapter
 
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -50,7 +56,13 @@ class DiskTitlesFragment : Fragment() {
 
     private fun init() {
         diskTitlesViewModel = ViewModelProvider(requireActivity())[DiskTitlesViewModel::class.java]
-        diskTitleAdapter = DiskTitlesAdapter(diskTitlesViewModel, viewLifecycleOwner)
+
+        diskTitleAdapter = DiskTitlesAdapter()
+        diskTitleAdapter.setDiskTitlesViewModel(diskTitlesViewModel)
+        diskTitleAdapter.setLifecycleOwner(viewLifecycleOwner)
+
+        genreAdapter = GenreAdapter(requireActivity().baseContext)
+
         diskTitlesViewModel.getDiskTitles().observe(viewLifecycleOwner) { response ->
             when (response) {
                 is Response.Loading -> {
@@ -63,7 +75,20 @@ class DiskTitlesFragment : Fragment() {
                     //Do what you need to do with your list
                     //Hide the ProgressBar
                     binding.progressbarDiskTitle.visibility = View.GONE
+
+         /*            val listParent = arrayListOf<DiskTitleParent>()
+                     val listGenre = arrayListOf<String>("ZvNutCQxPf4NLAGp6Vkj","cSaZOFGya4ds0uePxeq2","qh2CMkTZmywhLHyKPASa")
+                     listGenre.forEach{ section ->
+                         val items = arrayListOf<DiskTitle>()
+                         list.forEach { item->
+                             if (section==item.genreId)
+                                 items.add(item)
+                         }
+                         listParent.add(DiskTitleParent(section,items))
+                     }
+*/                  Log.d("TAG_VM",list.toString())
                     diskTitleAdapter.submitList(list.toMutableList())
+
                     if (diskTitleAdapter.itemCount >= 2)
                         binding.tvDiskTitlesTotal.text =
                             diskTitleAdapter.itemCount.toString() + " Titles"
@@ -81,30 +106,49 @@ class DiskTitlesFragment : Fragment() {
                 else -> print(response.toString())
             }
         }
+        diskTitlesViewModel.getGenres().observe(viewLifecycleOwner) { response ->
+            when (response) {
+                is Response.Loading -> {
+                    //Load a ProgressBar
+                    binding.progressbarDiskTitle.visibility = View.VISIBLE
+                    Log.d("TAG", "LOADING...")
+                }
+                is Response.Success -> {
+                    val list = response.data
+                    Log.d("TAG_VM",list.toString())
+                    genreAdapter.submitList(list.toMutableList())
+                }
+                is Response.Failure -> {
+                    print(response.errorMessage)
+                }
+                else -> print(response.toString())
+            }
+        }
+
         binding.apply {
             rcvDiskTitles.apply {
                 layoutManager = LinearLayoutManager(activity)
                 adapter = diskTitleAdapter
-                setHasFixedSize(true)
             }
+            rcvGenres.apply {
+                layoutManager = LinearLayoutManager(activity).apply {
+                    orientation = LinearLayoutManager.HORIZONTAL
+                }
+                adapter = genreAdapter
+            }
+            (rcvGenres.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
         }
     }
 
     private fun addListeners() {
         diskTitleAdapter.setIOnItemClickListener(object : IOnItemClickListener {
             override fun onItemClick(position: Int) {
-                Log.d(
-                    "TAG_ADAPTER",
-                    "pos: " + position.toString() + "name: " + diskTitleAdapter.getItemAt(position).name
-                )
+
             }
         })
         diskTitleAdapter.setIOnItemMoreClickListener(object : IOnItemClickListener {
             override fun onItemClick(position: Int) {
-                Log.d(
-                    "TAG_ADAPTER",
-                    "pos: " + position.toString() + "name: " + diskTitleAdapter.getItemAt(position).name
-                )
+
             }
         })
     }
@@ -115,15 +159,39 @@ class DiskTitlesFragment : Fragment() {
 
     private fun sortByName(type: TypeUtils.SORT_BY_NAME) {
         diskTitleAdapter.sortByName(type)
-        Log.d("TAG_SORTBYNAME", "sortByName in main")
     }
 
-    private fun filterByGenre(isEnabled: Boolean) {
-        if (isEnabled) {
-        } else {
-
+/*    private fun filterByGenre() {
+        val list = arrayListOf<DiskTitle>()
+        //list.addAll(diskTitleAdapter.getListData())
+        val listParent = arrayListOf<DiskTitleParent>()
+        val listGenre = arrayListOf<String>(
+            "ZvNutCQxPf4NLAGp6Vkj",
+            "cSaZOFGya4ds0uePxeq2",
+            "qh2CMkTZmywhLHyKPASa"
+        )
+        listGenre.forEach { section ->
+            val items = arrayListOf<DiskTitle>()
+            list.forEach { item ->
+                if (section == item.genreId)
+                    items.add(item)
+            }
+            listParent.add(DiskTitleParent(section, items))
         }
-    }
+        diskTitleParentAdapter = DiskTitleParentAdapter()
+        diskTitleParentAdapter.setDiskTitlesViewModel(diskTitlesViewModel)
+        diskTitleParentAdapter.setLifecycleOwner(viewLifecycleOwner)
+
+        diskTitleParentAdapter.submitList(listParent.toMutableList())
+
+        binding.apply {
+            rcvDiskTitles.apply {
+                this.adapter = diskTitleParentAdapter
+                layoutManager = LinearLayoutManager(activity)
+                setHasFixedSize(true)
+            }
+        }
+    }*/
 
     private fun createMenu() {
         requireActivity().toolbar.addMenuProvider(object : MenuProvider {
@@ -156,7 +224,7 @@ class DiskTitlesFragment : Fragment() {
                         true
                     }
                     R.id.menu_disk_title_tab_filter_by_genre -> {
-                        filterByGenre(true)
+                        //filterByGenre()
                         true
                     }
                     R.id.menu_disk_title_tab_sort_by_name_ascending -> {
