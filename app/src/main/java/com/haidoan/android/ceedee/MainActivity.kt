@@ -19,10 +19,7 @@ class MainActivity : AppCompatActivity() {
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
         setSupportActionBar(binding.toolbar)
-
-
         replaceFragment(RentalFragment())
         binding.bottomNavigationView.setOnItemSelectedListener {
             when(it.itemId)
