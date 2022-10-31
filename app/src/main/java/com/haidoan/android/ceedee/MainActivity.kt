@@ -25,7 +25,7 @@ class MainActivity : AppCompatActivity() {
             when(it.itemId)
             {
                 R.id.rental -> replaceFragment(RentalFragment())
-                R.id.disk -> replaceFragment(SecondFragment())
+                R.id.disk -> replaceFragment(DiskFragment())
                 R.id.report -> replaceFragment(ReportFragment())
                 else ->{
                 }
@@ -46,7 +46,6 @@ class MainActivity : AppCompatActivity() {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         return when (item.itemId) {
-            R.id.action_settings -> true
             else -> super.onOptionsItemSelected(item)
         }
     }

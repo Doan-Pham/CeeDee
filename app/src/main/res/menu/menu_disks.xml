@@ -25,7 +25,7 @@
         android:title="@string/filter"
         app:showAsAction="always"
         tools:targetApi="o"
-        android:visible="true"
+        android:visible="false"
         >
 
     </item>
