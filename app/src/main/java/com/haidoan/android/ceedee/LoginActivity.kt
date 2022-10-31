@@ -3,6 +3,7 @@ package com.haidoan.android.ceedee
 import android.content.Intent
 
 import android.os.Bundle
+import android.util.Log
 
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -18,6 +19,7 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.haidoan.android.ceedee.databinding.ActivityLoginBinding
+import com.haidoan.android.ceedee.ui.disk_screen.disk_titles.Response
 import com.haidoan.android.ceedee.ui.login.AuthenticationViewModel
 
 class LoginActivity : AppCompatActivity() {
@@ -45,16 +47,29 @@ class LoginActivity : AppCompatActivity() {
         setContentView(binding.root)
         binding.tvMessageRequired.visibility = View.INVISIBLE
         setOnClick()
+
     }
 
     private fun setOnClick() {
         binding.btnLogin.setOnClickListener(View.OnClickListener {
             val email = binding.edtUsernameLogin.text.toString()
             val pass = binding.edtPasswordLogin.text.toString()
-            if (email.isEmpty() || pass.isEmpty()) {
-                setTextRequired("Email or Password cannot be empty")
-            } else {
-                signIn(email, pass)
+
+            authViewModel.signIn(email, pass).observe(this) { response ->
+                when (response) {
+                    is Response.Loading -> {
+                        binding.progressbarLogin.visibility = View.VISIBLE
+                    }
+                    is Response.Success -> {
+                        binding.progressbarLogin.visibility = View.INVISIBLE
+                        val i = Intent(this, MainActivity::class.java)
+                        startActivity(i)
+                    }
+                    is Response.Failure -> {
+                        binding.progressbarLogin.visibility = View.INVISIBLE
+                    }
+
+                }
             }
 
         })

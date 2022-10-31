@@ -33,18 +33,13 @@ class RentalFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         _binding = FragmentRentalBinding.inflate(inflater, container, false)
-
         return binding.root
     }
     private lateinit var searchViewModel : SearchViewModel
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
       authViewModel = ViewModelProvider(this)[AuthenticationViewModel::class.java]
-       binding.buttonLogout.setOnClickListener{
-          authViewModel.signOut()
-            val i = Intent(requireActivity(), LoginActivity::class.java)
-           startActivity(i)
-      }
+
         var viewPager=view.findViewById<ViewPager>(R.id.viewPagerRental)
         var tabRental=view.findViewById<TabLayout>(R.id.tabRental)
         var adapter=tabRentalAdapter(childFragmentManager)
