@@ -12,6 +12,7 @@ import android.view.MenuItem
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.replace
 import com.haidoan.android.ceedee.databinding.ActivityMainBinding
+import com.haidoan.android.ceedee.ui.report.fragment.ReportFragment
 
 class MainActivity : AppCompatActivity() {
 
@@ -39,7 +40,7 @@ class MainActivity : AppCompatActivity() {
             {
                 R.id.rental -> replaceFragment(FirstFragment())
                 R.id.disk -> replaceFragment(SecondFragment())
-                R.id.report -> replaceFragment(ThirdFragment())
+                R.id.report -> replaceFragment(ReportFragment())
                 else ->{
 
                 }
