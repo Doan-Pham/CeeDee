@@ -11,9 +11,8 @@ import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.haidoan.android.ceedee.databinding.FragmentSecondBinding
 import com.haidoan.android.ceedee.ui.disk_screen.DiskViewPagerAdapter
-import kotlinx.android.synthetic.main.activity_main.*
 
-class SecondFragment : Fragment() {
+class DiskFragment : Fragment() {
 
     private var _binding: FragmentSecondBinding? = null
 
