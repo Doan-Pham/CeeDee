@@ -24,13 +24,19 @@ class DiskTitlesViewModel(application: Application) : AndroidViewModel(applicati
         }
     }
 
+    fun getDiskTitleFilterByGenreId(id: String) = liveData(Dispatchers.IO) {
+        diskTitlesRepository.getDiskTitleFilterByGenreIdFromFireStore(id).collect { response ->
+            emit(response)
+        }
+    }
+
     fun getDiskTitlesSortByName(type: TypeUtils.SORT_BY_NAME) = liveData(Dispatchers.IO) {
         diskTitlesRepository.getDiskTitlesSortByNameFromFireStore(type).collect { response ->
             emit(response)
         }
     }
 
-    fun getGenreById(id: String) = liveData(Dispatchers.IO) {
+    fun getGenreNameById(id: String) = liveData(Dispatchers.IO) {
         genreRepository.getGenreByIdFireStore(id).collect { response ->
             emit(response)
         }

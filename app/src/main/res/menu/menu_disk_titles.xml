@@ -51,11 +51,6 @@
                         android:title="@string/descending" />
                 </menu>
             </item>
-
-            <item android:title="@string/filter_by_genre"
-                android:id="@+id/menu_disk_title_tab_filter_by_genre"
-                >
-            </item>
         </menu>
     </item>
 

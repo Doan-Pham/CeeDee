@@ -20,15 +20,14 @@ import com.haidoan.android.ceedee.utils.TypeUtils
 import java.util.*
 
 @SuppressLint("NotifyDataSetChanged")
-class DiskTitlesAdapter(
-    private val diskTitlesViewModel: DiskTitlesViewModel,
-    private val viewLifecycleOwner: LifecycleOwner
-) : ListAdapter<DiskTitle, DiskTitlesAdapter.DiskTitlesViewHolder>(DiskTitleUtils()),
+class DiskTitlesAdapter: ListAdapter<DiskTitle, DiskTitlesAdapter.DiskTitlesViewHolder>(DiskTitleUtils()),
     Filterable {
 
     private val displayedDiskTitles = arrayListOf<DiskTitle>()
     private val allDiskTitles = arrayListOf<DiskTitle>()
 
+    private lateinit var diskTitlesViewModel: DiskTitlesViewModel
+    private lateinit var viewLifecycleOwner: LifecycleOwner
     private lateinit var iOnItemClickListener: IOnItemClickListener
     private lateinit var iOnItemMoreClickListener: IOnItemClickListener
 
@@ -44,22 +43,50 @@ class DiskTitlesAdapter(
         displayedDiskTitles.addAll(newList.toList())
     }
 
+    fun setLifecycleOwner(lco: LifecycleOwner){
+        viewLifecycleOwner=lco
+    }
+
+    fun setDiskTitlesViewModel(viewModel: DiskTitlesViewModel){
+        diskTitlesViewModel=viewModel
+    }
+
     fun getListData(): ArrayList<DiskTitle> {
-        return displayedDiskTitles
+        return allDiskTitles
+    }
+
+    fun setFilterByGenreList(newList: List<DiskTitle>) {
+        displayedDiskTitles.clear()
+        displayedDiskTitles.addAll(newList)
+        notifyDataSetChanged()
     }
 
     fun sortByCDAmount(type: TypeUtils.SORT_BY_AMOUNT) {
-        displayedDiskTitles.clear()
+        val sortByAmountList = arrayListOf<DiskTitle>()
         when (type) {
             TypeUtils.SORT_BY_AMOUNT.Ascending -> {
                 val list = mapDiskTitleAmount.toList().sortedBy { it.second }
-                list.forEach { displayedDiskTitles.add(it.first) }
+                list.forEach { map ->
+                    displayedDiskTitles.forEach { item ->
+                        if (map.first.id == item.id) {
+                            sortByAmountList.add(item)
+                        }
+                    }
+                }
             }
             TypeUtils.SORT_BY_AMOUNT.Descending -> {
                 val list = mapDiskTitleAmount.toList().sortedByDescending { it.second }
-                list.forEach { displayedDiskTitles.add(it.first) }
+                list.forEach { map ->
+                    displayedDiskTitles.forEach { item ->
+                        if (map.first.id == item.id) {
+                            sortByAmountList.add(item)
+                        }
+                    }
+                }
             }
         }
+        displayedDiskTitles.clear()
+        displayedDiskTitles.addAll(sortByAmountList)
         notifyDataSetChanged()
     }
 
