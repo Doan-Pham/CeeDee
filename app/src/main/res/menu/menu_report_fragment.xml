@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/menu_item_rpfragment_chart_type"
+        android:icon="@drawable/ic_barchart_black_24dp"
+        android:title="@string/chart_type"
+        app:showAsAction="always">
+        <menu>
+            <item
+                android:id="@+id/menu_item_rpfragment_barchart"
+                android:icon="@drawable/ic_barchart_black_24dp"
+                android:title="@string/bar_chart" />
+            <item
+                android:id="@+id/menu_item_rpfragment_linechart"
+                android:icon="@drawable/ic_linechart_black_24dp"
+                android:title="@string/line_chart" />
+        </menu>
+    </item>
+</menu>
