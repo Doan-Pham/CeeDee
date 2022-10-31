@@ -1,6 +1,5 @@
 package com.haidoan.android.ceedee.ui.report.fragment
 
-import android.Manifest
 import android.app.AlertDialog
 import android.content.pm.PackageManager
 import android.graphics.*
@@ -30,8 +29,8 @@ import com.haidoan.android.ceedee.R
 import com.haidoan.android.ceedee.data.report.FirestoreApi
 import com.haidoan.android.ceedee.data.report.ReportRepository
 import com.haidoan.android.ceedee.databinding.FragmentRevenueExpensesBinding
-import com.haidoan.android.ceedee.ui.report.util.MonthYearPickerDialog
-import com.haidoan.android.ceedee.ui.report.util.MonthYearXAxisValueFormatter
+import com.haidoan.android.ceedee.ui.report.util.*
+import com.haidoan.android.ceedee.ui.report.util.ImageUtils.Companion.resizeBitmap
 import com.haidoan.android.ceedee.ui.report.viewmodel.ReportViewModel
 import java.io.File
 import java.io.FileOutputStream
@@ -44,28 +43,12 @@ import java.time.temporal.ChronoUnit
 import java.time.temporal.TemporalAdjusters
 import java.util.*
 
-
 private const val BAR_CHART_BAR_WIDTH = 0.45f
 private const val BAR_CHART_BAR_SPACE = 0.02f
 private const val BAR_CHAR_GROUP_SPACE = 0.06f
 private const val BAR_CHART_MIN_X_DEFAULT = 0f
 private const val CHART_TEXT_SIZE = 14f
 private const val TAG = "RevenueExpensesFragment"
-
-// Some methods for chart styling doesn't allow R.color
-private val CHART_COLOR_FIRST = Color.rgb(228, 86, 33)
-private val CHART_COLOR_SECOND = Color.rgb(251, 173, 86)
-private val CHART_COLOR_THIRD = Color.rgb(160, 215, 113)
-private val CHART_COLOR_FOURTH = Color.rgb(115, 176, 215)
-
-private val PERMISSIONS = arrayOf(
-    Manifest.permission.WRITE_EXTERNAL_STORAGE,
-    Manifest.permission.READ_EXTERNAL_STORAGE
-)
-
-// Unit of measurement is pt, 1 pt = 1/72 inch
-private const val STANDARD_REPORT_PAGE_WIDTH = 595
-private const val STANDARD_REPORT_PAGE_HEIGHT = 842
 
 class RevenueExpensesFragment : Fragment() {
 
@@ -300,7 +283,7 @@ class RevenueExpensesFragment : Fragment() {
                 )
             } VND",
             pageCanvas.width / 2f,
-            pageCanvas.height -70f,
+            pageCanvas.height - 70f,
             textPaint
         )
         reportAsPdf.finishPage(firstPage)
@@ -627,27 +610,6 @@ class RevenueExpensesFragment : Fragment() {
             YearMonth.from(startTime),
             YearMonth.from(endTime)
         )
-    }
-
-    private fun resizeBitmap(inputImage: Bitmap, resultWidth: Int, resultHeight: Int): Bitmap {
-        var resultImage = inputImage
-        return if (resultHeight > 0 && resultWidth > 0) {
-            val width = inputImage.width
-            val height = inputImage.height
-            val ratioBitmap = width.toFloat() / height.toFloat()
-            val ratioMax = resultWidth.toFloat() / resultHeight.toFloat()
-            var finalWidth = resultWidth
-            var finalHeight = resultHeight
-            if (ratioMax > ratioBitmap) {
-                finalWidth = (resultHeight.toFloat() * ratioBitmap).toInt()
-            } else {
-                finalHeight = (resultWidth.toFloat() / ratioBitmap).toInt()
-            }
-            resultImage = Bitmap.createScaledBitmap(inputImage, finalWidth, finalHeight, true)
-            resultImage
-        } else {
-            resultImage
-        }
     }
 }
 
