@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.haidoan.android.ceedee.ui.report.ReportFragment">
+    tools:context="com.haidoan.android.ceedee.ui.report.fragment.ReportFragment">
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tab_layout"

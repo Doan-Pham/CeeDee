@@ -21,7 +21,6 @@
         android:id="@+id/menu_disk_titles_filter"
         android:icon="@drawable/ic_round_filter_alt_24"
         android:orderInCategory="102"
-        app:iconTint="@color/white"
         android:title="@string/sort_by"
         tools:targetApi="o"
         android:visible="true"
@@ -59,7 +58,6 @@
         android:id="@+id/menu_disk_titles_cart"
         android:icon="@drawable/ic_round_shopping_cart_24"
         android:orderInCategory="104"
-        app:iconTint="@color/white"
         android:title="@string/cart"
         app:showAsAction="ifRoom"
         tools:targetApi="o">
