@@ -9,13 +9,16 @@
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tabRental"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        app:layout_constraintTop_toTopOf="parent"></com.google.android.material.tabs.TabLayout>
-   <androidx.viewpager.widget.ViewPager
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_marginTop="50dp"
-    android:id="@+id/viewPagerRental">
-   </androidx.viewpager.widget.ViewPager>
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tabIndicatorColor="@color/primary"
+        app:tabMode="scrollable"
+        app:tabTextColor="@color/primary" />
+
+    <androidx.viewpager.widget.ViewPager
+        android:id="@+id/viewPagerRental"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="50dp"></androidx.viewpager.widget.ViewPager>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,32 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:tools="http://schemas.android.com/tools"
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    >
+    xmlns:tools="http://schemas.android.com/tools">
 
     <item
         android:id="@+id/menu_disks_search"
         android:icon="@drawable/ic_round_search_24"
         android:orderInCategory="100"
-        app:iconTint="@color/white"
+        app:iconTint="@color/black"
         android:title="@string/search"
+        app:actionViewClass="android.widget.SearchView"
         app:showAsAction="always"
-        tools:targetApi="o"
         tools:ignore="AlwaysShowAction"
-        app:actionViewClass="android.widget.SearchView">
+        tools:targetApi="o">
 
     </item>
 
     <item
         android:id="@+id/menu_disks_tab_filter"
         android:icon="@drawable/ic_app_logo"
-        android:orderInCategory="102"
         android:iconTint="@color/white"
+        android:orderInCategory="102"
         android:title="@string/filter"
-        app:showAsAction="always"
-        tools:targetApi="o"
         android:visible="false"
-        >
+        app:showAsAction="always"
+        tools:targetApi="o">
 
     </item>
 
@@ -34,10 +32,9 @@
         android:id="@+id/menu_disks_cart"
         android:icon="@drawable/ic_round_shopping_cart_24"
         android:orderInCategory="104"
-        app:iconTint="@color/white"
         android:title="@string/cart"
+        app:iconTint="@color/white"
         app:showAsAction="always"
-        tools:targetApi="o">
-    </item>
+        tools:targetApi="o"></item>
 
 </menu>
