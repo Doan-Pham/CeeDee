@@ -28,6 +28,25 @@ class DiskTitlesRepository(private val application: Application) {
 
     }
 
+    fun getDiskTitleFilterByGenreIdFromFireStore(id: String) = flow {
+        emit(Response.Loading())
+        emit(
+            Response.Success(queryDiskTitle
+                .whereEqualTo("genreId",id)
+                .get()
+                .await()
+                .documents
+                .mapNotNull { doc ->
+                    Log.d("TAG", "GET POST SUCCESS")
+                    doc.toObject(DiskTitle::class.java)
+                })
+        )
+    }.catch { error ->
+        error.message?.let { errorMessage ->
+            emit(Response.Failure(errorMessage))
+        }
+    }
+
     fun getDiskTitlesSortByNameFromFireStore(type: TypeUtils.SORT_BY_NAME) = flow {
         emit(Response.Loading())
         emit(

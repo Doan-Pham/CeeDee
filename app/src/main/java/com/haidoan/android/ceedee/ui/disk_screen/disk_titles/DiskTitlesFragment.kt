@@ -61,7 +61,11 @@ class DiskTitlesFragment : Fragment() {
         diskTitleAdapter.setDiskTitlesViewModel(diskTitlesViewModel)
         diskTitleAdapter.setLifecycleOwner(viewLifecycleOwner)
 
-        genreAdapter = GenreAdapter(requireActivity().baseContext)
+        genreAdapter = GenreAdapter(context = requireActivity().baseContext,
+                                    diskTitlesViewModel = diskTitlesViewModel,
+                                    viewLifecycleOwner = viewLifecycleOwner,
+                                    diskTitlesAdapter = diskTitleAdapter,
+                                    fragmentDiskTitlesBinding = binding)
 
         diskTitlesViewModel.getDiskTitles().observe(viewLifecycleOwner) { response ->
             when (response) {
@@ -76,17 +80,6 @@ class DiskTitlesFragment : Fragment() {
                     //Hide the ProgressBar
                     binding.progressbarDiskTitle.visibility = View.GONE
 
-         /*            val listParent = arrayListOf<DiskTitleParent>()
-                     val listGenre = arrayListOf<String>("ZvNutCQxPf4NLAGp6Vkj","cSaZOFGya4ds0uePxeq2","qh2CMkTZmywhLHyKPASa")
-                     listGenre.forEach{ section ->
-                         val items = arrayListOf<DiskTitle>()
-                         list.forEach { item->
-                             if (section==item.genreId)
-                                 items.add(item)
-                         }
-                         listParent.add(DiskTitleParent(section,items))
-                     }
-*/                  Log.d("TAG_VM",list.toString())
                     diskTitleAdapter.submitList(list.toMutableList())
 
                     if (diskTitleAdapter.itemCount >= 2)
@@ -115,8 +108,11 @@ class DiskTitlesFragment : Fragment() {
                 }
                 is Response.Success -> {
                     val list = response.data
-                    Log.d("TAG_VM",list.toString())
-                    genreAdapter.submitList(list.toMutableList())
+
+                    val genreList= mutableListOf<Genre>()
+                    genreList.add(Genre(GenreRepository.defaultGenre,"All"))
+                    genreList.addAll(list)
+                    genreAdapter.submitList(genreList)
                 }
                 is Response.Failure -> {
                     print(response.errorMessage)
@@ -161,38 +157,6 @@ class DiskTitlesFragment : Fragment() {
         diskTitleAdapter.sortByName(type)
     }
 
-/*    private fun filterByGenre() {
-        val list = arrayListOf<DiskTitle>()
-        //list.addAll(diskTitleAdapter.getListData())
-        val listParent = arrayListOf<DiskTitleParent>()
-        val listGenre = arrayListOf<String>(
-            "ZvNutCQxPf4NLAGp6Vkj",
-            "cSaZOFGya4ds0uePxeq2",
-            "qh2CMkTZmywhLHyKPASa"
-        )
-        listGenre.forEach { section ->
-            val items = arrayListOf<DiskTitle>()
-            list.forEach { item ->
-                if (section == item.genreId)
-                    items.add(item)
-            }
-            listParent.add(DiskTitleParent(section, items))
-        }
-        diskTitleParentAdapter = DiskTitleParentAdapter()
-        diskTitleParentAdapter.setDiskTitlesViewModel(diskTitlesViewModel)
-        diskTitleParentAdapter.setLifecycleOwner(viewLifecycleOwner)
-
-        diskTitleParentAdapter.submitList(listParent.toMutableList())
-
-        binding.apply {
-            rcvDiskTitles.apply {
-                this.adapter = diskTitleParentAdapter
-                layoutManager = LinearLayoutManager(activity)
-                setHasFixedSize(true)
-            }
-        }
-    }*/
-
     private fun createMenu() {
         requireActivity().toolbar.addMenuProvider(object : MenuProvider {
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
@@ -221,10 +185,6 @@ class DiskTitlesFragment : Fragment() {
                 return when (menuItem.itemId) {
                     R.id.menu_disk_titles_cart -> {
                         Log.d("TAG_MENU", "DISKTITLE_CART")
-                        true
-                    }
-                    R.id.menu_disk_title_tab_filter_by_genre -> {
-                        //filterByGenre()
                         true
                     }
                     R.id.menu_disk_title_tab_sort_by_name_ascending -> {

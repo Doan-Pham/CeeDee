@@ -18,6 +18,10 @@ class GenreRepository(application: Application) {
 
     }
 
+    companion object {
+         const val defaultGenre = "default_genre"
+    }
+
     fun getGenresFromFireStore() = flow {
         emit(Response.Loading())
         emit(Response.Success(queryGenre.get().await().documents.mapNotNull { doc ->

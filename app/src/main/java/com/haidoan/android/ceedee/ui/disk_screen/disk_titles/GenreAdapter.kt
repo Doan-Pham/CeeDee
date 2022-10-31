@@ -1,19 +1,29 @@
 package com.haidoan.android.ceedee.ui.disk_screen.disk_titles
 
 import android.content.Context
+import android.opengl.Visibility
+import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
-import android.widget.CompoundButton
-import android.widget.RadioButton
+
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.haidoan.android.ceedee.R
 import com.haidoan.android.ceedee.data.Genre
+import com.haidoan.android.ceedee.databinding.FragmentDiskTitlesBinding
 import com.haidoan.android.ceedee.databinding.GenreItemBinding
 
-class GenreAdapter(private val context: Context) :
+class GenreAdapter(
+    private val context: Context,
+    private val diskTitlesViewModel: DiskTitlesViewModel,
+    private val diskTitlesAdapter: DiskTitlesAdapter,
+    private val viewLifecycleOwner: LifecycleOwner,
+    private val fragmentDiskTitlesBinding: FragmentDiskTitlesBinding
+) :
     ListAdapter<Genre, GenreAdapter.GenreViewHolder>(GenreUtils()) {
 
     private val displayedGenres = arrayListOf<Genre>()
@@ -37,15 +47,80 @@ class GenreAdapter(private val context: Context) :
 
         init {
             binding.root.setOnClickListener {
-                selectedItemPos = bindingAdapterPosition
-                if (lastItemSelectedPos == -1)
-                    lastItemSelectedPos = selectedItemPos
-                else {
-                    notifyItemChanged(lastItemSelectedPos)
-                    lastItemSelectedPos = selectedItemPos
+                setPosItemClick()
+                Log.d("TAG", getItemAt(position = bindingAdapterPosition).name.toString())
+
+                if (getItemAt(bindingAdapterPosition).id == GenreRepository.defaultGenre) {
+                    getAllDiskTitle()
+                } else {
+                    getDiskTitleFilterByGenreId(displayedGenres[bindingAdapterPosition].id)
                 }
-                notifyItemChanged(selectedItemPos)
+
             }
+        }
+
+        private fun getDiskTitleFilterByGenreId(id: String) {
+            diskTitlesViewModel.getDiskTitleFilterByGenreId(id)
+                .observe(viewLifecycleOwner) { response ->
+                    when (response) {
+                        is Response.Loading -> {
+                            fragmentDiskTitlesBinding.progressbarDiskTitle.visibility =
+                                View.VISIBLE
+                            fragmentDiskTitlesBinding.rcvDiskTitles.visibility = View.INVISIBLE
+                        }
+                        is Response.Success -> {
+                            val list = response.data
+                            fragmentDiskTitlesBinding.progressbarDiskTitle.visibility =
+                                View.GONE
+                            fragmentDiskTitlesBinding.rcvDiskTitles.visibility = View.VISIBLE
+                            diskTitlesAdapter.setFilterByGenreList(list)
+                        }
+                        is Response.Failure -> {
+                            println(response.errorMessage)
+                            fragmentDiskTitlesBinding.progressbarDiskTitle.visibility =
+                                View.GONE
+                            fragmentDiskTitlesBinding.rcvDiskTitles.visibility = View.VISIBLE
+                        }
+                    }
+
+                }
+        }
+
+        private fun getAllDiskTitle() {
+            diskTitlesViewModel.getDiskTitles().observe(viewLifecycleOwner) { response ->
+                when (response) {
+                    is Response.Loading -> {
+                        fragmentDiskTitlesBinding.progressbarDiskTitle.visibility =
+                            View.VISIBLE
+                        fragmentDiskTitlesBinding.rcvDiskTitles.visibility = View.INVISIBLE
+                    }
+                    is Response.Success -> {
+                        val list = response.data
+                        fragmentDiskTitlesBinding.progressbarDiskTitle.visibility =
+                            View.GONE
+                        fragmentDiskTitlesBinding.rcvDiskTitles.visibility = View.VISIBLE
+                        diskTitlesAdapter.setFilterByGenreList(list)
+                    }
+                    is Response.Failure -> {
+                        print(response.errorMessage)
+                        fragmentDiskTitlesBinding.progressbarDiskTitle.visibility =
+                            View.GONE
+                        fragmentDiskTitlesBinding.rcvDiskTitles.visibility = View.VISIBLE
+                    }
+                    else -> print(response.toString())
+                }
+            }
+        }
+
+        private fun setPosItemClick() {
+            selectedItemPos = bindingAdapterPosition
+            if (lastItemSelectedPos == -1)
+                lastItemSelectedPos = selectedItemPos
+            else {
+                notifyItemChanged(lastItemSelectedPos)
+                lastItemSelectedPos = selectedItemPos
+            }
+            notifyItemChanged(selectedItemPos)
         }
 
         fun setData(item: Genre) {

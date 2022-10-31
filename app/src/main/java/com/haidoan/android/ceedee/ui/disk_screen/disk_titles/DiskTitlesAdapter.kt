@@ -52,21 +52,41 @@ class DiskTitlesAdapter: ListAdapter<DiskTitle, DiskTitlesAdapter.DiskTitlesView
     }
 
     fun getListData(): ArrayList<DiskTitle> {
-        return displayedDiskTitles
+        return allDiskTitles
+    }
+
+    fun setFilterByGenreList(newList: List<DiskTitle>) {
+        displayedDiskTitles.clear()
+        displayedDiskTitles.addAll(newList)
+        notifyDataSetChanged()
     }
 
     fun sortByCDAmount(type: TypeUtils.SORT_BY_AMOUNT) {
-        displayedDiskTitles.clear()
+        val sortByAmountList = arrayListOf<DiskTitle>()
         when (type) {
             TypeUtils.SORT_BY_AMOUNT.Ascending -> {
                 val list = mapDiskTitleAmount.toList().sortedBy { it.second }
-                list.forEach { displayedDiskTitles.add(it.first) }
+                list.forEach { map ->
+                    displayedDiskTitles.forEach { item ->
+                        if (map.first.id == item.id) {
+                            sortByAmountList.add(item)
+                        }
+                    }
+                }
             }
             TypeUtils.SORT_BY_AMOUNT.Descending -> {
                 val list = mapDiskTitleAmount.toList().sortedByDescending { it.second }
-                list.forEach { displayedDiskTitles.add(it.first) }
+                list.forEach { map ->
+                    displayedDiskTitles.forEach { item ->
+                        if (map.first.id == item.id) {
+                            sortByAmountList.add(item)
+                        }
+                    }
+                }
             }
         }
+        displayedDiskTitles.clear()
+        displayedDiskTitles.addAll(sortByAmountList)
         notifyDataSetChanged()
     }
 
