@@ -6,6 +6,12 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.haidoan.android.ceedee.data.DiskTitle
+import com.haidoan.android.ceedee.data.Genre
+import com.haidoan.android.ceedee.ui.disk_screen.disk_titles.Response
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.tasks.await
 
 class AuthenticationRepository(private val application: Application) {
     private val firebaseUserMutableLiveData: MutableLiveData<FirebaseUser?> = MutableLiveData()
@@ -32,18 +38,22 @@ class AuthenticationRepository(private val application: Application) {
         return firebaseUserMutableLiveData
     }
 
-    fun login(email: String?, pass: String?) {
-        auth.signInWithEmailAndPassword(email!!, pass!!).addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                firebaseUserMutableLiveData.postValue(auth.currentUser)
-                Log.d("TAG", "success")
+    fun loginFromFireStore(email: String?, pass: String?) = flow {
+        emit(Response.Loading())
+        emit(Response.Success(auth.signInWithEmailAndPassword(email!!, pass!!).await().run {
+            firebaseUserMutableLiveData.postValue(auth.currentUser)
+        }))
+    }.catch { error ->
+        error.message?.let { errorMessage ->
+            emit(Response.Failure(errorMessage))
+            val networkError = "A network error (such as timeout, interrupted connection or unreachable host) has occurred."
+            if (errorMessage == networkError) {
+                requiredText.postValue("A network error has occurred.")
             } else {
-                val networkError = "A network error (such as timeout, interrupted connection or unreachable host) has occurred."
-                if (task.exception?.message.toString() == networkError) {
-                    requiredText.postValue("A network error has occurred.")
-                } else {
-                    requiredText.postValue(task.exception?.message.toString())
-                }
+                requiredText.postValue(errorMessage)
+            }
+            if (email!!.isEmpty() || pass!!.isEmpty()) {
+                requiredText.postValue("Email or Password cannot be empty")
             }
         }
     }
