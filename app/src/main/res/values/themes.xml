@@ -57,4 +57,13 @@
         <!-- Required -->
         <item name="postSplashScreenTheme">@style/Theme.CeeDee.NoActionBar</item>
     </style>
+
+    <style name="textview_round_outline" parent="Widget.Material3.TextInputEditText.OutlinedBox">
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="15dp"
+        android:layout_marginTop="30dp"
+        android:background="@drawable/background_textview_round_outline"
+        android:drawablePadding="10dp"
+        android:gravity="center_vertical"
+    </style>
 </resources>
