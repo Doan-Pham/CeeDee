@@ -81,7 +81,7 @@ class DiskTitlesFragment : Fragment() {
                     binding.progressbarDiskTitle.visibility = View.GONE
 
                     diskTitleAdapter.submitList(list.toMutableList())
-
+                    diskTitleAdapter.setAllDiskTitleFilterByGenre(list)
                     if (diskTitleAdapter.itemCount >= 2)
                         binding.tvDiskTitlesTotal.text =
                             diskTitleAdapter.itemCount.toString() + " Titles"

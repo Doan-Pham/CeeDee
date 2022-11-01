@@ -74,6 +74,7 @@ class GenreAdapter(
                                 View.GONE
                             fragmentDiskTitlesBinding.rcvDiskTitles.visibility = View.VISIBLE
                             diskTitlesAdapter.setFilterByGenreList(list)
+                            diskTitlesAdapter.setAllDiskTitleFilterByGenre(list)
                         }
                         is Response.Failure -> {
                             println(response.errorMessage)
@@ -100,6 +101,7 @@ class GenreAdapter(
                             View.GONE
                         fragmentDiskTitlesBinding.rcvDiskTitles.visibility = View.VISIBLE
                         diskTitlesAdapter.setFilterByGenreList(list)
+                        diskTitlesAdapter.setAllDiskTitleFilterByGenre(list)
                     }
                     is Response.Failure -> {
                         print(response.errorMessage)

@@ -16,6 +16,7 @@ import coil.load
 import com.haidoan.android.ceedee.R
 import com.haidoan.android.ceedee.data.DiskTitle
 import com.haidoan.android.ceedee.databinding.DiskTitlesItemBinding
+
 import com.haidoan.android.ceedee.utils.TypeUtils
 import java.util.*
 
@@ -25,6 +26,7 @@ class DiskTitlesAdapter: ListAdapter<DiskTitle, DiskTitlesAdapter.DiskTitlesView
 
     private val displayedDiskTitles = arrayListOf<DiskTitle>()
     private val allDiskTitles = arrayListOf<DiskTitle>()
+    private val allDiskTitleFilterByGenre = arrayListOf<DiskTitle>()
 
     private lateinit var diskTitlesViewModel: DiskTitlesViewModel
     private lateinit var viewLifecycleOwner: LifecycleOwner
@@ -41,6 +43,11 @@ class DiskTitlesAdapter: ListAdapter<DiskTitle, DiskTitlesAdapter.DiskTitlesView
         allDiskTitles.addAll(newList.toList())
         displayedDiskTitles.clear()
         displayedDiskTitles.addAll(newList.toList())
+    }
+
+    fun setAllDiskTitleFilterByGenre(newList: List<DiskTitle>) {
+        allDiskTitleFilterByGenre.clear()
+        allDiskTitleFilterByGenre.addAll(newList.toList())
     }
 
     fun setLifecycleOwner(lco: LifecycleOwner){
@@ -211,11 +218,11 @@ class DiskTitlesAdapter: ListAdapter<DiskTitle, DiskTitlesAdapter.DiskTitlesView
             override fun performFiltering(constraint: CharSequence?): FilterResults {
                 val filteredList = arrayListOf<DiskTitle>()
                 if (constraint == null || constraint.isEmpty()) {
-                    filteredList.addAll(allDiskTitles)
+                    filteredList.addAll(allDiskTitleFilterByGenre)
                 } else {
                     val filterPattern: String =
                         constraint.toString().lowercase(Locale.getDefault()).trim()
-                    allDiskTitles.forEach { item ->
+                    allDiskTitleFilterByGenre.forEach { item ->
                         if (item.name.lowercase(Locale.getDefault()).trim()
                                 .contains(filterPattern)
                         ) {
