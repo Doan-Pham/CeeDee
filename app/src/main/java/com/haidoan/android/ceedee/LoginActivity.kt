@@ -35,7 +35,9 @@ class LoginActivity : AppCompatActivity() {
         authViewModel = ViewModelProvider(this)[AuthenticationViewModel::class.java]
         authViewModel.getUserData().observe(this, Observer<FirebaseUser?> { _ ->
             val i = Intent(this, MainActivity::class.java)
+            //i.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             startActivity(i)
+            finish()
         })
         authViewModel.getRequiredTextMessage().observe(this, Observer<String> { s ->
             run {

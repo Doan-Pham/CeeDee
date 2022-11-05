@@ -3,26 +3,20 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/FirstFragment">
-
+    app:startDestination="@id/rentalFragment">
     <fragment
-        android:id="@+id/FirstFragment"
+        android:id="@+id/diskFragment"
+        android:name="com.haidoan.android.ceedee.ui.disk_screen.DiskFragment"
+        android:label="fragment_second"
+        tools:layout="@layout/fragment_disk" />
+    <fragment
+        android:id="@+id/rentalFragment"
         android:name="com.haidoan.android.ceedee.RentalFragment"
-        android:label="@string/first_fragment_label"
-        tools:layout="@layout/fragment_rental">
-
-        <action
-            android:id="@+id/action_FirstFragment_to_SecondFragment"
-            app:destination="@id/SecondFragment" />
-    </fragment>
+        android:label="fragment_rental"
+        tools:layout="@layout/fragment_rental" />
     <fragment
-        android:id="@+id/SecondFragment"
-        android:name="com.haidoan.android.ceedee.DiskFragment"
-        android:label="@string/second_fragment_label"
-        tools:layout="@layout/fragment_second">
-
-        <action
-            android:id="@+id/action_SecondFragment_to_FirstFragment"
-            app:destination="@id/FirstFragment" />
-    </fragment>
+        android:id="@+id/reportFragment"
+        android:name="com.haidoan.android.ceedee.ui.report.fragment.ReportFragment"
+        android:label="fragment_report"
+        tools:layout="@layout/fragment_report" />
 </navigation>

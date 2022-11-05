@@ -4,17 +4,16 @@ import android.os.Bundle
 import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
-import androidx.appcompat.widget.Toolbar
 import androidx.core.view.MenuProvider
 import androidx.lifecycle.Lifecycle
 import com.haidoan.android.ceedee.R
-import com.haidoan.android.ceedee.databinding.FragmentDisksBinding
+import com.haidoan.android.ceedee.databinding.FragmentDiskTabDisksBinding
 
 import kotlinx.android.synthetic.main.activity_main.*
 
-class DisksFragment : Fragment() {
+class DisksTabFragment : Fragment() {
 
-    private var _binding: FragmentDisksBinding? = null
+    private var _binding: FragmentDiskTabDisksBinding? = null
 
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -25,8 +24,8 @@ class DisksFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        _binding = FragmentDisksBinding.inflate(inflater, container, false)
-        createMenu()
+        _binding = FragmentDiskTabDisksBinding.inflate(inflater, container, false)
+        //createMenu()
         return binding.root
     }
 

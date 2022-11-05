@@ -14,7 +14,8 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.haidoan.android.ceedee.R
 import com.haidoan.android.ceedee.data.Genre
-import com.haidoan.android.ceedee.databinding.FragmentDiskTitlesBinding
+import com.haidoan.android.ceedee.databinding.FragmentDiskTabDiskTitlesBinding
+
 import com.haidoan.android.ceedee.databinding.GenreItemBinding
 
 class GenreAdapter(
@@ -22,7 +23,7 @@ class GenreAdapter(
     private val diskTitlesViewModel: DiskTitlesViewModel,
     private val diskTitlesAdapter: DiskTitlesAdapter,
     private val viewLifecycleOwner: LifecycleOwner,
-    private val fragmentDiskTitlesBinding: FragmentDiskTitlesBinding
+    private val fragmentDiskTitlesBinding: FragmentDiskTabDiskTitlesBinding
 ) :
     ListAdapter<Genre, GenreAdapter.GenreViewHolder>(GenreUtils()) {
 

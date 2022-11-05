@@ -44,22 +44,24 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:srcCompat="@drawable/ic_app_logo" />
         </androidx.constraintlayout.widget.ConstraintLayout>
-
-
     </com.google.android.material.appbar.AppBarLayout>
 
-
-    <FrameLayout
-        android:id="@+id/frameRental"
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/mainContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="55dp"
-        android:layout_marginBottom="55dp"></FrameLayout>
+        android:layout_marginBottom="55dp"
+
+        app:defaultNavHost="true"
+        app:navGraph="@navigation/nav_graph"
+        android:name="androidx.navigation.fragment.NavHostFragment"
+        />
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigationView"
         android:layout_width="match_parent"
         android:layout_height="55dp"
         android:layout_gravity="bottom|end"
-        app:menu="@menu/bottom_nav"></com.google.android.material.bottomnavigation.BottomNavigationView>
+        app:menu="@menu/bottom_nav" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
