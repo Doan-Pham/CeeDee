@@ -14,6 +14,8 @@ import androidx.core.view.MenuProvider
 import androidx.lifecycle.Lifecycle
 
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.findNavController
+import androidx.navigation.fragment.NavHostFragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.haidoan.android.ceedee.R
@@ -140,7 +142,8 @@ class DiskTitlesTabFragment : Fragment() {
     private fun addListeners() {
         diskTitleAdapter.setIOnItemClickListener(object : IOnItemClickListener {
             override fun onItemClick(position: Int) {
-
+                val navController = requireActivity().findNavController(R.id.mainContainer)
+                navController.navigate(R.id.diskDetailsFragment)
             }
         })
         diskTitleAdapter.setIOnItemMoreClickListener(object : IOnItemClickListener {

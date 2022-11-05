@@ -7,16 +7,21 @@
     <fragment
         android:id="@+id/diskFragment"
         android:name="com.haidoan.android.ceedee.ui.disk_screen.DiskFragment"
-        android:label="fragment_second"
-        tools:layout="@layout/fragment_disk" />
+        tools:layout="@layout/fragment_disk" >
+        <action
+            android:id="@+id/action_diskFragment_to_diskDetailsFragment"
+            app:destination="@id/diskDetailsFragment" />
+    </fragment>
     <fragment
         android:id="@+id/rentalFragment"
         android:name="com.haidoan.android.ceedee.RentalFragment"
-        android:label="fragment_rental"
         tools:layout="@layout/fragment_rental" />
     <fragment
         android:id="@+id/reportFragment"
         android:name="com.haidoan.android.ceedee.ui.report.fragment.ReportFragment"
-        android:label="fragment_report"
         tools:layout="@layout/fragment_report" />
+    <fragment
+        android:id="@+id/diskDetailsFragment"
+        android:name="com.haidoan.android.ceedee.ui.disk_screen.disk_details.DiskDetailsFragment"
+        tools:layout="@layout/fragment_disk_details" />
 </navigation>

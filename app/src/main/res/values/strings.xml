@@ -17,8 +17,8 @@
     <string name="password">Password</string>
     <string name="required">Required</string>
     <string name="email">Email</string>
-    
-<!-- Disks-related features -->
+
+    <!-- Disks-related features -->
     <string name="disk_titles">Disk Titles</string>
     <string name="disks">Disks</string>
     <string name="search">Search</string>
@@ -35,7 +35,7 @@
     <string name="sort_by_cd_amount">Sort by CD amount</string>
     <string name="filter_by_genre">Filter by Genre</string>
 
-<!-- Report-related features -->
+    <!-- Report-related features -->
     <string name="report_start_month">Start month</string>
     <string name="report_end_month">End month</string>
     <string name="chart_type">Chart type</string>

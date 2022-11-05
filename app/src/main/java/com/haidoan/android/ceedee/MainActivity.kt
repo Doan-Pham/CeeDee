@@ -8,7 +8,9 @@ import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.NavigationUI.setupWithNavController
+import androidx.navigation.ui.setupWithNavController
 import com.haidoan.android.ceedee.databinding.ActivityMainBinding
 import com.haidoan.android.ceedee.ui.report.fragment.ReportFragment
 
@@ -22,14 +24,23 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        setSupportActionBar(binding.toolbar)
-
         // Set up nav
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.mainContainer) as NavHostFragment
         navController = navHostFragment.navController
         val bottomNavigationView = binding.bottomNavigationView
         setupWithNavController(bottomNavigationView, navController)
+
+        //set up appbar
+        setSupportActionBar(binding.toolbar)
+        val config = AppBarConfiguration(
+            setOf(
+                R.id.rentalFragment,
+                R.id.diskFragment,
+                R.id.reportFragment
+            )
+        )
+        binding.toolbar.setupWithNavController(navController, config)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
