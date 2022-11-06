@@ -7,30 +7,33 @@ import android.util.Log
 import android.view.*
 import android.widget.SearchView
 import android.widget.SearchView.OnQueryTextListener
+import androidx.core.view.MenuHost
 
 import androidx.fragment.app.Fragment
 import androidx.core.view.MenuProvider
 import androidx.lifecycle.Lifecycle
 
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.findNavController
+import androidx.navigation.fragment.NavHostFragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.haidoan.android.ceedee.R
-import com.haidoan.android.ceedee.data.DiskTitle
 import com.haidoan.android.ceedee.data.Genre
-import com.haidoan.android.ceedee.databinding.FragmentDiskTitlesBinding
+import com.haidoan.android.ceedee.databinding.FragmentDiskTabDiskTitlesBinding
+
 import com.haidoan.android.ceedee.utils.TypeUtils
 
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.fragment_second.*
-import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
+
 import java.util.*
 
-class DiskTitlesFragment : Fragment() {
-    private var _binding: FragmentDiskTitlesBinding? = null
+class DiskTitlesTabFragment : Fragment() {
+    private var _binding: FragmentDiskTabDiskTitlesBinding? = null
 
     private lateinit var diskTitleAdapter: DiskTitlesAdapter
     private lateinit var diskTitlesViewModel: DiskTitlesViewModel
+
     private lateinit var genreAdapter: GenreAdapter
 
     // This property is only valid between onCreateView and
@@ -42,7 +45,7 @@ class DiskTitlesFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        _binding = FragmentDiskTitlesBinding.inflate(inflater, container, false)
+        _binding = FragmentDiskTabDiskTitlesBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -139,7 +142,8 @@ class DiskTitlesFragment : Fragment() {
     private fun addListeners() {
         diskTitleAdapter.setIOnItemClickListener(object : IOnItemClickListener {
             override fun onItemClick(position: Int) {
-
+                val navController = requireActivity().findNavController(R.id.mainContainer)
+                navController.navigate(R.id.diskDetailsFragment)
             }
         })
         diskTitleAdapter.setIOnItemMoreClickListener(object : IOnItemClickListener {
@@ -158,10 +162,10 @@ class DiskTitlesFragment : Fragment() {
     }
 
     private fun createMenu() {
-        requireActivity().toolbar.addMenuProvider(object : MenuProvider {
+        val menuHost: MenuHost = requireActivity()
+        menuHost.addMenuProvider(object : MenuProvider {
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
                 // Add menu items here
-                menu.clear()
                 menuInflater.inflate(R.menu.menu_disk_titles, menu)
 
                 val searchView: SearchView =

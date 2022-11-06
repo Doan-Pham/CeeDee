@@ -1,13 +1,12 @@
 package com.haidoan.android.ceedee.ui.disk_screen
 
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
-import androidx.lifecycle.Lifecycle
-import androidx.viewpager2.adapter.FragmentStateAdapter
-import com.haidoan.android.ceedee.ui.disk_screen.disk_titles.DiskTitlesFragment
-import com.haidoan.android.ceedee.ui.disk_screen.disks.DisksFragment
 
-class DiskViewPagerAdapter (fragmentManager: FragmentManager,lifecycle: Lifecycle): FragmentStateAdapter(fragmentManager, lifecycle) {
+import androidx.viewpager2.adapter.FragmentStateAdapter
+import com.haidoan.android.ceedee.ui.disk_screen.disk_titles.DiskTitlesTabFragment
+import com.haidoan.android.ceedee.ui.disk_screen.disks.DisksTabFragment
+
+class DiskViewPagerAdapter (fragment: DiskFragment): FragmentStateAdapter(fragment) {
     override fun getItemCount(): Int {
         return 2
     }
@@ -15,12 +14,12 @@ class DiskViewPagerAdapter (fragmentManager: FragmentManager,lifecycle: Lifecycl
     override fun createFragment(position: Int): Fragment {
         return when(position){
             0->{
-                DiskTitlesFragment()
+                DiskTitlesTabFragment()
             }
             1->{
-                DisksFragment()
+                DisksTabFragment()
             }
-            else->{
+            else -> {
                 Fragment()
             }
         }

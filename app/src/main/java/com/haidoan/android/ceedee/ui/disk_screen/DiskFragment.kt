@@ -1,20 +1,19 @@
-package com.haidoan.android.ceedee
+package com.haidoan.android.ceedee.ui.disk_screen
 
 import android.os.Bundle
 import android.view.*
-import androidx.core.view.MenuHost
-import androidx.core.view.MenuProvider
+
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Lifecycle
+
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
-import com.haidoan.android.ceedee.databinding.FragmentSecondBinding
-import com.haidoan.android.ceedee.ui.disk_screen.DiskViewPagerAdapter
+import com.haidoan.android.ceedee.R
+import com.haidoan.android.ceedee.databinding.FragmentDiskBinding
 
 class DiskFragment : Fragment() {
 
-    private var _binding: FragmentSecondBinding? = null
+    private var _binding: FragmentDiskBinding? = null
 
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -28,36 +27,21 @@ class DiskFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        _binding = FragmentSecondBinding.inflate(inflater, container, false)
+        _binding = FragmentDiskBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         createTabLayout()
-        createMenu()
-    }
-
-    private fun createMenu() {
-        val menuHost: MenuHost = requireActivity()
-        menuHost.addMenuProvider(object : MenuProvider {
-            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-                // Add menu items here
-                menu.clear()
-            }
-
-            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
-                // Handle the menu selection
-                return true
-            }
-        }, viewLifecycleOwner, Lifecycle.State.RESUMED)
     }
 
     private fun createTabLayout() {
         tabLayout = binding.tabLayout
         viewPager2 = binding.viewPager2
-        diskAdapter = DiskViewPagerAdapter(parentFragmentManager, lifecycle)
+        diskAdapter = DiskViewPagerAdapter(this@DiskFragment)
         viewPager2.adapter = diskAdapter
+        viewPager2.isUserInputEnabled = false
         TabLayoutMediator(tabLayout, viewPager2) { tab, position ->
             when (position) {
                 0 -> {
@@ -70,8 +54,4 @@ class DiskFragment : Fragment() {
         }.attach()
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
 }
