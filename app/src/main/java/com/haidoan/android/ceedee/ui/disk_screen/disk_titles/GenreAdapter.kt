@@ -42,6 +42,10 @@ class GenreAdapter(
         return displayedGenres[position]
     }
 
+    fun getAllGenres() : ArrayList<Genre> {
+        return displayedGenres
+    }
+
     inner class GenreViewHolder(
         val binding: GenreItemBinding,
     ) : RecyclerView.ViewHolder(binding.root) {

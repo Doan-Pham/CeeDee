@@ -15,7 +15,6 @@ import androidx.lifecycle.Lifecycle
 
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
-import androidx.navigation.fragment.NavHostFragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.haidoan.android.ceedee.R
@@ -54,7 +53,6 @@ class DiskTitlesTabFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         init()
-        addListeners()
     }
 
     private fun init() {
@@ -63,13 +61,14 @@ class DiskTitlesTabFragment : Fragment() {
         diskTitleAdapter = DiskTitlesAdapter()
         diskTitleAdapter.setDiskTitlesViewModel(diskTitlesViewModel)
         diskTitleAdapter.setLifecycleOwner(viewLifecycleOwner)
+        diskTitleAdapter.setNavController(requireActivity().findNavController(R.id.mainContainer))
 
         genreAdapter = GenreAdapter(context = requireActivity().baseContext,
                                     diskTitlesViewModel = diskTitlesViewModel,
                                     viewLifecycleOwner = viewLifecycleOwner,
                                     diskTitlesAdapter = diskTitleAdapter,
                                     fragmentDiskTitlesBinding = binding)
-
+        diskTitleAdapter.setGenreAdapter(genreAdapter)
         diskTitlesViewModel.getDiskTitles().observe(viewLifecycleOwner) { response ->
             when (response) {
                 is Response.Loading -> {
@@ -137,20 +136,6 @@ class DiskTitlesTabFragment : Fragment() {
             }
             (rcvGenres.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
         }
-    }
-
-    private fun addListeners() {
-        diskTitleAdapter.setIOnItemClickListener(object : IOnItemClickListener {
-            override fun onItemClick(position: Int) {
-                val navController = requireActivity().findNavController(R.id.mainContainer)
-                navController.navigate(R.id.diskDetailsFragment)
-            }
-        })
-        diskTitleAdapter.setIOnItemMoreClickListener(object : IOnItemClickListener {
-            override fun onItemClick(position: Int) {
-
-            }
-        })
     }
 
     private fun sortByCDAmount(type: TypeUtils.SORT_BY_AMOUNT) {
