@@ -1,17 +1,15 @@
-package com.haidoan.android.ceedee.ui.disk_screen.disk_titles
+package com.haidoan.android.ceedee.ui.disk_screen.repository
 
 import android.app.Application
 import android.util.Log
-import androidx.lifecycle.MutableLiveData
-import com.google.firebase.firestore.AggregateSource
 
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 
 import com.haidoan.android.ceedee.data.DiskTitle
-import com.haidoan.android.ceedee.data.Genre
-import com.haidoan.android.ceedee.utils.TypeUtils
+import com.haidoan.android.ceedee.ui.disk_screen.utils.Response
+import com.haidoan.android.ceedee.ui.disk_screen.utils.TypeUtils
 
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
@@ -32,7 +30,7 @@ class DiskTitlesRepository(private val application: Application) {
         emit(Response.Loading())
         emit(
             Response.Success(queryDiskTitle
-                .whereEqualTo("genreId",id)
+                .whereEqualTo("genreId", id)
                 .get()
                 .await()
                 .documents

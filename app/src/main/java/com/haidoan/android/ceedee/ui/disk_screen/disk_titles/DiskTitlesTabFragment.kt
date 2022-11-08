@@ -23,8 +23,10 @@ import androidx.recyclerview.widget.SimpleItemAnimator
 import com.haidoan.android.ceedee.R
 import com.haidoan.android.ceedee.data.Genre
 import com.haidoan.android.ceedee.databinding.FragmentDiskTabDiskTitlesBinding
+import com.haidoan.android.ceedee.ui.disk_screen.repository.GenreRepository
+import com.haidoan.android.ceedee.ui.disk_screen.utils.Response
 
-import com.haidoan.android.ceedee.utils.TypeUtils
+import com.haidoan.android.ceedee.ui.disk_screen.utils.TypeUtils
 
 import kotlinx.android.synthetic.main.activity_main.*
 

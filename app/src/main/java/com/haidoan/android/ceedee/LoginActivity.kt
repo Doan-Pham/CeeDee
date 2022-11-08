@@ -3,7 +3,6 @@ package com.haidoan.android.ceedee
 import android.content.Intent
 
 import android.os.Bundle
-import android.util.Log
 
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -19,7 +18,7 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.haidoan.android.ceedee.databinding.ActivityLoginBinding
-import com.haidoan.android.ceedee.ui.disk_screen.disk_titles.Response
+import com.haidoan.android.ceedee.ui.disk_screen.utils.Response
 import com.haidoan.android.ceedee.ui.login.AuthenticationViewModel
 
 class LoginActivity : AppCompatActivity() {

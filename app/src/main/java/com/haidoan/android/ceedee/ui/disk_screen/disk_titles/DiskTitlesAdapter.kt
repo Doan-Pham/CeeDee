@@ -18,10 +18,10 @@ import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import com.haidoan.android.ceedee.R
 import com.haidoan.android.ceedee.data.DiskTitle
-import com.haidoan.android.ceedee.data.Genre
 import com.haidoan.android.ceedee.databinding.DiskTitlesItemBinding
+import com.haidoan.android.ceedee.ui.disk_screen.utils.Response
 
-import com.haidoan.android.ceedee.utils.TypeUtils
+import com.haidoan.android.ceedee.ui.disk_screen.utils.TypeUtils
 import java.util.*
 
 @SuppressLint("NotifyDataSetChanged")

@@ -1,7 +1,6 @@
 package com.haidoan.android.ceedee.ui.disk_screen.disk_titles
 
 import android.content.Context
-import android.opengl.Visibility
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -17,6 +16,8 @@ import com.haidoan.android.ceedee.data.Genre
 import com.haidoan.android.ceedee.databinding.FragmentDiskTabDiskTitlesBinding
 
 import com.haidoan.android.ceedee.databinding.GenreItemBinding
+import com.haidoan.android.ceedee.ui.disk_screen.repository.GenreRepository
+import com.haidoan.android.ceedee.ui.disk_screen.utils.Response
 
 class GenreAdapter(
     private val context: Context,
