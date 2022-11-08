@@ -1,12 +1,15 @@
 package com.haidoan.android.ceedee.ui.disk_screen.disk_titles
 
 import android.annotation.SuppressLint
+import android.app.AlertDialog
 
 import android.os.Bundle
 import android.util.Log
 import android.view.*
+import android.widget.EditText
 import android.widget.SearchView
 import android.widget.SearchView.OnQueryTextListener
+import android.widget.Toast
 import androidx.core.view.MenuHost
 
 import androidx.fragment.app.Fragment
@@ -53,6 +56,7 @@ class DiskTitlesTabFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         init()
+        createMenu()
     }
 
     private fun init() {
@@ -89,8 +93,6 @@ class DiskTitlesTabFragment : Fragment() {
                             diskTitleAdapter.itemCount.toString() + " Titles"
                     else binding.tvDiskTitlesTotal.text =
                         diskTitleAdapter.itemCount.toString() + " Title"
-
-                    createMenu()
                 }
                 is Response.Failure -> {
                     print(response.errorMessage)
@@ -138,14 +140,6 @@ class DiskTitlesTabFragment : Fragment() {
         }
     }
 
-    private fun sortByCDAmount(type: TypeUtils.SORT_BY_AMOUNT) {
-        diskTitleAdapter.sortByCDAmount(type)
-    }
-
-    private fun sortByName(type: TypeUtils.SORT_BY_NAME) {
-        diskTitleAdapter.sortByName(type)
-    }
-
     private fun createMenu() {
         val menuHost: MenuHost = requireActivity()
         menuHost.addMenuProvider(object : MenuProvider {
@@ -176,6 +170,18 @@ class DiskTitlesTabFragment : Fragment() {
                         Log.d("TAG_MENU", "DISKTITLE_CART")
                         true
                     }
+                    R.id.menu_disk_titles_add_genre -> {
+                        addGenre()
+                        true
+                    }
+                    R.id.menu_disk_titles_add_disk_title -> {
+                        addDiskTitle()
+                        true
+                    }
+                    R.id.menu_disk_titles_add_supplier -> {
+                        addSupplier()
+                        true
+                    }
                     R.id.menu_disk_title_tab_sort_by_name_ascending -> {
                         sortByName(TypeUtils.SORT_BY_NAME.Ascending)
                         true
@@ -196,6 +202,64 @@ class DiskTitlesTabFragment : Fragment() {
                 }
             }
         }, viewLifecycleOwner, Lifecycle.State.RESUMED)
+    }
+
+
+    private fun sortByCDAmount(type: TypeUtils.SORT_BY_AMOUNT) {
+        diskTitleAdapter.sortByCDAmount(type)
+    }
+
+    private fun sortByName(type: TypeUtils.SORT_BY_NAME) {
+        diskTitleAdapter.sortByName(type)
+    }
+
+    private fun addSupplier() {
+        TODO("Not yet implemented")
+    }
+
+    private fun addDiskTitle() {
+        view?.findNavController()?.navigate(R.id.diskAddEditFragment)
+    }
+
+    private fun addGenre() {
+        view?.let { withEditTextGenre(it) }
+    }
+
+    /**
+     *  Create dialog for add genre
+     * */
+    private fun withEditTextGenre(view: View) {
+        val builder = AlertDialog.Builder(context)
+        val inflater = layoutInflater
+        builder.setTitle("Add new genre")
+        val dialogLayout = inflater.inflate(R.layout.dialog_add_genre, null)
+        val editText  = dialogLayout.findViewById<EditText>(R.id.editText)
+        builder.setView(dialogLayout)
+        builder.setPositiveButton("ADD") { dialogInterface, i -> addGenreToFireStore(editText.text.toString()) }
+        builder.setNegativeButton("CANCEL") {dialogLayout,i -> }
+        builder.show()
+    }
+
+    private fun addGenreToFireStore(genreName: String) {
+        val genre = hashMapOf("name" to genreName)
+        diskTitlesViewModel.addGenres(genre).observe(this) { response ->
+            when (response) {
+                is Response.Loading -> {
+                }
+                is Response.Success -> {
+                    makeToast("Add genre success!")
+                    init()
+                }
+                is Response.Failure -> {
+                    makeToast("Add genre fail!")
+                }
+            }
+
+        }
+    }
+
+    private fun makeToast(text: String) {
+        Toast.makeText(context,  text, Toast.LENGTH_SHORT).show()
     }
 
     override fun onDestroyView() {

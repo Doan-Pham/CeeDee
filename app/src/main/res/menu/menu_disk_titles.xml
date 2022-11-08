@@ -10,7 +10,7 @@
         android:orderInCategory="100"
         app:iconTint="@color/white"
         android:title="@string/search"
-        app:showAsAction="ifRoom"
+        app:showAsAction="always"
         tools:targetApi="o"
         tools:ignore="AlwaysShowAction"
         app:actionViewClass="android.widget.SearchView">
@@ -24,7 +24,7 @@
         android:title="@string/sort_by"
         tools:targetApi="o"
         android:visible="true"
-        app:showAsAction="ifRoom">
+        app:showAsAction="always">
         <menu>
             <item android:title="@string/sort_by_name"
                 >
@@ -55,11 +55,36 @@
     </item>
 
     <item
+        android:id="@+id/menu_disk_titles_add"
+        android:icon="@drawable/ic_round_add_24"
+        android:orderInCategory="102"
+        android:title="@string/sort_by"
+        tools:targetApi="o"
+        android:visible="true"
+        app:showAsAction="always">
+        <menu>
+            <item
+                android:id="@+id/menu_disk_titles_add_genre"
+                android:title="Add new genre"
+                />
+            <item
+                android:id="@+id/menu_disk_titles_add_supplier"
+                android:title="Add new supplier"
+                />
+            <item
+                android:id="@+id/menu_disk_titles_add_disk_title"
+                android:title="Add new disk title"
+                />
+        </menu>
+    </item>
+
+
+    <item
         android:id="@+id/menu_disk_titles_cart"
         android:icon="@drawable/ic_round_shopping_cart_24"
         android:orderInCategory="104"
         android:title="@string/cart"
-        app:showAsAction="ifRoom"
+        app:showAsAction="always"
         tools:targetApi="o">
     </item>
 

@@ -42,6 +42,12 @@ class DiskTitlesViewModel(application: Application) : AndroidViewModel(applicati
         }
     }
 
+    fun addGenres(genre: HashMap<String, String>) = liveData(Dispatchers.IO) {
+        genreRepository.addGenreToFireStore(genre).collect { response ->
+            emit(response)
+        }
+    }
+
     fun getGenres() = liveData(Dispatchers.IO) {
         genreRepository.getGenresFromFireStore().collect { response ->
             emit(response)
