@@ -10,12 +10,21 @@
     >
 
     <EditText
-        android:id="@+id/edt_add_genre_name"
+        android:id="@+id/edt_add_supplier_name"
         style="@style/edt_login_style"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Name"
         android:inputType="text"
-        />
+        android:autofillHints="" />
 
+    <EditText
+        android:id="@+id/edt_add_supplier_email"
+        style="@style/edt_login_style"
+        android:layout_marginTop="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Email"
+        android:inputType="textEmailAddress"
+        android:autofillHints="" />
 </LinearLayout>

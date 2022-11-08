@@ -69,11 +69,13 @@ class DiskTitlesTabFragment : Fragment() {
         diskTitleAdapter.setLifecycleOwner(viewLifecycleOwner)
         diskTitleAdapter.setNavController(requireActivity().findNavController(R.id.mainContainer))
 
-        genreAdapter = GenreAdapter(context = requireActivity().baseContext,
-                                    diskTitlesViewModel = diskTitlesViewModel,
-                                    viewLifecycleOwner = viewLifecycleOwner,
-                                    diskTitlesAdapter = diskTitleAdapter,
-                                    fragmentDiskTitlesBinding = binding)
+        genreAdapter = GenreAdapter(
+            context = requireActivity().baseContext,
+            diskTitlesViewModel = diskTitlesViewModel,
+            viewLifecycleOwner = viewLifecycleOwner,
+            diskTitlesAdapter = diskTitleAdapter,
+            fragmentDiskTitlesBinding = binding
+        )
         diskTitleAdapter.setGenreAdapter(genreAdapter)
         diskTitlesViewModel.getDiskTitles().observe(viewLifecycleOwner) { response ->
             when (response) {
@@ -115,8 +117,8 @@ class DiskTitlesTabFragment : Fragment() {
                 is Response.Success -> {
                     val list = response.data
 
-                    val genreList= mutableListOf<Genre>()
-                    genreList.add(Genre(GenreRepository.defaultGenre,"All"))
+                    val genreList = mutableListOf<Genre>()
+                    genreList.add(Genre(GenreRepository.defaultGenre, "All"))
                     genreList.addAll(list)
                     genreAdapter.submitList(genreList)
                 }
@@ -216,7 +218,7 @@ class DiskTitlesTabFragment : Fragment() {
     }
 
     private fun addSupplier() {
-        TODO("Not yet implemented")
+        view?.let { withEditTextSupplier(it) }
     }
 
     private fun addDiskTitle() {
@@ -235,10 +237,10 @@ class DiskTitlesTabFragment : Fragment() {
         val inflater = layoutInflater
         builder.setTitle("Add new genre")
         val dialogLayout = inflater.inflate(R.layout.dialog_add_genre, null)
-        val editText  = dialogLayout.findViewById<EditText>(R.id.editText)
+        val editText = dialogLayout.findViewById<EditText>(R.id.edt_add_genre_name)
         builder.setView(dialogLayout)
         builder.setPositiveButton("ADD") { dialogInterface, i -> addGenreToFireStore(editText.text.toString()) }
-        builder.setNegativeButton("CANCEL") {dialogLayout,i -> }
+        builder.setNegativeButton("CANCEL") { dialogLayout, i -> }
         builder.show()
     }
 
@@ -260,8 +262,45 @@ class DiskTitlesTabFragment : Fragment() {
         }
     }
 
+    /**
+     *  Create dialog for add supplier
+     * */
+    private fun withEditTextSupplier(view: View) {
+        val builder = AlertDialog.Builder(context)
+        val inflater = layoutInflater
+        builder.setTitle("Add new supplier")
+        val dialogLayout = inflater.inflate(R.layout.dialog_add_supplier, null)
+        val name = dialogLayout.findViewById<EditText>(R.id.edt_add_supplier_name)
+        val email = dialogLayout.findViewById<EditText>(R.id.edt_add_supplier_email)
+        builder.setView(dialogLayout)
+        builder.setPositiveButton("ADD") { dialogInterface, i -> addSupplierToFireStore(name.text.toString(),email.text.toString()) }
+        builder.setNegativeButton("CANCEL") { dialogLayout, i -> }
+        builder.show()
+    }
+
+    private fun addSupplierToFireStore(supplierName: String, supplierEmail: String) {
+        val supplier = hashMapOf(
+            "name" to supplierName,
+            "email" to supplierEmail
+        )
+        diskTitlesViewModel.addSupplier(supplier).observe(this) { response ->
+            when (response) {
+                is Response.Loading -> {
+                }
+                is Response.Success -> {
+                    makeToast("Add supplier success!")
+                    init()
+                }
+                is Response.Failure -> {
+                    makeToast("Add supplier fail!")
+                }
+            }
+
+        }
+    }
+
     private fun makeToast(text: String) {
-        Toast.makeText(context,  text, Toast.LENGTH_SHORT).show()
+        Toast.makeText(context, text, Toast.LENGTH_SHORT).show()
     }
 
     override fun onDestroyView() {

@@ -6,6 +6,7 @@ import androidx.lifecycle.liveData
 import com.haidoan.android.ceedee.ui.disk_screen.repository.DisksRepository
 import com.haidoan.android.ceedee.ui.disk_screen.repository.DiskTitlesRepository
 import com.haidoan.android.ceedee.ui.disk_screen.repository.GenreRepository
+import com.haidoan.android.ceedee.ui.disk_screen.repository.SupplierRepository
 import com.haidoan.android.ceedee.ui.disk_screen.utils.TypeUtils
 import kotlinx.coroutines.Dispatchers
 
@@ -13,11 +14,12 @@ class DiskTitlesViewModel(application: Application) : AndroidViewModel(applicati
     private val diskTitlesRepository : DiskTitlesRepository
     private val disksRepository: DisksRepository
     private val genreRepository: GenreRepository
-
+    private val supplierRepository: SupplierRepository
     init {
         diskTitlesRepository = DiskTitlesRepository(application)
         disksRepository = DisksRepository(application)
         genreRepository = GenreRepository(application)
+        supplierRepository = SupplierRepository(application)
     }
 
     fun getDiskAmountInDiskTitles(diskTitleId : String) = liveData(Dispatchers.IO) {
@@ -46,6 +48,12 @@ class DiskTitlesViewModel(application: Application) : AndroidViewModel(applicati
 
     fun addGenres(genre: HashMap<String, String>) = liveData(Dispatchers.IO) {
         genreRepository.addGenreToFireStore(genre).collect { response ->
+            emit(response)
+        }
+    }
+
+    fun addSupplier(supplier: HashMap<String, String>) = liveData(Dispatchers.IO) {
+        supplierRepository.addSupplierToFireStore(supplier).collect { response ->
             emit(response)
         }
     }

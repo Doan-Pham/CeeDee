@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.tasks.await
 
-class GenreRepository(application: Application) {
+class GenreRepository(private val application: Application) {
     private val db: FirebaseFirestore = FirebaseFirestore.getInstance()
 
     private var queryGenre: CollectionReference = db.collection("Genre")
