@@ -11,10 +11,10 @@ import com.google.android.material.tabs.TabLayout
 import com.google.firebase.auth.FirebaseAuth
 import com.haidoan.android.ceedee.databinding.FragmentRentalBinding
 import com.haidoan.android.ceedee.fragmentRentalTabs.Adapters.TabRentalAdapter
-import com.haidoan.android.ceedee.fragmentRentalTabs.tabAll
-import com.haidoan.android.ceedee.fragmentRentalTabs.tabComplete
-import com.haidoan.android.ceedee.fragmentRentalTabs.tabInProgress
-import com.haidoan.android.ceedee.fragmentRentalTabs.tabOverdue
+import com.haidoan.android.ceedee.fragmentRentalTabs.TabAll
+import com.haidoan.android.ceedee.fragmentRentalTabs.TabComplete
+import com.haidoan.android.ceedee.fragmentRentalTabs.TabInProgress
+import com.haidoan.android.ceedee.fragmentRentalTabs.TabOverdue
 import com.haidoan.android.ceedee.ui.login.AuthenticationViewModel
 
 
@@ -45,10 +45,10 @@ class RentalFragment : Fragment() {
         val viewPager=view.findViewById<ViewPager>(R.id.viewPagerRental)
         val tabRental=view.findViewById<TabLayout>(R.id.tabRental)
         val adapter= TabRentalAdapter(childFragmentManager)
-        adapter.addFragment(tabAll(),"All")
-        adapter.addFragment(tabInProgress(),"In progress")
-        adapter.addFragment(tabOverdue(),"Overdue")
-        adapter.addFragment(tabComplete(),"Complete")
+        adapter.addFragment(TabAll(),"All")
+        adapter.addFragment(TabInProgress(),"In progress")
+        adapter.addFragment(TabOverdue(),"Overdue")
+        adapter.addFragment(TabComplete(),"Complete")
         viewPager.adapter=adapter
        tabRental.setupWithViewPager(viewPager)
 

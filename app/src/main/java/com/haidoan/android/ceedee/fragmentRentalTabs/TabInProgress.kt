@@ -25,7 +25,7 @@ private lateinit var rental_adapter: RentalAdapter
 private lateinit var rentalList: ArrayList<Rental>
 private lateinit var tempRentalList: ArrayList<Rental>
 
-class tabInProgress : Fragment() {
+class TabInProgress : Fragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
