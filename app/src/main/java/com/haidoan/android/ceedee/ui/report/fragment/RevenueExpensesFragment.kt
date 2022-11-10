@@ -2,8 +2,10 @@ package com.haidoan.android.ceedee.ui.report.fragment
 
 import android.app.AlertDialog
 import android.content.pm.PackageManager
-import android.graphics.*
+import android.graphics.Canvas
+import android.graphics.Paint
 import android.graphics.Paint.FILTER_BITMAP_FLAG
+import android.graphics.Typeface
 import android.graphics.pdf.PdfDocument
 import android.os.Bundle
 import android.os.Environment
@@ -26,7 +28,7 @@ import com.github.mikephil.charting.components.YAxis
 import com.github.mikephil.charting.data.*
 import com.github.mikephil.charting.formatter.LargeValueFormatter
 import com.haidoan.android.ceedee.R
-import com.haidoan.android.ceedee.data.report.FirestoreApi
+import com.haidoan.android.ceedee.data.report.FirestoreStatisticsDataSource
 import com.haidoan.android.ceedee.data.report.ReportRepository
 import com.haidoan.android.ceedee.databinding.FragmentRevenueExpensesBinding
 import com.haidoan.android.ceedee.ui.report.util.*
@@ -61,7 +63,7 @@ class RevenueExpensesFragment : Fragment() {
         ViewModelProvider(
             this, ReportViewModel.Factory(
                 activity.application, ReportRepository(
-                    FirestoreApi()
+                    FirestoreStatisticsDataSource()
                 )
             )
         )[ReportViewModel::class.java]

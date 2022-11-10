@@ -32,8 +32,9 @@ class ReportViewModel(application: Application, private val reportRepository: Re
     private fun refreshMonthlyRevenue(
     ) {
         viewModelScope.launch {
-            _monthlyRevenue.value =
-                reportRepository.getRevenueBetweenMonths(startTime, endTime).value
+            reportRepository.getRevenueBetweenMonths(startTime, endTime).collect { revenue ->
+                _monthlyRevenue.value = revenue
+            }
         }
         Log.d(
             TAG,
@@ -44,14 +45,15 @@ class ReportViewModel(application: Application, private val reportRepository: Re
     private fun refreshMonthlyExpenses(
     ) {
         viewModelScope.launch {
-            _monthlyExpenses.value =
-                reportRepository.getExpensesBetweenMonths(startTime, endTime).value
+            reportRepository.getExpensesBetweenMonths(startTime, endTime)
+                .collect { expenses -> _monthlyExpenses.value = expenses }
         }
         Log.d(
             TAG,
             "Called refreshMonthlyExpenses(), expenses between $startTime and $endTime after refresh: ${_monthlyExpenses.value.toString()}"
         )
     }
+
     fun setMonthsPeriod(
         startTime: LocalDate = LocalDate.now(),
         endTime: LocalDate = LocalDate.now()

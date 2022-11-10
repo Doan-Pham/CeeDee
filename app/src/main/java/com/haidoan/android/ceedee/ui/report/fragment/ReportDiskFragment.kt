@@ -18,6 +18,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import com.github.mikephil.charting.charts.PieChart
 import com.github.mikephil.charting.components.Legend
 import com.github.mikephil.charting.data.PieData
@@ -25,8 +26,11 @@ import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
 import com.github.mikephil.charting.formatter.PercentFormatter
 import com.haidoan.android.ceedee.R
+import com.haidoan.android.ceedee.data.report.FirestoreStatisticsDataSource
+import com.haidoan.android.ceedee.data.report.ReportRepository
 import com.haidoan.android.ceedee.databinding.FragmentReportDiskBinding
 import com.haidoan.android.ceedee.ui.report.util.*
+import com.haidoan.android.ceedee.ui.report.viewmodel.ReportViewModel
 import java.io.File
 import java.io.FileOutputStream
 import java.time.LocalDate
@@ -53,6 +57,19 @@ class ReportDiskFragment : Fragment() {
     private lateinit var binding: FragmentReportDiskBinding
     private lateinit var pieChart: PieChart
 
+    private val viewModel: ReportViewModel by lazy {
+        val activity = requireNotNull(this.activity) {
+            "You can only access the viewModel after onActivityCreated()"
+        }
+        ViewModelProvider(
+            this, ReportViewModel.Factory(
+                activity.application, ReportRepository(
+                    FirestoreStatisticsDataSource()
+                )
+            )
+        )[ReportViewModel::class.java]
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -75,13 +92,13 @@ class ReportDiskFragment : Fragment() {
         legend.horizontalAlignment = Legend.LegendHorizontalAlignment.LEFT
         legend.isWordWrapEnabled = true
         legend.orientation = Legend.LegendOrientation.HORIZONTAL
-        legend.xEntrySpace = 7f;
+        legend.xEntrySpace = 7f
         legend.textSize = 12f
         legend.setDrawInside(false)
 
         pieChart.setUsePercentValues(true)
-        pieChart.setEntryLabelColor(Color.WHITE);
-        pieChart.setEntryLabelTextSize(14f);
+        pieChart.setEntryLabelColor(Color.WHITE)
+        pieChart.setEntryLabelTextSize(14f)
         pieChart.description.isEnabled = false
         pieChart.isDrawHoleEnabled = false
         pieChart.isHighlightPerTapEnabled = false
@@ -113,7 +130,6 @@ class ReportDiskFragment : Fragment() {
         data.setValueTextColor(Color.WHITE)
         pieChart.data = data
     }
-
 
     private fun setUpButtonPrint() {
         binding.buttonPrint.setOnClickListener {

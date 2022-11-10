@@ -1,34 +1,32 @@
 package com.haidoan.android.ceedee.data.report
 
 import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import com.google.android.gms.tasks.Task
 import com.google.firebase.Timestamp
-import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneId
 import java.time.ZoneOffset
 import java.time.temporal.TemporalAdjusters.firstDayOfMonth
 import java.time.temporal.TemporalAdjusters.lastDayOfMonth
-import java.util.TreeMap
+import java.util.*
 
 private const val TAG = "FirestoreApi.kt"
 
 // The zoneId is currently Asia/Ho_Chi_Minh which has an offset of 7 hours
 private var DEFAULT_TIMEZONE_OFFSET_IN_HOURS = 7
 
-class FirestoreApi {
+class FirestoreStatisticsDataSource {
     private val databaseRef = Firebase.firestore
 
     suspend fun getRevenueBetweenMonths(
         startTime: LocalDate,
         endTime: LocalDate,
-    ): LiveData<Map<LocalDate, Float>> {
+    ): Flow<Map<LocalDate, Float>> = callbackFlow {
 
         val zoneId = ZoneId.of("Asia/Ho_Chi_Minh")
 
@@ -55,31 +53,47 @@ class FirestoreApi {
         val firebaseQueryRef = databaseRef.collection("Rental")
             .whereGreaterThanOrEqualTo("returnDate", startTimestamp)
             .whereLessThanOrEqualTo("returnDate", endTimestamp)
-        val firebaseQueryAsTask: Task<QuerySnapshot> = firebaseQueryRef.get()
 
-        for (document in firebaseQueryAsTask.await().documents) {
-            val currentMonthAsTimestamp = document.get("returnDate") as Timestamp
-            val currentMonthAsLocalDate =
-                currentMonthAsTimestamp.toDate().toInstant().atZone(zoneId).toLocalDate()
-                    .with(firstDayOfMonth())
+        // Registers callback to firestore, which will be called on new events
+        val subscription = firebaseQueryRef.addSnapshotListener { snapshot, _ ->
+            if (snapshot == null) {
+                return@addSnapshotListener
+            }
+            monthlyRevenue.clear()
+            for (document in snapshot.documents) {
+                val currentMonthAsTimestamp = document.get("returnDate") as Timestamp
+                val currentMonthAsLocalDate =
+                    currentMonthAsTimestamp.toDate().toInstant().atZone(zoneId).toLocalDate()
+                        .with(firstDayOfMonth())
 
-            val revenueAtCurrentMonth = monthlyRevenue[currentMonthAsLocalDate]
-            val currentRentalRevenue = document.getDouble("totalPayment")
+                val revenueAtCurrentMonth = monthlyRevenue[currentMonthAsLocalDate]
+                val currentRentalRevenue = document.getDouble("totalPayment")
 
-            monthlyRevenue[currentMonthAsLocalDate] =
-                (currentRentalRevenue?.toFloat() ?: 0f) + (revenueAtCurrentMonth ?: 0f)
+                monthlyRevenue[currentMonthAsLocalDate] =
+                    (currentRentalRevenue?.toFloat() ?: 0f) + (revenueAtCurrentMonth ?: 0f)
+            }
+            // Sends events to the flow! Consumers will get the new events
+            try {
+                trySend(monthlyRevenue).isSuccess
+            } catch (e: Throwable) {
+                // Event couldn't be sent to the flow
+            }
         }
+
+        // The callback inside awaitClose will be executed when the flow is
+        // either closed or cancelled.
+        // In this case, remove the callback from Firestore
+        awaitClose { subscription.remove() }
         Log.d(
             TAG,
             "Called getRevenueBetweenMonths(), revenue between $startTime and $endTime : $monthlyRevenue"
         )
-        return MutableLiveData(monthlyRevenue)
     }
 
     suspend fun getExpensesBetweenMonths(
         startTime: LocalDate,
         endTime: LocalDate,
-    ): LiveData<Map<LocalDate, Float>> {
+    ): Flow<Map<LocalDate, Float>> = callbackFlow {
 
         val zoneId = ZoneId.of("Asia/Ho_Chi_Minh")
 
@@ -106,24 +120,43 @@ class FirestoreApi {
         val firebaseQueryRef = databaseRef.collection("Import")
             .whereGreaterThanOrEqualTo("date", startTimestamp)
             .whereLessThanOrEqualTo("date", endTimestamp)
-        val firebaseQueryAsTask: Task<QuerySnapshot> = firebaseQueryRef.get()
 
-        for (document in firebaseQueryAsTask.await().documents) {
-            val currentMonthAsTimestamp = document.get("date") as Timestamp
-            val currentMonthAsLocalDate =
-                currentMonthAsTimestamp.toDate().toInstant().atZone(zoneId).toLocalDate()
-                    .with(firstDayOfMonth())
+        // Registers callback to firestore, which will be called on new events
+        val subscription = firebaseQueryRef.addSnapshotListener { snapshot, _ ->
+            if (snapshot == null) {
+                return@addSnapshotListener
+            }
 
-            val expensesAtCurrentMonth = monthlyExpenses[currentMonthAsLocalDate]
-            val currentRentalExpenses = document.getDouble("totalPayment")
+            monthlyExpenses.clear()
+            for (document in snapshot.documents) {
+                val currentMonthAsTimestamp = document.get("date") as Timestamp
+                val currentMonthAsLocalDate =
+                    currentMonthAsTimestamp.toDate().toInstant().atZone(zoneId).toLocalDate()
+                        .with(firstDayOfMonth())
 
-            monthlyExpenses[currentMonthAsLocalDate] =
-                (currentRentalExpenses?.toFloat() ?: 0f) + (expensesAtCurrentMonth ?: 0f)
+                val expensesAtCurrentMonth = monthlyExpenses[currentMonthAsLocalDate]
+                val currentRentalExpenses = document.getDouble("totalPayment")
+
+                monthlyExpenses[currentMonthAsLocalDate] =
+                    (currentRentalExpenses?.toFloat() ?: 0f) + (expensesAtCurrentMonth ?: 0f)
+            }
+            // Sends events to the flow! Consumers will get the new events
+            try {
+                trySend(monthlyExpenses).isSuccess
+            } catch (e: Throwable) {
+                // Event couldn't be sent to the flow
+            }
         }
+
+        // The callback inside awaitClose will be executed when the flow is
+        // either closed or cancelled.
+        // In this case, remove the callback from Firestore
+        awaitClose { subscription.remove() }
         Log.d(
             TAG,
             "Called getExpensesBetweenMonths(), expenses between $startTime and $endTime : $monthlyExpenses"
         )
-        return MutableLiveData(monthlyExpenses)
     }
+
+
 }
