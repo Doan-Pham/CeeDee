@@ -5,4 +5,8 @@ import com.google.firebase.firestore.DocumentId
 data class Genre(
     @DocumentId
     val id: String = "",
-    val name: String = ""):java.io.Serializable
+    val name: String = ""):java.io.Serializable {
+    override fun toString(): String {
+        return name
+    }
+    }

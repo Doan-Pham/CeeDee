@@ -76,6 +76,7 @@ class DiskTitlesTabFragment : Fragment() {
             diskTitlesAdapter = diskTitleAdapter,
             fragmentDiskTitlesBinding = binding
         )
+
         diskTitleAdapter.setGenreAdapter(genreAdapter)
         diskTitlesViewModel.getDiskTitles().observe(viewLifecycleOwner) { response ->
             when (response) {

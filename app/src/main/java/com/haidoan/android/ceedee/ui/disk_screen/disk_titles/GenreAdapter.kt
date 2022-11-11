@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ProgressBar
 
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
@@ -22,14 +23,16 @@ import com.haidoan.android.ceedee.ui.disk_screen.utils.Response
 class GenreAdapter(
     private val context: Context,
     private val diskTitlesViewModel: DiskTitlesViewModel,
-    private val diskTitlesAdapter: DiskTitlesAdapter,
     private val viewLifecycleOwner: LifecycleOwner,
-    private val fragmentDiskTitlesBinding: FragmentDiskTabDiskTitlesBinding
+    private val diskTitlesAdapter: DiskTitlesAdapter?,
+    private val fragmentDiskTitlesBinding: FragmentDiskTabDiskTitlesBinding?
 ) :
-    ListAdapter<Genre, GenreAdapter.GenreViewHolder>(GenreUtils()) {
+    ListAdapter<Genre, GenreAdapter.GenreViewHolder>(GenreUtils())
+    {
 
     private val displayedGenres = arrayListOf<Genre>()
 
+   // private lateinit var diskTitlesAdapter: DiskTitlesAdapter
     private var selectedItemPos = -1
     private var lastItemSelectedPos = -1
 
@@ -38,6 +41,10 @@ class GenreAdapter(
         displayedGenres.clear()
         displayedGenres.addAll(newList.toList())
     }
+
+  /*  fun setDiskTitlesAdapter(adapter: DiskTitlesAdapter) {
+        diskTitlesAdapter = adapter
+    }*/
 
     fun getItemAt(position: Int): Genre {
         return displayedGenres[position]
@@ -66,27 +73,29 @@ class GenreAdapter(
         }
 
         private fun getDiskTitleFilterByGenreId(id: String) {
+            val progressBar = fragmentDiskTitlesBinding?.progressbarDiskTitle
+            val rcvDiskTitle = fragmentDiskTitlesBinding?.rcvDiskTitles
             diskTitlesViewModel.getDiskTitleFilterByGenreId(id)
                 .observe(viewLifecycleOwner) { response ->
                     when (response) {
                         is Response.Loading -> {
-                            fragmentDiskTitlesBinding.progressbarDiskTitle.visibility =
+                            progressBar?.visibility =
                                 View.VISIBLE
-                            fragmentDiskTitlesBinding.rcvDiskTitles.visibility = View.INVISIBLE
+                            progressBar?.visibility = View.INVISIBLE
                         }
                         is Response.Success -> {
                             val list = response.data
-                            fragmentDiskTitlesBinding.progressbarDiskTitle.visibility =
+                            progressBar?.visibility =
                                 View.GONE
-                            fragmentDiskTitlesBinding.rcvDiskTitles.visibility = View.VISIBLE
-                            diskTitlesAdapter.setFilterByGenreList(list)
-                            diskTitlesAdapter.setAllDiskTitleFilterByGenre(list)
+                            rcvDiskTitle?.visibility = View.VISIBLE
+                            diskTitlesAdapter?.setFilterByGenreList(list)
+                            diskTitlesAdapter?.setAllDiskTitleFilterByGenre(list)
                         }
                         is Response.Failure -> {
                             println(response.errorMessage)
-                            fragmentDiskTitlesBinding.progressbarDiskTitle.visibility =
+                            progressBar?.visibility =
                                 View.GONE
-                            fragmentDiskTitlesBinding.rcvDiskTitles.visibility = View.VISIBLE
+                            rcvDiskTitle?.visibility = View.VISIBLE
                         }
                     }
 
@@ -94,26 +103,28 @@ class GenreAdapter(
         }
 
         private fun getAllDiskTitle() {
+            val progressBar = fragmentDiskTitlesBinding?.progressbarDiskTitle
+            val rcvDiskTitle = fragmentDiskTitlesBinding?.rcvDiskTitles
             diskTitlesViewModel.getDiskTitles().observe(viewLifecycleOwner) { response ->
                 when (response) {
                     is Response.Loading -> {
-                        fragmentDiskTitlesBinding.progressbarDiskTitle.visibility =
+                        progressBar?.visibility =
                             View.VISIBLE
-                        fragmentDiskTitlesBinding.rcvDiskTitles.visibility = View.INVISIBLE
+                        progressBar?.visibility = View.INVISIBLE
                     }
                     is Response.Success -> {
                         val list = response.data
-                        fragmentDiskTitlesBinding.progressbarDiskTitle.visibility =
+                        progressBar?.visibility =
                             View.GONE
-                        fragmentDiskTitlesBinding.rcvDiskTitles.visibility = View.VISIBLE
-                        diskTitlesAdapter.setFilterByGenreList(list)
-                        diskTitlesAdapter.setAllDiskTitleFilterByGenre(list)
+                        rcvDiskTitle?.visibility = View.VISIBLE
+                        diskTitlesAdapter?.setFilterByGenreList(list)
+                        diskTitlesAdapter?.setAllDiskTitleFilterByGenre(list)
                     }
                     is Response.Failure -> {
                         print(response.errorMessage)
-                        fragmentDiskTitlesBinding.progressbarDiskTitle.visibility =
+                        progressBar?.visibility =
                             View.GONE
-                        fragmentDiskTitlesBinding.rcvDiskTitles.visibility = View.VISIBLE
+                        rcvDiskTitle?.visibility = View.VISIBLE
                     }
                     else -> print(response.toString())
                 }
