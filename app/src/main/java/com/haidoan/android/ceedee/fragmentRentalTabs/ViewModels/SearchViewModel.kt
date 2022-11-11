@@ -1,4 +1,4 @@
-package fragmentRentalTabs
+package com.haidoan.android.ceedee.fragmentRentalTabs.ViewModels
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
