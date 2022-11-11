@@ -10,6 +10,11 @@ import java.time.temporal.TemporalAdjusters
 
 private const val TAG = "ReportViewModel.kt"
 
+enum class DiskDataGroupingCategory {
+    GROUP_BY_GENRE,
+    GROUP_BY_STATUS
+}
+
 class ReportViewModel(application: Application, private val reportRepository: ReportRepository) :
     AndroidViewModel(application) {
 
@@ -24,7 +29,28 @@ class ReportViewModel(application: Application, private val reportRepository: Re
     val monthlyExpenses: LiveData<Map<LocalDate, Float>>
         get() = _monthlyExpenses
 
-    private val _diskRelatedData = MutableLiveData<Map<String, Int>>()
+
+    private val _diskDataGroupingCategory = MutableLiveData(
+        DiskDataGroupingCategory.GROUP_BY_GENRE
+    )
+
+    private val _diskRelatedData = _diskDataGroupingCategory.switchMap { groupingCategory ->
+        val resultFromDataLayer = MutableLiveData<Map<String, Int>>()
+        viewModelScope.launch {
+            when (groupingCategory) {
+                DiskDataGroupingCategory.GROUP_BY_GENRE ->
+                    reportRepository
+                        .getDiskAmountGroupByGenre()
+                        .collect { data -> resultFromDataLayer.value = data }
+
+                DiskDataGroupingCategory.GROUP_BY_STATUS ->
+                    reportRepository
+                        .getDiskAmountGroupByStatus()
+                        .collect { data -> resultFromDataLayer.value = data }
+            }
+        }
+        resultFromDataLayer
+    }
     val diskRelatedData: LiveData<Map<String, Int>>
         get() = _diskRelatedData
 
@@ -61,10 +87,10 @@ class ReportViewModel(application: Application, private val reportRepository: Re
 
     private fun refreshDiskRelatedData(
     ) {
-        viewModelScope.launch {
-            reportRepository.getDiskAmountGroupByGenre()
-                .collect { data -> _diskRelatedData.value = data }
-        }
+//        viewModelScope.launch {
+//            reportRepository.getDiskAmountGroupByGenre()
+//                .collect { data -> _diskRelatedData.value = data }
+//        }
         Log.d(
             TAG,
             "Called refreshDiskRelatedData(), result: ${_diskRelatedData.value.toString()}"
@@ -79,6 +105,10 @@ class ReportViewModel(application: Application, private val reportRepository: Re
         this.endTime = endTime.with(TemporalAdjusters.lastDayOfMonth())
         refreshMonthlyRevenue()
         refreshMonthlyExpenses()
+    }
+
+    fun setDiskDataGroupingCategory(category: DiskDataGroupingCategory) {
+        _diskDataGroupingCategory.value = category
     }
 
     class Factory(val app: Application, private val reportRepository: ReportRepository) :

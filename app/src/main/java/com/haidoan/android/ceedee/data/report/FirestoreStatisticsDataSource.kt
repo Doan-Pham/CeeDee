@@ -201,4 +201,48 @@ class FirestoreStatisticsDataSource {
             "Called getDiskAmountGroupByGenre(), result : $diskAmountGroupByGenre"
         )
     }
+
+    fun getDiskAmountGroupByStatus() = callbackFlow<Map<String, Int>> {
+
+        val diskAmountGroupByStatus = TreeMap<String, Int>()
+        for (document in databaseRef.collection("DiskStatus").get().await().documents) {
+            diskAmountGroupByStatus[document.get("name") as String] = 0
+        }
+
+        // Registers callback to firestore, which will be called on new events
+        val subscription =
+            databaseRef
+                .collection("Disk")
+                .orderBy("status", Query.Direction.ASCENDING)
+                .addSnapshotListener { snapshot, _ ->
+                    if (snapshot == null) {
+                        return@addSnapshotListener
+                    }
+                    diskAmountGroupByStatus.clear()
+                    for (document in snapshot.documents) {
+
+                        val currentDiskStatus = document.get("status") as String
+
+                        val diskAmountAtCurrentStatus =
+                            diskAmountGroupByStatus[currentDiskStatus] ?: 0
+                        diskAmountGroupByStatus[currentDiskStatus] = diskAmountAtCurrentStatus + 1
+                    }
+                    // Sends events to the flow! Consumers will get the new events
+                    try {
+                        trySend(diskAmountGroupByStatus).isSuccess
+                    } catch (e: Throwable) {
+                        // Event couldn't be sent to the flow
+                    }
+                }
+
+        // The callback inside awaitClose will be executed when the flow is
+        // either closed or cancelled.
+        // In this case, remove the callback from Firestore
+        awaitClose { subscription.remove() }
+        Log.d(
+            TAG,
+            "Called getDiskAmountGroupByStatus(), result : $diskAmountGroupByStatus"
+        )
+    }
 }
+
