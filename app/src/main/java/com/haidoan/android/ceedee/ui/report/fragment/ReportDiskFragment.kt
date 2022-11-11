@@ -10,13 +10,13 @@ import android.graphics.pdf.PdfDocument
 import android.os.Bundle
 import android.os.Environment
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.view.MenuHost
+import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.github.mikephil.charting.charts.PieChart
@@ -29,6 +29,7 @@ import com.haidoan.android.ceedee.data.report.FirestoreStatisticsDataSource
 import com.haidoan.android.ceedee.data.report.ReportRepository
 import com.haidoan.android.ceedee.databinding.FragmentReportDiskBinding
 import com.haidoan.android.ceedee.ui.report.util.*
+import com.haidoan.android.ceedee.ui.report.viewmodel.DiskDataGroupingCategory
 import com.haidoan.android.ceedee.ui.report.viewmodel.ReportViewModel
 import java.io.File
 import java.io.FileOutputStream
@@ -81,8 +82,8 @@ class ReportDiskFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         pieChart = binding.pieChart
         setUpButtonPrint()
+        setUpOptionMenu()
         styleAndDrawPieChart()
-
         viewModel.diskRelatedData.observe(requireActivity()) { data ->
             styleAndDrawPieChart()
             fillPieChartData(data)
@@ -156,6 +157,38 @@ class ReportDiskFragment : Fragment() {
                 .show()
 
         }
+    }
+
+    private fun setUpOptionMenu() {
+        val menuHost: MenuHost = requireActivity()
+        menuHost.addMenuProvider(object : MenuProvider {
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                // Add menu items here
+                menuInflater.inflate(R.menu.menu_report_disk_fragment, menu)
+            }
+
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                // Handle the menu selection
+                return when (menuItem.itemId) {
+                    R.id.menu_item_rpdiskfragment_genre -> {
+                        viewModel.setDiskDataGroupingCategory(DiskDataGroupingCategory.GROUP_BY_GENRE)
+
+                        // Doing this removes the "setText can not be translated..." warning
+                        val textViewChartTitleText = "Disk Amount by Genre"
+                        binding.textviewChartTitle.text = textViewChartTitleText
+                        true
+                    }
+                    R.id.menu_item_rpdiskfragment_status -> {
+                        viewModel.setDiskDataGroupingCategory(DiskDataGroupingCategory.GROUP_BY_STATUS)
+                        // Doing this removes the "setText can not be translated..." warning
+                        val textViewChartTitleText = "Disk Amount by Status"
+                        binding.textviewChartTitle.text = textViewChartTitleText
+                        true
+                    }
+                    else -> false
+                }
+            }
+        })
     }
 
     private fun printReportAsPdf() {

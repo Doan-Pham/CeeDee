@@ -356,7 +356,7 @@ class RevenueExpensesFragment : Fragment() {
         menuHost.addMenuProvider(object : MenuProvider {
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
                 // Add menu items here
-                menuInflater.inflate(R.menu.menu_report_fragment, menu)
+                menuInflater.inflate(R.menu.menu_report_revenue_fragment, menu)
                 menu.findItem(R.id.menu_item_rpfragment_chart_type).subMenu?.setHeaderTitle("Choose chart type")
             }
 
