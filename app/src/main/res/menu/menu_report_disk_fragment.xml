@@ -10,11 +10,15 @@
             <item
                 android:id="@+id/menu_item_rpdiskfragment_genre"
                 android:icon="@drawable/ic_baseline_playlist_play_24"
-                android:title="@string/sort_by_genre" />
+                android:title="@string/disk_amount_by_genre" />
             <item
                 android:id="@+id/menu_item_rpdiskfragment_status"
                 android:icon="@drawable/ic_round_info_24"
-                android:title="@string/sort_by_status" />
+                android:title="@string/disk_amount_by_status" />
+            <item
+                android:id="@+id/menu_item_rpdiskfragment_rentalCount"
+                android:icon="@drawable/ic_round_info_24"
+                android:title="@string/total_rentals_by_genre" />
         </menu>
     </item>
 </menu>

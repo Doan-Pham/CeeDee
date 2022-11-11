@@ -171,18 +171,24 @@ class ReportDiskFragment : Fragment() {
                 // Handle the menu selection
                 return when (menuItem.itemId) {
                     R.id.menu_item_rpdiskfragment_genre -> {
-                        viewModel.setDiskDataGroupingCategory(DiskDataGroupingCategory.GROUP_BY_GENRE)
+                        viewModel.setDiskDataGroupingCategory(DiskDataGroupingCategory.DISK_AMOUNT_BY_GENRE)
 
-                        // Doing this removes the "setText can not be translated..." warning
-                        val textViewChartTitleText = "Disk Amount by Genre"
-                        binding.textviewChartTitle.text = textViewChartTitleText
+                        binding.textviewChartTitle.text =
+                            resources.getString(R.string.disk_amount_by_genre)
                         true
                     }
                     R.id.menu_item_rpdiskfragment_status -> {
-                        viewModel.setDiskDataGroupingCategory(DiskDataGroupingCategory.GROUP_BY_STATUS)
-                        // Doing this removes the "setText can not be translated..." warning
-                        val textViewChartTitleText = "Disk Amount by Status"
-                        binding.textviewChartTitle.text = textViewChartTitleText
+                        viewModel.setDiskDataGroupingCategory(DiskDataGroupingCategory.DISK_AMOUNT_BY_STATUS)
+
+                        binding.textviewChartTitle.text =
+                            resources.getString(R.string.disk_amount_by_status)
+                        true
+                    }
+                    R.id.menu_item_rpdiskfragment_rentalCount -> {
+                        viewModel.setDiskDataGroupingCategory(DiskDataGroupingCategory.TOTAL_RENTAL_BY_GENRE)
+
+                        binding.textviewChartTitle.text =
+                            resources.getString(R.string.total_rentals_by_genre)
                         true
                     }
                     else -> false

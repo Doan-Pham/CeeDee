@@ -47,5 +47,7 @@
     <string name="options">Options</string>
     <string name="sort_by_genre">Sort by genre</string>
     <string name="sort_by_status">Sort by status</string>
-    <string name="disk_amount_by_genre">Disk Amount by Genre</string>
+    <string name="disk_amount_by_genre">Disk amount by genre</string>
+    <string name="disk_amount_by_status">Disk amount by status</string>
+    <string name="total_rentals_by_genre">Total rentals by genre</string>
 </resources>

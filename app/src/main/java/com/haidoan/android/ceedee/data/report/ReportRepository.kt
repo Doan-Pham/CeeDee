@@ -23,4 +23,7 @@ class ReportRepository(private val firestoreApi: FirestoreStatisticsDataSource) 
 
     suspend fun getDiskAmountGroupByStatus(): Flow<Map<String, Int>> =
         firestoreApi.getDiskAmountGroupByStatus()
+
+    suspend fun getTotalRentalGroupByGenre(): Flow<Map<String, Int>> =
+        firestoreApi.getTotalRentalGroupByGenre()
 }

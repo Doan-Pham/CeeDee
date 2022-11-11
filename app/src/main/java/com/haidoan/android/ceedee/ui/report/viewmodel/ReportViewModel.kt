@@ -11,8 +11,9 @@ import java.time.temporal.TemporalAdjusters
 private const val TAG = "ReportViewModel.kt"
 
 enum class DiskDataGroupingCategory {
-    GROUP_BY_GENRE,
-    GROUP_BY_STATUS
+    DISK_AMOUNT_BY_GENRE,
+    DISK_AMOUNT_BY_STATUS,
+    TOTAL_RENTAL_BY_GENRE
 }
 
 class ReportViewModel(application: Application, private val reportRepository: ReportRepository) :
@@ -31,21 +32,25 @@ class ReportViewModel(application: Application, private val reportRepository: Re
 
 
     private val _diskDataGroupingCategory = MutableLiveData(
-        DiskDataGroupingCategory.GROUP_BY_GENRE
+        DiskDataGroupingCategory.DISK_AMOUNT_BY_GENRE
     )
 
     private val _diskRelatedData = _diskDataGroupingCategory.switchMap { groupingCategory ->
         val resultFromDataLayer = MutableLiveData<Map<String, Int>>()
         viewModelScope.launch {
             when (groupingCategory) {
-                DiskDataGroupingCategory.GROUP_BY_GENRE ->
+                DiskDataGroupingCategory.DISK_AMOUNT_BY_GENRE ->
                     reportRepository
                         .getDiskAmountGroupByGenre()
                         .collect { data -> resultFromDataLayer.value = data }
 
-                DiskDataGroupingCategory.GROUP_BY_STATUS ->
+                DiskDataGroupingCategory.DISK_AMOUNT_BY_STATUS ->
                     reportRepository
                         .getDiskAmountGroupByStatus()
+                        .collect { data -> resultFromDataLayer.value = data }
+                DiskDataGroupingCategory.TOTAL_RENTAL_BY_GENRE ->
+                    reportRepository
+                        .getTotalRentalGroupByGenre()
                         .collect { data -> resultFromDataLayer.value = data }
             }
         }
