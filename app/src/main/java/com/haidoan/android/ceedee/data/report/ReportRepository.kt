@@ -18,4 +18,6 @@ class ReportRepository(private val firestoreApi: FirestoreStatisticsDataSource) 
         endTime: LocalDate
     ): Flow<Map<LocalDate, Float>> = firestoreApi.getExpensesBetweenMonths(startTime, endTime)
 
+    suspend fun getDiskAmountGroupByGenre(): Flow<Map<String, Int>> =
+        firestoreApi.getDiskAmountGroupByGenre()
 }

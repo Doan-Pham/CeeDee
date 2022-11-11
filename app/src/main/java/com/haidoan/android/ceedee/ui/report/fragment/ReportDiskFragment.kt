@@ -24,7 +24,6 @@ import com.github.mikephil.charting.components.Legend
 import com.github.mikephil.charting.data.PieData
 import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
-import com.github.mikephil.charting.formatter.PercentFormatter
 import com.haidoan.android.ceedee.R
 import com.haidoan.android.ceedee.data.report.FirestoreStatisticsDataSource
 import com.haidoan.android.ceedee.data.report.ReportRepository
@@ -82,8 +81,12 @@ class ReportDiskFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         pieChart = binding.pieChart
         setUpButtonPrint()
-        fillPieChartData()
         styleAndDrawPieChart()
+
+        viewModel.diskRelatedData.observe(requireActivity()) { data ->
+            styleAndDrawPieChart()
+            fillPieChartData(data)
+        }
     }
 
     private fun styleAndDrawPieChart() {
@@ -96,23 +99,27 @@ class ReportDiskFragment : Fragment() {
         legend.textSize = 12f
         legend.setDrawInside(false)
 
-        pieChart.setUsePercentValues(true)
+        //pieChart.setUsePercentValues(true)
         pieChart.setEntryLabelColor(Color.WHITE)
         pieChart.setEntryLabelTextSize(14f)
         pieChart.description.isEnabled = false
         pieChart.isDrawHoleEnabled = false
         pieChart.isHighlightPerTapEnabled = false
+        pieChart.setUsePercentValues(false);
         pieChart.invalidate()
     }
 
-    private fun fillPieChartData() {
-        val entries = mutableListOf<PieEntry>()
-        entries.add(PieEntry(90f, "Rock"))
-        entries.add(PieEntry(20f, "Punk"))
-        entries.add(PieEntry(50f, "Guitar"))
-        entries.add(PieEntry(40f, "Country"))
-        entries.add(PieEntry(30f, "Pop"))
-        entries.add(PieEntry(20f, "Blues"))
+    private fun fillPieChartData(diskData: Map<String, Int>) {
+        val pieChartEntries = mutableListOf<PieEntry>()
+
+        diskData.forEach { (key, value) ->
+            pieChartEntries.add(
+                PieEntry(
+                    value.toFloat(),
+                    key
+                )
+            )
+        }
 
         val colors =
             listOf(
@@ -121,14 +128,18 @@ class ReportDiskFragment : Fragment() {
                 CHART_COLOR_NINE, CHART_COLOR_TEN
             )
 
-        val dataSet = PieDataSet(entries, "Disks by status")
+        val dataSet = PieDataSet(pieChartEntries, "")
         dataSet.colors = colors
 
         val data = PieData(dataSet)
-        data.setValueFormatter(PercentFormatter(pieChart))
+        //data.setValueFormatter(PercentFormatter(pieChart))
         data.setValueTextSize(14f)
         data.setValueTextColor(Color.WHITE)
+
+        pieChart.clear()
         pieChart.data = data
+        pieChart.notifyDataSetChanged()
+        pieChart.invalidate()
     }
 
     private fun setUpButtonPrint() {

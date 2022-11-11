@@ -24,9 +24,14 @@ class ReportViewModel(application: Application, private val reportRepository: Re
     val monthlyExpenses: LiveData<Map<LocalDate, Float>>
         get() = _monthlyExpenses
 
+    private val _diskRelatedData = MutableLiveData<Map<String, Int>>()
+    val diskRelatedData: LiveData<Map<String, Int>>
+        get() = _diskRelatedData
+
     init {
         refreshMonthlyRevenue()
         refreshMonthlyExpenses()
+        refreshDiskRelatedData()
     }
 
     private fun refreshMonthlyRevenue(
@@ -51,6 +56,18 @@ class ReportViewModel(application: Application, private val reportRepository: Re
         Log.d(
             TAG,
             "Called refreshMonthlyExpenses(), expenses between $startTime and $endTime after refresh: ${_monthlyExpenses.value.toString()}"
+        )
+    }
+
+    private fun refreshDiskRelatedData(
+    ) {
+        viewModelScope.launch {
+            reportRepository.getDiskAmountGroupByGenre()
+                .collect { data -> _diskRelatedData.value = data }
+        }
+        Log.d(
+            TAG,
+            "Called refreshDiskRelatedData(), result: ${_diskRelatedData.value.toString()}"
         )
     }
 
