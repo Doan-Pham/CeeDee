@@ -17,8 +17,10 @@ import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import coil.load
+import com.haidoan.android.ceedee.R
 import com.haidoan.android.ceedee.data.Genre
 import com.haidoan.android.ceedee.databinding.FragmentDiskAddEditBinding
+
 import com.haidoan.android.ceedee.ui.disk_screen.disk_titles.DiskTitlesViewModel
 import com.haidoan.android.ceedee.ui.disk_screen.utils.Response
 import com.haidoan.android.ceedee.ui.report.util.PERMISSIONS
@@ -77,8 +79,13 @@ class DiskAddEditFragment : Fragment() {
         diskTitlesViewModel.getGenres().observe(viewLifecycleOwner) { response ->
             when (response) {
                 is Response.Loading -> {
+                    binding.layoutAddEditDisk.visibility = View.GONE
+                    binding.progressBarDiskAddEdit.visibility=View.VISIBLE
                 }
                 is Response.Success -> {
+                    binding.layoutAddEditDisk.visibility = View.VISIBLE
+                    binding.progressBarDiskAddEdit.visibility=View.GONE
+
                     val list = response.data
 
                     val genreList = mutableListOf<Genre>()
@@ -86,7 +93,7 @@ class DiskAddEditFragment : Fragment() {
 
                     adapterForSpinnerGenre = ArrayAdapter(
                         requireActivity().baseContext,
-                        android.R.layout.simple_spinner_item,
+                        android.R.layout.simple_spinner_dropdown_item,
                         genreList
                     )
 
@@ -97,6 +104,8 @@ class DiskAddEditFragment : Fragment() {
                     }
                 }
                 is Response.Failure -> {
+                    binding.layoutAddEditDisk.visibility = View.VISIBLE
+                    binding.progressBarDiskAddEdit.visibility=View.GONE
                     print(response.errorMessage)
                 }
                 else -> print(response.toString())
