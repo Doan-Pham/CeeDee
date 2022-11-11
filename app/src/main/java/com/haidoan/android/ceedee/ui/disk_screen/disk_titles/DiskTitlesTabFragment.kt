@@ -9,6 +9,7 @@ import android.view.*
 import android.widget.EditText
 import android.widget.SearchView
 import android.widget.SearchView.OnQueryTextListener
+import android.widget.TextView
 import android.widget.Toast
 import androidx.core.view.MenuHost
 
@@ -240,14 +241,18 @@ class DiskTitlesTabFragment : Fragment() {
         val dialogLayout = inflater.inflate(R.layout.dialog_add_genre, null)
         val editText = dialogLayout.findViewById<EditText>(R.id.edt_add_genre_name)
         builder.setView(dialogLayout)
-        builder.setPositiveButton("ADD") { dialogInterface, i -> addGenreToFireStore(editText.text.toString()) }
+        builder.setPositiveButton("ADD") { dialogInterface, i ->
+            if (editText.text.toString() == "") {
+                makeToast("Name cannot be empty!")
+            } else
+                addGenreToFireStore(editText.text.toString())
+        }
         builder.setNegativeButton("CANCEL") { dialogLayout, i -> }
         builder.show()
     }
 
     private fun addGenreToFireStore(genreName: String) {
-        val genre = hashMapOf("name" to genreName)
-        diskTitlesViewModel.addGenres(genre).observe(this) { response ->
+        diskTitlesViewModel.addGenres(genreName).observe(this) { response ->
             when (response) {
                 is Response.Loading -> {
                 }
@@ -274,7 +279,13 @@ class DiskTitlesTabFragment : Fragment() {
         val name = dialogLayout.findViewById<EditText>(R.id.edt_add_supplier_name)
         val email = dialogLayout.findViewById<EditText>(R.id.edt_add_supplier_email)
         builder.setView(dialogLayout)
-        builder.setPositiveButton("ADD") { dialogInterface, i -> addSupplierToFireStore(name.text.toString(),email.text.toString()) }
+        builder.setPositiveButton("ADD") { dialogInterface, i ->
+
+            if (email.text.toString() == "" || name.text.toString() == "") {
+                makeToast("Please fill all information!")
+            } else
+                addSupplierToFireStore(name.text.toString(), email.text.toString())
+        }
         builder.setNegativeButton("CANCEL") { dialogLayout, i -> }
         builder.show()
     }
@@ -301,7 +312,7 @@ class DiskTitlesTabFragment : Fragment() {
     }
 
     private fun makeToast(text: String) {
-        Toast.makeText(context, text, Toast.LENGTH_SHORT).show()
+        Toast.makeText(requireActivity(), text, Toast.LENGTH_SHORT).show()
     }
 
     override fun onDestroyView() {

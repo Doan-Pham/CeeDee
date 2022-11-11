@@ -66,8 +66,6 @@
             android:gravity="top|left"
             android:visibility="invisible"
 
-            android:layout_marginStart="48dp"
-            android:layout_marginEnd="48dp"
             android:letterSpacing="0.01"
 
             android:padding="4dp"

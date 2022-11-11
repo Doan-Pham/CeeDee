@@ -113,7 +113,13 @@ class DiskAddEditFragment : Fragment() {
                     val author = binding.edtDiskAddEditAuthor.text.toString()
                     val description = binding.edtDiskAddEditDescription.text.toString()
                     val name = binding.edtDiskAddEditDiskTitleName.text.toString()
-                    diskAddEditViewModel.addDiskTitle(author, coverImgUrl, description, genreId, name)
+                    diskAddEditViewModel.addDiskTitle(
+                        author,
+                        coverImgUrl,
+                        description,
+                        genreId,
+                        name
+                    )
                         .observe(viewLifecycleOwner) { response ->
                             when (response) {
                                 is Response.Loading -> {
@@ -228,7 +234,16 @@ class DiskAddEditFragment : Fragment() {
             }
 
         binding.btnSave.setOnClickListener {
-            addDiskTitleToFireStore()
+            if (filePath == null || binding.edtDiskAddEditDescription.text.toString() == ""
+                || binding.edtDiskAddEditAuthor.text.toString() == ""
+                || binding.edtDiskAddEditDiskTitleName.text.toString() == ""
+            ) {
+                binding.tvMessageRequiredAddEditDiskTitle.text = "Please fill all information!"
+                binding.tvMessageRequiredAddEditDiskTitle.visibility = View.VISIBLE
+            } else {
+                binding.tvMessageRequiredAddEditDiskTitle.visibility = View.INVISIBLE
+                addDiskTitleToFireStore()
+            }
         }
     }
 

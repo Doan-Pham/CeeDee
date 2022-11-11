@@ -3,6 +3,7 @@ package com.haidoan.android.ceedee.ui.disk_screen.disk_titles
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.liveData
+import com.haidoan.android.ceedee.data.Genre
 import com.haidoan.android.ceedee.ui.disk_screen.repository.DisksRepository
 import com.haidoan.android.ceedee.ui.disk_screen.repository.DiskTitlesRepository
 import com.haidoan.android.ceedee.ui.disk_screen.repository.GenreRepository
@@ -46,8 +47,8 @@ class DiskTitlesViewModel(application: Application) : AndroidViewModel(applicati
         }
     }
 
-    fun addGenres(genre: HashMap<String, String>) = liveData(Dispatchers.IO) {
-        genreRepository.addGenreToFireStore(genre).collect { response ->
+    fun addGenres(genreName: String) = liveData(Dispatchers.IO) {
+        genreRepository.addGenreToFireStore(genreName).collect { response ->
             emit(response)
         }
     }

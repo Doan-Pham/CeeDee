@@ -23,10 +23,13 @@ class GenreRepository(private val application: Application) {
         const val defaultGenre = "default_genre"
     }
 
-    fun addGenreToFireStore(genre: HashMap<String, String>) = flow {
+    fun addGenreToFireStore(genreName: String) = flow {
+        val hash = hashMapOf(
+            "name" to genreName
+        )
         emit(Response.Loading())
         emit(
-            Response.Success(queryGenre.add(genre).await())
+            Response.Success(queryGenre.add(hash).await())
         )
     }.catch { error ->
         error.message?.let { errorMessage ->

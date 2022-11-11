@@ -105,13 +105,34 @@
             android:layout_marginTop="40dp"
             android:visibility="gone"
             />
+
+        <TextView
+            android:id="@+id/tv_message_required_add_edit_disk_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="top|left"
+            android:visibility="invisible"
+
+            android:letterSpacing="0.01"
+            android:layout_marginTop="20dp"
+            android:padding="4dp"
+            android:text=""
+            android:textColor="@color/secondary"
+            android:textSize="14sp"
+            android:textStyle="normal"
+
+            android:drawablePadding="4dp"
+            android:drawableTint="@color/secondary"
+            android:drawableStart="@drawable/ic_round_info_24"
+            tools:ignore="RtlHardcoded,UseCompatTextViewDrawableXml"
+            tools:targetApi="m" />
         <Button
             android:id="@+id/btn_save"
             style="@style/btn_style"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
 
-            android:layout_marginTop="40dp"
+            android:layout_marginTop="20dp"
 
             android:text="Save"
             />
