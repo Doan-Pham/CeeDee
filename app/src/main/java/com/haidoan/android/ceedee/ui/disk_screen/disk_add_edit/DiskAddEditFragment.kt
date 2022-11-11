@@ -9,26 +9,33 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Toast
-
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import coil.load
-import com.haidoan.android.ceedee.R
+import com.google.android.gms.tasks.Continuation
+import com.google.android.gms.tasks.Task
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
+import com.google.firebase.storage.UploadTask
 import com.haidoan.android.ceedee.data.Genre
 import com.haidoan.android.ceedee.databinding.FragmentDiskAddEditBinding
-
-import com.haidoan.android.ceedee.ui.disk_screen.disk_titles.DiskTitlesViewModel
 import com.haidoan.android.ceedee.ui.disk_screen.utils.Response
 import com.haidoan.android.ceedee.ui.report.util.PERMISSIONS
 import java.io.FileNotFoundException
 import java.io.InputStream
+import java.util.*
 
 
 class DiskAddEditFragment : Fragment() {
+
+    private var filePath: Uri? = null
+    private var coverImgUrl: String = ""
+    private var genreId: String = ""
 
     private val multiplePermissionLauncher =
         registerForActivityResult(
@@ -43,16 +50,25 @@ class DiskAddEditFragment : Fragment() {
             }
         }
 
-    private val pickerLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
-        // Handle the returned Uri
-        uri?.let { loadImageFromUri(it) }
-    }
+    private val pickerLauncher =
+        registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+            // Handle the returned Uri
+
+            uri?.let {
+                loadImageFromUri(it)
+                filePath = uri
+                Log.d("TAG_REF", "filePath: $filePath")
+            }
+        }
 
     private var _binding: FragmentDiskAddEditBinding? = null
-    private lateinit var diskTitlesViewModel: DiskTitlesViewModel
 
+    private lateinit var diskAddEditViewModel: DiskAddEditViewModel
+
+    private var genreList = mutableListOf<Genre>()
     private lateinit var adapterForSpinnerGenre: ArrayAdapter<Genre>
     private lateinit var currentBitmap: Bitmap
+
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
@@ -71,24 +87,86 @@ class DiskAddEditFragment : Fragment() {
 
         init()
         setListeners()
+
+    }
+
+    private fun addDiskTitleToFireStore() {
+        binding.btnSave.visibility = View.GONE
+        binding.progressBarDiskAddEditSave.visibility = View.VISIBLE
+        if (filePath != null) {
+            val storageReference: StorageReference = FirebaseStorage.getInstance().reference
+            val ref = storageReference.child("disk_titles_img/" + UUID.randomUUID().toString())
+            val uploadTask = ref.putFile(filePath!!)
+
+            uploadTask.continueWithTask(Continuation<UploadTask.TaskSnapshot, Task<Uri>> { task ->
+                if (!task.isSuccessful) {
+                    task.exception?.let {
+                        throw it
+                    }
+                }
+                return@Continuation ref.downloadUrl
+            }).addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    val downloadUri = task.result
+                    coverImgUrl = downloadUri.toString()
+
+                    val author = binding.edtDiskAddEditAuthor.text.toString()
+                    val description = binding.edtDiskAddEditDescription.text.toString()
+                    val name = binding.edtDiskAddEditDiskTitleName.text.toString()
+                    diskAddEditViewModel.addDiskTitle(author, coverImgUrl, description, genreId, name)
+                        .observe(viewLifecycleOwner) { response ->
+                            when (response) {
+                                is Response.Loading -> {
+                                }
+                                is Response.Success -> {
+                                    Toast.makeText(
+                                        requireActivity(),
+                                        "Add disk title success!!!",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                    binding.btnSave.visibility = View.VISIBLE
+                                    binding.progressBarDiskAddEditSave.visibility = View.GONE
+                                }
+                                is Response.Failure -> {
+                                    Toast.makeText(
+                                        requireActivity(),
+                                        "Fail to disk title!!!",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+
+                                    binding.btnSave.visibility = View.VISIBLE
+                                    binding.progressBarDiskAddEditSave.visibility = View.GONE
+                                }
+                                else -> print(response.toString())
+                            }
+                        }
+                } else {
+                    // Handle failures
+                    binding.btnSave.visibility = View.VISIBLE
+                    binding.progressBarDiskAddEditSave.visibility = View.GONE
+                }
+            }.addOnFailureListener {
+                Log.d("TAG_REF", it.message.toString())
+                binding.btnSave.visibility = View.VISIBLE
+                binding.progressBarDiskAddEditSave.visibility = View.GONE
+            }
+        }
     }
 
     private fun init() {
-        diskTitlesViewModel = ViewModelProvider(requireActivity())[DiskTitlesViewModel::class.java]
-
-        diskTitlesViewModel.getGenres().observe(viewLifecycleOwner) { response ->
+        diskAddEditViewModel =
+            ViewModelProvider(requireActivity())[DiskAddEditViewModel::class.java]
+        diskAddEditViewModel.getGenres().observe(viewLifecycleOwner) { response ->
             when (response) {
                 is Response.Loading -> {
                     binding.layoutAddEditDisk.visibility = View.GONE
-                    binding.progressBarDiskAddEdit.visibility=View.VISIBLE
+                    binding.progressBarDiskAddEdit.visibility = View.VISIBLE
                 }
                 is Response.Success -> {
                     binding.layoutAddEditDisk.visibility = View.VISIBLE
-                    binding.progressBarDiskAddEdit.visibility=View.GONE
+                    binding.progressBarDiskAddEdit.visibility = View.GONE
 
                     val list = response.data
-
-                    val genreList = mutableListOf<Genre>()
                     genreList.addAll(list)
 
                     adapterForSpinnerGenre = ArrayAdapter(
@@ -105,7 +183,7 @@ class DiskAddEditFragment : Fragment() {
                 }
                 is Response.Failure -> {
                     binding.layoutAddEditDisk.visibility = View.VISIBLE
-                    binding.progressBarDiskAddEdit.visibility=View.GONE
+                    binding.progressBarDiskAddEdit.visibility = View.GONE
                     print(response.errorMessage)
                 }
                 else -> print(response.toString())
@@ -114,14 +192,43 @@ class DiskAddEditFragment : Fragment() {
     }
 
     private fun setListeners() {
-        binding.imgDiskAddEditCoverImg.setOnClickListener{
+        binding.imgDiskAddEditCoverImg.setOnClickListener {
             if (!handlePermission()) return@setOnClickListener
 
             pickerLauncher.launch("image/*")
         }
 
-        binding.btnSave.setOnClickListener{
+        binding.spinnerDiskAddEditGenre.onItemSelectedListener =
+            object : AdapterView.OnItemClickListener,
+                AdapterView.OnItemSelectedListener {
 
+                override fun onItemSelected(
+                    parent: AdapterView<*>?,
+                    view: View?,
+                    position: Int,
+                    id: Long
+                ) {
+                    val genre = genreList[position]
+                    genreId = genre.id
+                }
+
+                override fun onNothingSelected(parent: AdapterView<*>?) {
+
+                }
+
+                override fun onItemClick(
+                    parent: AdapterView<*>?,
+                    view: View?,
+                    position: Int,
+                    id: Long
+                ) {
+
+                }
+
+            }
+
+        binding.btnSave.setOnClickListener {
+            addDiskTitleToFireStore()
         }
     }
 
@@ -131,7 +238,11 @@ class DiskAddEditFragment : Fragment() {
             currentBitmap = BitmapFactory.decodeStream(imageStream)
             binding.imgDiskAddEditCoverImg.load(currentBitmap)
         } catch (e: FileNotFoundException) {
-            Toast.makeText(requireActivity(), "Failed to load bitmap from gallery", Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                requireActivity(),
+                "Failed to load bitmap from gallery",
+                Toast.LENGTH_SHORT
+            ).show()
         }
     }
 

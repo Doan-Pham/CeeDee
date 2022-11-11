@@ -1,11 +1,19 @@
 package com.haidoan.android.ceedee.ui.disk_screen.repository
 
 import android.app.Application
+import android.net.Uri
 import android.util.Log
+import com.google.android.gms.tasks.Continuation
+import com.google.android.gms.tasks.Task
 
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
+import com.google.firebase.storage.UploadTask
+import com.google.firebase.storage.ktx.storage
 
 import com.haidoan.android.ceedee.data.DiskTitle
 import com.haidoan.android.ceedee.ui.disk_screen.utils.Response
@@ -15,7 +23,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 
 import kotlinx.coroutines.tasks.await
-
+import java.util.*
 
 class DiskTitlesRepository(private val application: Application) {
     private val db: FirebaseFirestore = FirebaseFirestore.getInstance()
@@ -85,28 +93,23 @@ class DiskTitlesRepository(private val application: Application) {
         }
     }
 
-/*
-    fun getDiskTitleListMutableLiveData() : MutableLiveData<ArrayList<DiskTitle>> {
-        val list = ArrayList<DiskTitle>()
-        Toast.makeText(application, "Loading...",Toast.LENGTH_SHORT).show()
-
-        db.collection(collectionPath)
-            .get()
-            .addOnSuccessListener { documents ->
-                for (document in documents) {
-                    Log.d(TAG, "${document.id} => ${document.data["name"]}")
-                    //val d = document.toObject(DiskTitle::class.java)
-                    // Log.d(TAG, d.name +" + "  + d.author)
-                    //diskTitleList.add(d)
-                    val diskTitle=getDiskTitleFromDocument(document)
-                    list.add(diskTitle)
-                    Toast.makeText(application, "Success!!!",Toast.LENGTH_SHORT).show()
-                }
-            }
-            .addOnFailureListener { exception ->
-                Log.w(TAG, "Error getting documents: ", exception)
-            }
-        diskTitleListMutableLiveData.postValue(list)
-        return diskTitleListMutableLiveData
-    }*/
+    fun addDiskTitleToFireStore(author: String, coverImageUrl: String, description: String, genreId: String, name: String) = flow {
+        val hash = hashMapOf(
+            "author" to author,
+            "coverImageUrl" to coverImageUrl,
+            "description" to description,
+            "genreId" to genreId,
+            "name" to name
+        )
+        emit(Response.Loading())
+        emit(
+            Response.Success(
+                queryDiskTitle.add(hash).await()
+            )
+        )
+    }.catch { error ->
+        error.message?.let { errorMessage ->
+            emit(Response.Failure(errorMessage))
+        }
+    }
 }

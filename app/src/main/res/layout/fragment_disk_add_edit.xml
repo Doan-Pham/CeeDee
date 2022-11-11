@@ -97,7 +97,14 @@
             android:hint="Description"
             android:inputType="text" />
 
-
+        <ProgressBar
+            android:id="@+id/progressBar_disk_add_edit_save"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="40dp"
+            android:visibility="gone"
+            />
         <Button
             android:id="@+id/btn_save"
             style="@style/btn_style"
