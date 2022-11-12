@@ -113,8 +113,8 @@ class RevenueExpensesFragment : Fragment() {
 
         lineChart.visibility = View.GONE
 
-        setUpTextViewStartTime()
-        setUpTextViewEndTime()
+        setUpTextViewChooseStartTime()
+        setUpTextViewChooseEndTime()
         setUpOptionMenu()
         setUpButtonPrint()
 
@@ -136,10 +136,10 @@ class RevenueExpensesFragment : Fragment() {
         }
     }
 
-    private fun setUpTextViewStartTime() {
+    private fun setUpTextViewChooseStartTime() {
         val displayedStartTime = "${startTime.monthValue}/${startTime.year}"
-        binding.textviewStartMonth.text = displayedStartTime
-        binding.textviewStartMonth.setOnClickListener {
+        binding.textviewChooseStartMonth.text = displayedStartTime
+        binding.textviewChooseStartMonth.setOnClickListener {
             MonthYearPickerDialog(Calendar.getInstance().time).apply {
                 setTitle("Select start month")
                 setListener { _, month, year, _ ->
@@ -151,7 +151,7 @@ class RevenueExpensesFragment : Fragment() {
                         ).show()
                     } else {
                         val displayedTime = "$month/$year"
-                        binding.textviewStartMonth.text = displayedTime
+                        binding.textviewChooseStartMonth.text = displayedTime
                         startTime = startTime.withMonth(month).withYear(year)
                         onMonthYearChanged()
                     }
@@ -161,10 +161,10 @@ class RevenueExpensesFragment : Fragment() {
         }
     }
 
-    private fun setUpTextViewEndTime() {
+    private fun setUpTextViewChooseEndTime() {
         val displayedEndTime = "${endTime.monthValue}/${endTime.year}"
-        binding.textviewEndMonth.text = displayedEndTime
-        binding.textviewEndMonth.setOnClickListener {
+        binding.textviewChooseEndMonth.text = displayedEndTime
+        binding.textviewChooseEndMonth.setOnClickListener {
             MonthYearPickerDialog(Calendar.getInstance().time).apply {
                 setTitle("Select end month")
                 setListener { _, month, year, _ ->
@@ -176,7 +176,7 @@ class RevenueExpensesFragment : Fragment() {
                         ).show()
                     } else {
                         val displayedTime = "$month/$year"
-                        binding.textviewEndMonth.text = displayedTime
+                        binding.textviewChooseEndMonth.text = displayedTime
                         endTime = endTime.withMonth(month).withYear(year)
                         onMonthYearChanged()
                     }

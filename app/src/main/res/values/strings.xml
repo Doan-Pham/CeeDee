@@ -50,4 +50,6 @@
     <string name="disk_amount_by_genre">Disk amount by genre</string>
     <string name="disk_amount_by_status">Disk amount by status</string>
     <string name="total_rentals_by_genre">Total rentals by genre</string>
+    <string name="revenue_and_expenses">Revenue and Expenses</string>
+    <string name="start_time">Start time</string>
 </resources>

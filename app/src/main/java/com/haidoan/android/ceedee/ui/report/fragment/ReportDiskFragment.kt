@@ -18,6 +18,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import com.github.mikephil.charting.charts.PieChart
 import com.github.mikephil.charting.components.Legend
@@ -106,7 +107,7 @@ class ReportDiskFragment : Fragment() {
         pieChart.description.isEnabled = false
         pieChart.isDrawHoleEnabled = false
         pieChart.isHighlightPerTapEnabled = false
-        pieChart.setUsePercentValues(false);
+        pieChart.setUsePercentValues(false)
         pieChart.invalidate()
     }
 
@@ -194,7 +195,7 @@ class ReportDiskFragment : Fragment() {
                     else -> false
                 }
             }
-        })
+        }, viewLifecycleOwner, Lifecycle.State.RESUMED)
     }
 
     private fun printReportAsPdf() {
