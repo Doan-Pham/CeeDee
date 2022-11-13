@@ -16,6 +16,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.findNavController
 import coil.load
 import com.google.android.gms.tasks.Continuation
 import com.google.android.gms.tasks.Task
@@ -24,6 +25,7 @@ import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.UploadTask
 import com.haidoan.android.ceedee.data.Genre
 import com.haidoan.android.ceedee.databinding.FragmentDiskAddEditBinding
+
 import com.haidoan.android.ceedee.ui.disk_screen.utils.Response
 import com.haidoan.android.ceedee.ui.report.util.PERMISSIONS
 import java.io.FileNotFoundException
@@ -130,6 +132,7 @@ class DiskAddEditFragment : Fragment() {
                                         "Add disk title success!!!",
                                         Toast.LENGTH_SHORT
                                     ).show()
+                                    view?.findNavController()?.popBackStack()
                                     binding.btnSave.visibility = View.VISIBLE
                                     binding.progressBarDiskAddEditSave.visibility = View.GONE
                                 }
