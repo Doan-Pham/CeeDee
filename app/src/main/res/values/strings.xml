@@ -44,4 +44,7 @@
     <string name="print">Print</string>
     <string name="chart_print_note">Only the visible part of the chart will be printed, please zoom out if you want to print the whole chart</string>
     <string name="end_time">End time</string>
+    <string name="add_to_import">Add to import</string>
+    <string name="edit">Edit</string>
+    <string name="delete">Delete</string>
 </resources>

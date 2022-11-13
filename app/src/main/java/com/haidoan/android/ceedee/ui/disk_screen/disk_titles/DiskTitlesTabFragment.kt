@@ -65,7 +65,7 @@ class DiskTitlesTabFragment : Fragment() {
     private fun init() {
         diskTitlesViewModel = ViewModelProvider(requireActivity())[DiskTitlesViewModel::class.java]
 
-        diskTitleAdapter = DiskTitlesAdapter()
+        diskTitleAdapter = DiskTitlesAdapter(requireActivity())
         diskTitleAdapter.setDiskTitlesViewModel(diskTitlesViewModel)
         diskTitleAdapter.setLifecycleOwner(viewLifecycleOwner)
         diskTitleAdapter.setNavController(requireActivity().findNavController(R.id.mainContainer))

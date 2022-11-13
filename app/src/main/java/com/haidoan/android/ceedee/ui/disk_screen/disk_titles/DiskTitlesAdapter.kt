@@ -1,12 +1,14 @@
 package com.haidoan.android.ceedee.ui.disk_screen.disk_titles
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Filter
 import android.widget.Filterable
 import android.widget.ImageView
+import android.widget.PopupMenu
 import androidx.core.net.toUri
 import androidx.core.os.bundleOf
 import androidx.lifecycle.LifecycleOwner
@@ -25,7 +27,7 @@ import com.haidoan.android.ceedee.ui.disk_screen.utils.TypeUtils
 import java.util.*
 
 @SuppressLint("NotifyDataSetChanged")
-class DiskTitlesAdapter: ListAdapter<DiskTitle, DiskTitlesAdapter.DiskTitlesViewHolder>(DiskTitleUtils()),
+class DiskTitlesAdapter(private val context: Context): ListAdapter<DiskTitle, DiskTitlesAdapter.DiskTitlesViewHolder>(DiskTitleUtils()),
     Filterable {
 
     private val displayedDiskTitles = arrayListOf<DiskTitle>()
@@ -58,7 +60,6 @@ class DiskTitlesAdapter: ListAdapter<DiskTitle, DiskTitlesAdapter.DiskTitlesView
     fun setGenreAdapter(g: GenreAdapter){
         genreAdapter=g
     }
-
 
     fun setLifecycleOwner(lco: LifecycleOwner){
         viewLifecycleOwner=lco
@@ -221,7 +222,23 @@ class DiskTitlesAdapter: ListAdapter<DiskTitle, DiskTitlesAdapter.DiskTitlesView
             }
 
             binding.imgDiskTitlesBtnMore.setOnClickListener {
+                val popupMenu=PopupMenu(context, binding.imgDiskTitlesBtnMore)
+                popupMenu.menuInflater.inflate(R.menu.popup_menu_disk_title_tab_more_btn,popupMenu.menu)
+                popupMenu.setOnMenuItemClickListener(PopupMenu.OnMenuItemClickListener { item ->
+                    when(item.itemId) {
+                        R.id.popup_disk_title_add_to_import ->{
 
+                        }
+                        R.id.popup_disk_title_edit ->{
+
+                        }
+                        R.id.popup_disk_title_delete ->{
+
+                        }
+                    }
+                    true
+                })
+                popupMenu.show()
             }
         }
     }
