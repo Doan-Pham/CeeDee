@@ -5,6 +5,11 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import androidx.core.net.toUri
+import coil.load
+import com.haidoan.android.ceedee.R
+import com.haidoan.android.ceedee.data.DiskTitle
 
 import com.haidoan.android.ceedee.databinding.FragmentDiskDetailsBinding
 
@@ -27,5 +32,28 @@ class DiskDetailsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        val diskTitle = arguments?.getSerializable("disk_title") as DiskTitle
+        val amount = arguments?.getLong("amount_disk_title") as Long
+        val genreName = arguments?.getString("genre_name") as String
+        if (arguments!=null){
+            bindImage(binding.imgDiskDetailsCoverImg, diskTitle.coverImageUrl)
+            binding.tvDiskDetailsTitle.text = diskTitle.name
+            binding.tvDiskDetailsAuthor.text=diskTitle.author
+            binding.tvDiskDetailsGenreName.text = genreName
+            binding.tvDiskDetailsAmountName.text= amount.toString() + " CD"
+            binding.tvDiskDetailsDescriptionName.text=diskTitle.description
+        }
+
+    }
+
+    private fun bindImage(imgView: ImageView, imgUrl: String?) {
+        imgUrl?.let {
+            val imgUri = imgUrl.toUri().buildUpon().scheme("https").build()
+            imgView.load(imgUri) {
+                placeholder(R.drawable.ic_launcher)
+                error(R.drawable.ic_app_logo)
+            }
+        }
     }
 }

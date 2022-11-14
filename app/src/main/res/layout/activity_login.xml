@@ -7,7 +7,10 @@
     android:background="@color/white"
     android:gravity="center"
     android:orientation="vertical"
-    tools:context=".LoginActivity">
+    tools:context=".LoginActivity"
+    android:paddingStart="48dp"
+    android:paddingEnd="48dp"
+    >
 
     <ImageView
         android:layout_width="144dp"
@@ -32,9 +35,7 @@
         android:id="@+id/edt_username_login"
         style="@style/edt_login_style"
 
-        android:layout_marginStart="48dp"
         android:layout_marginTop="52dp"
-        android:layout_marginEnd="48dp"
 
         android:autofillHints=""
         android:drawableStart="@drawable/ic_round_person_24"
@@ -43,11 +44,11 @@
 
     <EditText
         android:id="@+id/edt_password_login"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
         style="@style/edt_login_style"
 
-        android:layout_marginStart="48dp"
         android:layout_marginTop="24dp"
-        android:layout_marginEnd="48dp"
 
         android:autofillHints=""
         android:drawableStart="@drawable/ic_round_lock_24"
@@ -65,8 +66,6 @@
             android:gravity="top|left"
             android:visibility="invisible"
 
-            android:layout_marginStart="48dp"
-            android:layout_marginEnd="48dp"
             android:letterSpacing="0.01"
 
             android:padding="4dp"
@@ -90,20 +89,12 @@
 
     <Button
         android:id="@+id/btn_login"
+        style="@style/btn_style"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
 
-        android:layout_marginStart="48dp"
         android:layout_marginTop="4dp"
-        android:layout_marginEnd="48dp"
 
-        android:background="@drawable/login_button_background"
         android:text="@string/login"
-
-        android:textAllCaps="false"
-        android:textColor="@color/white"
-        android:textSize="16sp"
-
-        android:textStyle="bold"
-        app:backgroundTint="@null" />
+ />
 </LinearLayout>

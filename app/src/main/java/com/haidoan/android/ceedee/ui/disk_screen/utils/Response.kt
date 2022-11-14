@@ -1,4 +1,4 @@
-package com.haidoan.android.ceedee.ui.disk_screen.disk_titles
+package com.haidoan.android.ceedee.ui.disk_screen.utils
 
 sealed class Response<out T> {
     class Loading<out T>: Response<T>()

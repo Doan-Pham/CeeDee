@@ -8,7 +8,10 @@ import android.widget.Filter
 import android.widget.Filterable
 import android.widget.ImageView
 import androidx.core.net.toUri
+import androidx.core.os.bundleOf
 import androidx.lifecycle.LifecycleOwner
+import androidx.navigation.NavController
+import androidx.navigation.findNavController
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -16,8 +19,9 @@ import coil.load
 import com.haidoan.android.ceedee.R
 import com.haidoan.android.ceedee.data.DiskTitle
 import com.haidoan.android.ceedee.databinding.DiskTitlesItemBinding
+import com.haidoan.android.ceedee.ui.disk_screen.utils.Response
 
-import com.haidoan.android.ceedee.utils.TypeUtils
+import com.haidoan.android.ceedee.ui.disk_screen.utils.TypeUtils
 import java.util.*
 
 @SuppressLint("NotifyDataSetChanged")
@@ -28,10 +32,11 @@ class DiskTitlesAdapter: ListAdapter<DiskTitle, DiskTitlesAdapter.DiskTitlesView
     private val allDiskTitles = arrayListOf<DiskTitle>()
     private val allDiskTitleFilterByGenre = arrayListOf<DiskTitle>()
 
+    private lateinit var navController: NavController
     private lateinit var diskTitlesViewModel: DiskTitlesViewModel
     private lateinit var viewLifecycleOwner: LifecycleOwner
-    private lateinit var iOnItemClickListener: IOnItemClickListener
-    private lateinit var iOnItemMoreClickListener: IOnItemClickListener
+
+    private lateinit var genreAdapter: GenreAdapter
 
     private val mapDiskTitleAmount = hashMapOf<DiskTitle, Long>()
 
@@ -50,8 +55,17 @@ class DiskTitlesAdapter: ListAdapter<DiskTitle, DiskTitlesAdapter.DiskTitlesView
         allDiskTitleFilterByGenre.addAll(newList.toList())
     }
 
+    fun setGenreAdapter(g: GenreAdapter){
+        genreAdapter=g
+    }
+
+
     fun setLifecycleOwner(lco: LifecycleOwner){
         viewLifecycleOwner=lco
+    }
+
+    fun setNavController(nav: NavController){
+        navController=nav
     }
 
     fun setDiskTitlesViewModel(viewModel: DiskTitlesViewModel){
@@ -107,18 +121,6 @@ class DiskTitlesAdapter: ListAdapter<DiskTitle, DiskTitlesAdapter.DiskTitlesView
             }
         }
         notifyDataSetChanged()
-     /*   Log.d("TAG_SORTBYNAME", "sortByName in adapter")
-        listResult.forEach {
-            Log.d("TAG_SORTBYNAME", "${it.name}")
-        }*/
-    }
-
-    fun setIOnItemMoreClickListener(listener: IOnItemClickListener) {
-        iOnItemMoreClickListener = listener
-    }
-
-    fun setIOnItemClickListener(listener: IOnItemClickListener) {
-        iOnItemClickListener = listener
     }
 
     fun getItemAt(position: Int): DiskTitle {
@@ -134,8 +136,7 @@ class DiskTitlesAdapter: ListAdapter<DiskTitle, DiskTitlesAdapter.DiskTitlesView
             binding = binding,
             viewLifecycleOwner = viewLifecycleOwner,
             diskTitlesViewModel = diskTitlesViewModel,
-            itemClickListeners = iOnItemClickListener,
-            moreBtnClickListeners = iOnItemMoreClickListener
+            nav = navController
         )
     }
 
@@ -158,8 +159,7 @@ class DiskTitlesAdapter: ListAdapter<DiskTitle, DiskTitlesAdapter.DiskTitlesView
         private val binding: DiskTitlesItemBinding,
         private val diskTitlesViewModel: DiskTitlesViewModel,
         private val viewLifecycleOwner: LifecycleOwner,
-        private val itemClickListeners: IOnItemClickListener,
-        private val moreBtnClickListeners: IOnItemClickListener
+        private val nav: NavController
     ) : RecyclerView.ViewHolder(binding.root) {
         fun setData(item: DiskTitle) {
             binding.apply {
@@ -202,13 +202,26 @@ class DiskTitlesAdapter: ListAdapter<DiskTitle, DiskTitlesAdapter.DiskTitlesView
         }
 
         init {
-            itemView.setOnClickListener {
-                itemClickListeners.onItemClick(bindingAdapterPosition)
-                Log.d("TAG_ITEM", displayedDiskTitles[bindingAdapterPosition].name)
+            itemView.setOnClickListener { view->
+                val diskTitle = getItemAt(bindingAdapterPosition)
+
+                val listGenre = genreAdapter.getAllGenres()
+                lateinit var genre: String
+                for (item in listGenre){
+                    if (item.id==diskTitle.genreId){
+                        genre = item.name
+                        break
+                    }
+                }
+                Log.d("TAG_GENRE", listGenre.toString())
+                val bundle = bundleOf("disk_title" to diskTitle,
+                                        "amount_disk_title" to mapDiskTitleAmount[diskTitle],
+                                        "genre_name" to genre)
+                view.findNavController().navigate(R.id.diskDetailsFragment, bundle)
             }
 
             binding.imgDiskTitlesBtnMore.setOnClickListener {
-                moreBtnClickListeners.onItemClick((bindingAdapterPosition))
+
             }
         }
     }

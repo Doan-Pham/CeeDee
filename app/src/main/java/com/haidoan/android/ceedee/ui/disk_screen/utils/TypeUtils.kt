@@ -1,4 +1,4 @@
-package com.haidoan.android.ceedee.utils
+package com.haidoan.android.ceedee.ui.disk_screen.utils
 
 object TypeUtils {
     enum class SORT_BY_NAME {

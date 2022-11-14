@@ -1,15 +1,147 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.disk_screen.disk_details.DiskDetailsFragment">
+    tools:context=".ui.disk_screen.disk_details.DiskDetailsFragment"
+    android:paddingStart="48dp"
+    android:paddingEnd="48dp"
+    >
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardView_disk_details"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="20dp"
+
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <ImageView
+            android:id="@+id/img_disk_details_cover_img"
+            android:layout_width="180dp"
+            android:layout_height="180dp"
+
+            android:src="@drawable/ic_launcher" />
+
+    </androidx.cardview.widget.CardView>
 
     <TextView
+        android:id="@+id/tv_disk_details_title"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment"
+        android:layout_height="wrap_content"
         android:gravity="center"
+
+        android:layout_marginTop="20dp"
+        android:letterSpacing="0.01"
+        android:text="Title"
+
+        android:textColor="@color/black"
+        android:textSize="30sp"
+        android:textStyle="bold"
+
+        app:layout_constraintTop_toBottomOf="@id/cardView_disk_details"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         />
 
-</FrameLayout>
+    <TextView
+        android:id="@+id/tv_disk_details_author"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+
+        android:layout_marginTop="8dp"
+        android:letterSpacing="0.01"
+        android:text="Author"
+        android:textColor="@color/black"
+
+        android:textSize="18sp"
+        android:textStyle="bold"
+
+        app:layout_constraintTop_toBottomOf="@id/tv_disk_details_title"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        />
+
+    <LinearLayout
+        android:id="@+id/layout_disk_details_info"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintTop_toBottomOf="@id/tv_disk_details_author"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        >
+        <TextView
+            android:id="@+id/tv_disk_details_genre"
+            style="@style/tv_title_style"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+
+            android:layout_marginTop="8dp"
+            android:text="Genre"
+            />
+
+        <TextView
+            android:id="@+id/tv_disk_details_genre_name"
+            style="@style/tv_child_style"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Genre name"
+            />
+
+        <TextView
+            android:id="@+id/tv_disk_details_description"
+            style="@style/tv_title_style"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Description"
+            />
+
+        <TextView
+            android:id="@+id/tv_disk_details_description_name"
+            style="@style/tv_child_style"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Description namefggggggggggggggggggggggggggggggggggggggggggggggggggggggggggdffaaaaaaaaaaaasssssssssssss"
+            />
+
+        <TextView
+            android:id="@+id/tv_disk_details_amount"
+            style="@style/tv_title_style"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Amount"
+            />
+
+        <TextView
+            android:id="@+id/tv_disk_details_amount_name"
+            style="@style/tv_child_style"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Amount name"/>
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/btn_disk_details_add_to_import"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@style/btn_style"
+        android:text="Add to import"
+
+        android:layout_marginTop="20dp"
+        app:layout_constraintTop_toBottomOf="@id/layout_disk_details_info"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

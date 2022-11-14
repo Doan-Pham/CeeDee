@@ -2,6 +2,7 @@ package com.haidoan.android.ceedee.data
 
 import com.google.firebase.firestore.DocumentId
 import com.google.firebase.firestore.IgnoreExtraProperties
+import java.io.Serializable
 
 data class DiskTitle(
     @DocumentId
@@ -11,4 +12,4 @@ data class DiskTitle(
     val author: String = "",
     val coverImageUrl: String = "",
     val description: String = ""
-)
+): Serializable

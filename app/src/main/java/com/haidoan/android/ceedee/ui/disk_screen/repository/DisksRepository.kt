@@ -1,15 +1,15 @@
-package com.haidoan.android.ceedee.ui.disk_screen.disks
+package com.haidoan.android.ceedee.ui.disk_screen.repository
 
 import android.app.Application
 import com.google.firebase.firestore.AggregateSource
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FirebaseFirestore
-import com.haidoan.android.ceedee.ui.disk_screen.disk_titles.Response
+import com.haidoan.android.ceedee.ui.disk_screen.utils.Response
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.tasks.await
 
-class DisksRepository(application: Application) {
+class DisksRepository(private val application: Application) {
     private val db: FirebaseFirestore = FirebaseFirestore.getInstance()
 
     private var queryDisk: CollectionReference = db.collection("Disk")

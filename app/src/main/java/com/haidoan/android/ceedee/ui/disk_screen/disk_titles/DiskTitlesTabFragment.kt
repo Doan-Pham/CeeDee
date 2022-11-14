@@ -1,12 +1,16 @@
 package com.haidoan.android.ceedee.ui.disk_screen.disk_titles
 
 import android.annotation.SuppressLint
+import android.app.AlertDialog
 
 import android.os.Bundle
 import android.util.Log
 import android.view.*
+import android.widget.EditText
 import android.widget.SearchView
 import android.widget.SearchView.OnQueryTextListener
+import android.widget.TextView
+import android.widget.Toast
 import androidx.core.view.MenuHost
 
 import androidx.fragment.app.Fragment
@@ -15,14 +19,15 @@ import androidx.lifecycle.Lifecycle
 
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
-import androidx.navigation.fragment.NavHostFragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.haidoan.android.ceedee.R
 import com.haidoan.android.ceedee.data.Genre
 import com.haidoan.android.ceedee.databinding.FragmentDiskTabDiskTitlesBinding
+import com.haidoan.android.ceedee.ui.disk_screen.repository.GenreRepository
+import com.haidoan.android.ceedee.ui.disk_screen.utils.Response
 
-import com.haidoan.android.ceedee.utils.TypeUtils
+import com.haidoan.android.ceedee.ui.disk_screen.utils.TypeUtils
 
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -54,7 +59,7 @@ class DiskTitlesTabFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         init()
-        addListeners()
+        createMenu()
     }
 
     private fun init() {
@@ -63,13 +68,17 @@ class DiskTitlesTabFragment : Fragment() {
         diskTitleAdapter = DiskTitlesAdapter()
         diskTitleAdapter.setDiskTitlesViewModel(diskTitlesViewModel)
         diskTitleAdapter.setLifecycleOwner(viewLifecycleOwner)
+        diskTitleAdapter.setNavController(requireActivity().findNavController(R.id.mainContainer))
 
-        genreAdapter = GenreAdapter(context = requireActivity().baseContext,
-                                    diskTitlesViewModel = diskTitlesViewModel,
-                                    viewLifecycleOwner = viewLifecycleOwner,
-                                    diskTitlesAdapter = diskTitleAdapter,
-                                    fragmentDiskTitlesBinding = binding)
+        genreAdapter = GenreAdapter(
+            context = requireActivity().baseContext,
+            diskTitlesViewModel = diskTitlesViewModel,
+            viewLifecycleOwner = viewLifecycleOwner,
+            diskTitlesAdapter = diskTitleAdapter,
+            fragmentDiskTitlesBinding = binding
+        )
 
+        diskTitleAdapter.setGenreAdapter(genreAdapter)
         diskTitlesViewModel.getDiskTitles().observe(viewLifecycleOwner) { response ->
             when (response) {
                 is Response.Loading -> {
@@ -90,8 +99,6 @@ class DiskTitlesTabFragment : Fragment() {
                             diskTitleAdapter.itemCount.toString() + " Titles"
                     else binding.tvDiskTitlesTotal.text =
                         diskTitleAdapter.itemCount.toString() + " Title"
-
-                    createMenu()
                 }
                 is Response.Failure -> {
                     print(response.errorMessage)
@@ -112,8 +119,8 @@ class DiskTitlesTabFragment : Fragment() {
                 is Response.Success -> {
                     val list = response.data
 
-                    val genreList= mutableListOf<Genre>()
-                    genreList.add(Genre(GenreRepository.defaultGenre,"All"))
+                    val genreList = mutableListOf<Genre>()
+                    genreList.add(Genre(GenreRepository.defaultGenre, "All"))
                     genreList.addAll(list)
                     genreAdapter.submitList(genreList)
                 }
@@ -137,28 +144,6 @@ class DiskTitlesTabFragment : Fragment() {
             }
             (rcvGenres.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
         }
-    }
-
-    private fun addListeners() {
-        diskTitleAdapter.setIOnItemClickListener(object : IOnItemClickListener {
-            override fun onItemClick(position: Int) {
-                val navController = requireActivity().findNavController(R.id.mainContainer)
-                navController.navigate(R.id.diskDetailsFragment)
-            }
-        })
-        diskTitleAdapter.setIOnItemMoreClickListener(object : IOnItemClickListener {
-            override fun onItemClick(position: Int) {
-
-            }
-        })
-    }
-
-    private fun sortByCDAmount(type: TypeUtils.SORT_BY_AMOUNT) {
-        diskTitleAdapter.sortByCDAmount(type)
-    }
-
-    private fun sortByName(type: TypeUtils.SORT_BY_NAME) {
-        diskTitleAdapter.sortByName(type)
     }
 
     private fun createMenu() {
@@ -191,6 +176,18 @@ class DiskTitlesTabFragment : Fragment() {
                         Log.d("TAG_MENU", "DISKTITLE_CART")
                         true
                     }
+                    R.id.menu_disk_titles_add_genre -> {
+                        addGenre()
+                        true
+                    }
+                    R.id.menu_disk_titles_add_disk_title -> {
+                        addDiskTitle()
+                        true
+                    }
+                    R.id.menu_disk_titles_add_supplier -> {
+                        addSupplier()
+                        true
+                    }
                     R.id.menu_disk_title_tab_sort_by_name_ascending -> {
                         sortByName(TypeUtils.SORT_BY_NAME.Ascending)
                         true
@@ -211,6 +208,111 @@ class DiskTitlesTabFragment : Fragment() {
                 }
             }
         }, viewLifecycleOwner, Lifecycle.State.RESUMED)
+    }
+
+
+    private fun sortByCDAmount(type: TypeUtils.SORT_BY_AMOUNT) {
+        diskTitleAdapter.sortByCDAmount(type)
+    }
+
+    private fun sortByName(type: TypeUtils.SORT_BY_NAME) {
+        diskTitleAdapter.sortByName(type)
+    }
+
+    private fun addSupplier() {
+        view?.let { withEditTextSupplier(it) }
+    }
+
+    private fun addDiskTitle() {
+        view?.findNavController()?.navigate(R.id.diskAddEditFragment)
+    }
+
+    private fun addGenre() {
+        view?.let { withEditTextGenre(it) }
+    }
+
+    /**
+     *  Create dialog for add genre
+     * */
+    private fun withEditTextGenre(view: View) {
+        val builder = AlertDialog.Builder(context)
+        val inflater = layoutInflater
+        builder.setTitle("Add new genre")
+        val dialogLayout = inflater.inflate(R.layout.dialog_add_genre, null)
+        val editText = dialogLayout.findViewById<EditText>(R.id.edt_add_genre_name)
+        builder.setView(dialogLayout)
+        builder.setPositiveButton("ADD") { dialogInterface, i ->
+            if (editText.text.toString() == "") {
+                makeToast("Name cannot be empty!")
+            } else
+                addGenreToFireStore(editText.text.toString())
+        }
+        builder.setNegativeButton("CANCEL") { dialogLayout, i -> }
+        builder.show()
+    }
+
+    private fun addGenreToFireStore(genreName: String) {
+        diskTitlesViewModel.addGenres(genreName).observe(this) { response ->
+            when (response) {
+                is Response.Loading -> {
+                }
+                is Response.Success -> {
+                    makeToast("Add genre success!")
+                    init()
+                }
+                is Response.Failure -> {
+                    makeToast("Add genre fail!")
+                }
+            }
+
+        }
+    }
+
+    /**
+     *  Create dialog for add supplier
+     * */
+    private fun withEditTextSupplier(view: View) {
+        val builder = AlertDialog.Builder(context)
+        val inflater = layoutInflater
+        builder.setTitle("Add new supplier")
+        val dialogLayout = inflater.inflate(R.layout.dialog_add_supplier, null)
+        val name = dialogLayout.findViewById<EditText>(R.id.edt_add_supplier_name)
+        val email = dialogLayout.findViewById<EditText>(R.id.edt_add_supplier_email)
+        builder.setView(dialogLayout)
+        builder.setPositiveButton("ADD") { dialogInterface, i ->
+
+            if (email.text.toString() == "" || name.text.toString() == "") {
+                makeToast("Please fill all information!")
+            } else
+                addSupplierToFireStore(name.text.toString(), email.text.toString())
+        }
+        builder.setNegativeButton("CANCEL") { dialogLayout, i -> }
+        builder.show()
+    }
+
+    private fun addSupplierToFireStore(supplierName: String, supplierEmail: String) {
+        val supplier = hashMapOf(
+            "name" to supplierName,
+            "email" to supplierEmail
+        )
+        diskTitlesViewModel.addSupplier(supplier).observe(this) { response ->
+            when (response) {
+                is Response.Loading -> {
+                }
+                is Response.Success -> {
+                    makeToast("Add supplier success!")
+                    init()
+                }
+                is Response.Failure -> {
+                    makeToast("Add supplier fail!")
+                }
+            }
+
+        }
+    }
+
+    private fun makeToast(text: String) {
+        Toast.makeText(requireActivity(), text, Toast.LENGTH_SHORT).show()
     }
 
     override fun onDestroyView() {

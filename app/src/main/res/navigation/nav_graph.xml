@@ -11,6 +11,9 @@
         <action
             android:id="@+id/action_diskFragment_to_diskDetailsFragment"
             app:destination="@id/diskDetailsFragment" />
+        <action
+            android:id="@+id/action_diskFragment_to_diskAddEditFragment"
+            app:destination="@id/diskAddEditFragment" />
     </fragment>
     <fragment
         android:id="@+id/rentalFragment"
@@ -24,4 +27,8 @@
         android:id="@+id/diskDetailsFragment"
         android:name="com.haidoan.android.ceedee.ui.disk_screen.disk_details.DiskDetailsFragment"
         tools:layout="@layout/fragment_disk_details" />
+    <fragment
+        android:id="@+id/diskAddEditFragment"
+        android:name="com.haidoan.android.ceedee.ui.disk_screen.disk_add_edit.DiskAddEditFragment"
+        tools:layout="@layout/fragment_disk_add_edit" />
 </navigation>
