@@ -231,6 +231,7 @@ class DiskTitlesAdapter(private val context: Context): ListAdapter<DiskTitle, Di
                         }
                         R.id.popup_disk_title_edit ->{
 
+                            itemView.findNavController().navigate(R.id.diskAddEditFragment)
                         }
                         R.id.popup_disk_title_delete ->{
 
