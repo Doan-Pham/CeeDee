@@ -10,6 +10,12 @@ import java.time.temporal.TemporalAdjusters
 
 private const val TAG = "ReportViewModel.kt"
 
+enum class DiskDataGroupingCategory {
+    DISK_AMOUNT_BY_GENRE,
+    DISK_AMOUNT_BY_STATUS,
+    TOTAL_RENTAL_BY_GENRE
+}
+
 class ReportViewModel(application: Application, private val reportRepository: ReportRepository) :
     AndroidViewModel(application) {
 
@@ -24,16 +30,47 @@ class ReportViewModel(application: Application, private val reportRepository: Re
     val monthlyExpenses: LiveData<Map<LocalDate, Float>>
         get() = _monthlyExpenses
 
+
+    private val _diskDataGroupingCategory = MutableLiveData(
+        DiskDataGroupingCategory.DISK_AMOUNT_BY_GENRE
+    )
+
+    private val _diskRelatedData = _diskDataGroupingCategory.switchMap { groupingCategory ->
+        val resultFromDataLayer = MutableLiveData<Map<String, Int>>()
+        viewModelScope.launch {
+            when (groupingCategory) {
+                DiskDataGroupingCategory.DISK_AMOUNT_BY_GENRE ->
+                    reportRepository
+                        .getDiskAmountGroupByGenre()
+                        .collect { data -> resultFromDataLayer.value = data }
+
+                DiskDataGroupingCategory.DISK_AMOUNT_BY_STATUS ->
+                    reportRepository
+                        .getDiskAmountGroupByStatus()
+                        .collect { data -> resultFromDataLayer.value = data }
+                DiskDataGroupingCategory.TOTAL_RENTAL_BY_GENRE ->
+                    reportRepository
+                        .getTotalRentalGroupByGenre()
+                        .collect { data -> resultFromDataLayer.value = data }
+            }
+        }
+        resultFromDataLayer
+    }
+    val diskRelatedData: LiveData<Map<String, Int>>
+        get() = _diskRelatedData
+
     init {
         refreshMonthlyRevenue()
         refreshMonthlyExpenses()
+        refreshDiskRelatedData()
     }
 
     private fun refreshMonthlyRevenue(
     ) {
         viewModelScope.launch {
-            _monthlyRevenue.value =
-                reportRepository.getRevenueBetweenMonths(startTime, endTime).value
+            reportRepository.getRevenueBetweenMonths(startTime, endTime).collect { revenue ->
+                _monthlyRevenue.value = revenue
+            }
         }
         Log.d(
             TAG,
@@ -44,14 +81,27 @@ class ReportViewModel(application: Application, private val reportRepository: Re
     private fun refreshMonthlyExpenses(
     ) {
         viewModelScope.launch {
-            _monthlyExpenses.value =
-                reportRepository.getExpensesBetweenMonths(startTime, endTime).value
+            reportRepository.getExpensesBetweenMonths(startTime, endTime)
+                .collect { expenses -> _monthlyExpenses.value = expenses }
         }
         Log.d(
             TAG,
             "Called refreshMonthlyExpenses(), expenses between $startTime and $endTime after refresh: ${_monthlyExpenses.value.toString()}"
         )
     }
+
+    private fun refreshDiskRelatedData(
+    ) {
+//        viewModelScope.launch {
+//            reportRepository.getDiskAmountGroupByGenre()
+//                .collect { data -> _diskRelatedData.value = data }
+//        }
+        Log.d(
+            TAG,
+            "Called refreshDiskRelatedData(), result: ${_diskRelatedData.value.toString()}"
+        )
+    }
+
     fun setMonthsPeriod(
         startTime: LocalDate = LocalDate.now(),
         endTime: LocalDate = LocalDate.now()
@@ -60,6 +110,10 @@ class ReportViewModel(application: Application, private val reportRepository: Re
         this.endTime = endTime.with(TemporalAdjusters.lastDayOfMonth())
         refreshMonthlyRevenue()
         refreshMonthlyExpenses()
+    }
+
+    fun setDiskDataGroupingCategory(category: DiskDataGroupingCategory) {
+        _diskDataGroupingCategory.value = category
     }
 
     class Factory(val app: Application, private val reportRepository: ReportRepository) :
