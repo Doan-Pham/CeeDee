@@ -1,22 +1,35 @@
 package com.haidoan.android.ceedee.ui.disk_screen.disk_requisition
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.liveData
+import androidx.lifecycle.*
 import com.haidoan.android.ceedee.data.Requisition
 import com.haidoan.android.ceedee.data.disk_requisition.DiskRequisitionsRepository
 import kotlinx.coroutines.Dispatchers
 
 class DiskRequisitionsViewModel(
     private val diskRequisitionsRepository: DiskRequisitionsRepository
-) :
-    ViewModel() {
-    private val _requisitions = liveData(Dispatchers.IO) {
-        diskRequisitionsRepository.getRequisitionsStream().collect { emit(it) }
-    }
+) : ViewModel() {
 
+    private val searchQuery = MutableLiveData("")
+
+    private val _requisitions = searchQuery.switchMap {
+        liveData(Dispatchers.IO) {
+            diskRequisitionsRepository.getRequisitionsStream()
+                .collect { requisitions ->
+                    emit(requisitions.filter { individualRequisition ->
+                        individualRequisition.supplierName.lowercase()
+                            .contains(
+                                searchQuery.value.toString().lowercase()
+                            )
+                    })
+                }
+        }
+    }
     val requisitions: LiveData<List<Requisition>> = _requisitions
+
+
+    fun searchRequisition(query: String?) {
+        searchQuery.value = query ?: ""
+    }
 
     class Factory(
         private val diskRequisitionsRepository: DiskRequisitionsRepository

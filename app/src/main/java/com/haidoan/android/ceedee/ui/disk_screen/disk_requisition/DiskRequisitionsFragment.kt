@@ -78,6 +78,7 @@ class DiskRequisitionsFragment : Fragment() {
                     }
 
                     override fun onQueryTextChange(newText: String?): Boolean {
+                        viewModel.searchRequisition(newText)
                         return false
                     }
                 })
