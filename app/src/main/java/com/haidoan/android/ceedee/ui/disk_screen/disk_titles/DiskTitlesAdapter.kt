@@ -2,6 +2,7 @@ package com.haidoan.android.ceedee.ui.disk_screen.disk_titles
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -204,7 +205,7 @@ class DiskTitlesAdapter(private val context: Context): ListAdapter<DiskTitle, Di
 
         init {
             itemView.setOnClickListener { view->
-                val diskTitle = getItemAt(bindingAdapterPosition)
+              /*  val diskTitle = getItemAt(bindingAdapterPosition)
 
                 val listGenre = genreAdapter.getAllGenres()
                 lateinit var genre: String
@@ -217,7 +218,8 @@ class DiskTitlesAdapter(private val context: Context): ListAdapter<DiskTitle, Di
                 Log.d("TAG_GENRE", listGenre.toString())
                 val bundle = bundleOf("disk_title" to diskTitle,
                                         "amount_disk_title" to mapDiskTitleAmount[diskTitle],
-                                        "genre_name" to genre)
+                                        "genre_name" to genre)*/
+                val bundle = getBundleDiskTitle()
                 view.findNavController().navigate(R.id.diskDetailsFragment, bundle)
             }
 
@@ -227,11 +229,10 @@ class DiskTitlesAdapter(private val context: Context): ListAdapter<DiskTitle, Di
                 popupMenu.setOnMenuItemClickListener(PopupMenu.OnMenuItemClickListener { item ->
                     when(item.itemId) {
                         R.id.popup_disk_title_add_to_import ->{
-
+                            //TODO: Add to import
                         }
                         R.id.popup_disk_title_edit ->{
-
-                            itemView.findNavController().navigate(R.id.diskAddEditFragment)
+                            goToAddEditScreen()
                         }
                         R.id.popup_disk_title_delete ->{
 
@@ -241,6 +242,30 @@ class DiskTitlesAdapter(private val context: Context): ListAdapter<DiskTitle, Di
                 })
                 popupMenu.show()
             }
+        }
+
+        private fun goToAddEditScreen() {
+            val bundle = getBundleDiskTitle()
+            itemView.findNavController().navigate(R.id.diskAddEditFragment, bundle)
+        }
+
+        private fun getBundleDiskTitle(): Bundle {
+            val diskTitle = getItemAt(bindingAdapterPosition)
+
+            val listGenre = genreAdapter.getAllGenres()
+            lateinit var genre: String
+            for (item in listGenre) {
+                if (item.id == diskTitle.genreId) {
+                    genre = item.name
+                    break
+                }
+            }
+
+            return bundleOf(
+                "disk_title" to diskTitle,
+                "amount_disk_title" to mapDiskTitleAmount[diskTitle],
+                "genre_name" to genre
+            )
         }
     }
 

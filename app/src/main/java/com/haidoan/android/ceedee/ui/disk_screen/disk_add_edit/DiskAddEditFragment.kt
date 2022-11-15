@@ -4,6 +4,7 @@ import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -11,9 +12,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
+import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
@@ -23,13 +26,18 @@ import com.google.android.gms.tasks.Task
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.UploadTask
+import com.haidoan.android.ceedee.R
+import com.haidoan.android.ceedee.data.DiskTitle
 import com.haidoan.android.ceedee.data.Genre
 import com.haidoan.android.ceedee.databinding.FragmentDiskAddEditBinding
 
+
 import com.haidoan.android.ceedee.ui.disk_screen.utils.Response
 import com.haidoan.android.ceedee.ui.report.util.PERMISSIONS
+import java.io.File
 import java.io.FileNotFoundException
 import java.io.InputStream
+import java.io.Serializable
 import java.util.*
 
 
@@ -38,6 +46,7 @@ class DiskAddEditFragment : Fragment() {
     private var filePath: Uri? = null
     private var coverImgUrl: String = ""
     private var genreId: String = ""
+    private lateinit var diskTitle: DiskTitle
 
     private val multiplePermissionLauncher =
         registerForActivityResult(
@@ -75,6 +84,15 @@ class DiskAddEditFragment : Fragment() {
     // onDestroyView.
     private val binding get() = _binding!!
 
+    @Suppress("DEPRECATION")
+    inline fun <reified T : Serializable> Bundle.customGetSerializable(key: String): T? {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            getSerializable(key, T::class.java)
+        } else {
+            getSerializable(key) as? T
+        }
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -92,74 +110,24 @@ class DiskAddEditFragment : Fragment() {
 
     }
 
-    private fun addDiskTitleToFireStore() {
-        binding.btnSave.visibility = View.GONE
-        binding.progressBarDiskAddEditSave.visibility = View.VISIBLE
-        if (filePath != null) {
-            val storageReference: StorageReference = FirebaseStorage.getInstance().reference
-            val ref = storageReference.child("disk_titles_img/" + UUID.randomUUID().toString())
-            val uploadTask = ref.putFile(filePath!!)
+    private fun getFromBundle() {
+        if (arguments != null) {
+            val diskTitle = arguments?.customGetSerializable<DiskTitle>("disk_title") as DiskTitle
+            this.diskTitle = diskTitle
 
-            uploadTask.continueWithTask(Continuation<UploadTask.TaskSnapshot, Task<Uri>> { task ->
-                if (!task.isSuccessful) {
-                    task.exception?.let {
-                        throw it
-                    }
+            bindImage(binding.imgDiskAddEditCoverImg, diskTitle.coverImageUrl)
+            binding.edtDiskAddEditDiskTitleName.setText(diskTitle.name)
+            binding.edtDiskAddEditAuthor.setText(diskTitle.author)
+            binding.edtDiskAddEditDescription.setText(diskTitle.description)
+
+            for (i in genreList.indices) {
+                if (genreList[i].id == diskTitle.genreId) {
+                    binding.spinnerDiskAddEditGenre.setSelection(i)
+                    break;
                 }
-                return@Continuation ref.downloadUrl
-            }).addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    val downloadUri = task.result
-                    coverImgUrl = downloadUri.toString()
-
-                    val author = binding.edtDiskAddEditAuthor.text.toString()
-                    val description = binding.edtDiskAddEditDescription.text.toString()
-                    val name = binding.edtDiskAddEditDiskTitleName.text.toString()
-                    diskAddEditViewModel.addDiskTitle(
-                        author,
-                        coverImgUrl,
-                        description,
-                        genreId,
-                        name
-                    )
-                        .observe(viewLifecycleOwner) { response ->
-                            when (response) {
-                                is Response.Loading -> {
-                                }
-                                is Response.Success -> {
-                                    Toast.makeText(
-                                        requireActivity(),
-                                        "Add disk title success!!!",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                    view?.findNavController()?.popBackStack()
-                                    binding.btnSave.visibility = View.VISIBLE
-                                    binding.progressBarDiskAddEditSave.visibility = View.GONE
-                                }
-                                is Response.Failure -> {
-                                    Toast.makeText(
-                                        requireActivity(),
-                                        "Fail to disk title!!!",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-
-                                    binding.btnSave.visibility = View.VISIBLE
-                                    binding.progressBarDiskAddEditSave.visibility = View.GONE
-                                }
-                                else -> print(response.toString())
-                            }
-                        }
-                } else {
-                    // Handle failures
-                    binding.btnSave.visibility = View.VISIBLE
-                    binding.progressBarDiskAddEditSave.visibility = View.GONE
-                }
-            }.addOnFailureListener {
-                Log.d("TAG_REF", it.message.toString())
-                binding.btnSave.visibility = View.VISIBLE
-                binding.progressBarDiskAddEditSave.visibility = View.GONE
             }
         }
+
     }
 
     private fun init() {
@@ -189,6 +157,8 @@ class DiskAddEditFragment : Fragment() {
                             adapter = adapterForSpinnerGenre
                         }
                     }
+
+                    getFromBundle()
                 }
                 is Response.Failure -> {
                     binding.layoutAddEditDisk.visibility = View.VISIBLE
@@ -237,16 +207,238 @@ class DiskAddEditFragment : Fragment() {
             }
 
         binding.btnSave.setOnClickListener {
-            if (filePath == null || binding.edtDiskAddEditDescription.text.toString() == ""
-                || binding.edtDiskAddEditAuthor.text.toString() == ""
-                || binding.edtDiskAddEditDiskTitleName.text.toString() == ""
-            ) {
-                binding.tvMessageRequiredAddEditDiskTitle.text = "Please fill all information!"
-                binding.tvMessageRequiredAddEditDiskTitle.visibility = View.VISIBLE
+            if (arguments != null) {
+                updateDiskTitle()
             } else {
-                binding.tvMessageRequiredAddEditDiskTitle.visibility = View.INVISIBLE
-                addDiskTitleToFireStore()
+                addDiskTitle()
             }
+        }
+    }
+
+    private fun updateDiskTitle() {
+        if (binding.edtDiskAddEditDescription.text.toString() == ""
+            || binding.edtDiskAddEditAuthor.text.toString() == ""
+            || binding.edtDiskAddEditDiskTitleName.text.toString() == ""
+        ) {
+            binding.tvMessageRequiredAddEditDiskTitle.text = "Please fill all information!"
+            binding.tvMessageRequiredAddEditDiskTitle.visibility = View.VISIBLE
+        } else {
+            binding.tvMessageRequiredAddEditDiskTitle.visibility = View.INVISIBLE
+            updateDiskTitleToFireStore()
+        }
+    }
+
+    private fun updateDiskTitleToFireStore() {
+        binding.btnSave.visibility = View.GONE
+        binding.progressBarDiskAddEditSave.visibility = View.VISIBLE
+        if (filePath != null) {
+            val fileName = filePath!!.path?.let { File(it).name }
+            Log.d("TAG_test", "filepath $filePath, filename $fileName")
+            diskAddEditViewModel.addImage(filePath, fileName)
+                .observe(viewLifecycleOwner) { response ->
+                    when (response) {
+                        is Response.Loading -> {
+                            binding.btnSave.visibility = View.GONE
+                            binding.progressBarDiskAddEditSave.visibility = View.VISIBLE
+                        }
+                        is Response.Success -> {
+                            val uri = response.data as Uri
+                            Log.d("TAG_test", uri.toString())
+                            binding.btnSave.visibility = View.VISIBLE
+                            binding.progressBarDiskAddEditSave.visibility = View.GONE
+
+                            coverImgUrl = uri.toString()
+                            val author = binding.edtDiskAddEditAuthor.text.toString()
+                            val description = binding.edtDiskAddEditDescription.text.toString()
+                            val name = binding.edtDiskAddEditDiskTitleName.text.toString()
+                            diskAddEditViewModel.updateDiskTitle(
+                                diskTitle.id,
+                                author,
+                                coverImgUrl,
+                                description,
+                                genreId,
+                                name
+                            )
+                                .observe(viewLifecycleOwner) { resp ->
+                                    when (resp) {
+                                        is Response.Loading -> {
+                                            binding.btnSave.visibility = View.GONE
+                                            binding.progressBarDiskAddEditSave.visibility =
+                                                View.VISIBLE
+                                        }
+                                        is Response.Success -> {
+                                            Toast.makeText(
+                                                requireActivity(),
+                                                "Update disk title success!!!",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                            view?.findNavController()?.popBackStack()
+                                            binding.btnSave.visibility = View.VISIBLE
+                                            binding.progressBarDiskAddEditSave.visibility =
+                                                View.GONE
+                                        }
+                                        is Response.Failure -> {
+                                            Toast.makeText(
+                                                requireActivity(),
+                                                "Fail to update disk title!!!",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+
+                                            binding.btnSave.visibility = View.VISIBLE
+                                            binding.progressBarDiskAddEditSave.visibility =
+                                                View.GONE
+                                        }
+                                        else -> print(resp.toString())
+                                    }
+                                }
+                        }
+                        is Response.Failure -> {
+                            binding.btnSave.visibility = View.VISIBLE
+                            binding.progressBarDiskAddEditSave.visibility = View.GONE
+                            Toast.makeText(
+                                requireActivity(),
+                                "Fail to update image to FireStore!!!",
+                                Toast.LENGTH_SHORT
+                            ).show()
+
+                        }
+                        else -> print(response.toString())
+                    }
+                }
+
+        } else {
+            coverImgUrl = diskTitle.coverImageUrl
+            val author = binding.edtDiskAddEditAuthor.text.toString()
+            val description = binding.edtDiskAddEditDescription.text.toString()
+            val name = binding.edtDiskAddEditDiskTitleName.text.toString()
+            diskAddEditViewModel.updateDiskTitle(
+                diskTitle.id,
+                author,
+                coverImgUrl,
+                description,
+                genreId,
+                name
+            )
+                .observe(viewLifecycleOwner) { resp ->
+                    when (resp) {
+                        is Response.Loading -> {
+                            binding.btnSave.visibility = View.GONE
+                            binding.progressBarDiskAddEditSave.visibility = View.VISIBLE
+                        }
+                        is Response.Success -> {
+                            Toast.makeText(
+                                requireActivity(),
+                                "Update disk title success!!!",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            view?.findNavController()?.popBackStack()
+                            binding.btnSave.visibility = View.VISIBLE
+                            binding.progressBarDiskAddEditSave.visibility = View.GONE
+                        }
+                        is Response.Failure -> {
+                            Toast.makeText(
+                                requireActivity(),
+                                "Fail to update disk title!!!",
+                                Toast.LENGTH_SHORT
+                            ).show()
+
+                            binding.btnSave.visibility = View.VISIBLE
+                            binding.progressBarDiskAddEditSave.visibility = View.GONE
+                        }
+                        else -> print(resp.toString())
+                    }
+                }
+        }
+    }
+
+    private fun addDiskTitle() {
+        if (filePath == null || binding.edtDiskAddEditDescription.text.toString() == ""
+            || binding.edtDiskAddEditAuthor.text.toString() == ""
+            || binding.edtDiskAddEditDiskTitleName.text.toString() == ""
+        ) {
+            binding.tvMessageRequiredAddEditDiskTitle.text = "Please fill all information!"
+            binding.tvMessageRequiredAddEditDiskTitle.visibility = View.VISIBLE
+        } else {
+            binding.tvMessageRequiredAddEditDiskTitle.visibility = View.INVISIBLE
+            addDiskTitleToFireStore()
+        }
+    }
+
+    private fun addDiskTitleToFireStore() {
+        val fileName = filePath!!.path?.let { File(it).name }
+        binding.btnSave.visibility = View.GONE
+        binding.progressBarDiskAddEditSave.visibility = View.VISIBLE
+        if (filePath != null) {
+            diskAddEditViewModel.addImage(filePath, fileName)
+                .observe(viewLifecycleOwner) { response ->
+                    when (response) {
+                        is Response.Loading -> {
+                            binding.btnSave.visibility = View.GONE
+                            binding.progressBarDiskAddEditSave.visibility = View.VISIBLE
+                        }
+                        is Response.Success -> {
+                            val uri = response.data as Uri
+                            Log.d("TAG_test", uri.toString())
+                            binding.btnSave.visibility = View.VISIBLE
+                            binding.progressBarDiskAddEditSave.visibility = View.GONE
+
+                            coverImgUrl = uri.toString()
+                            val author = binding.edtDiskAddEditAuthor.text.toString()
+                            val description = binding.edtDiskAddEditDescription.text.toString()
+                            val name = binding.edtDiskAddEditDiskTitleName.text.toString()
+                            diskAddEditViewModel.addDiskTitle(
+                                author,
+                                coverImgUrl,
+                                description,
+                                genreId,
+                                name
+                            )
+                                .observe(viewLifecycleOwner) { resp ->
+                                    when (resp) {
+                                        is Response.Loading -> {
+                                            binding.btnSave.visibility = View.GONE
+                                            binding.progressBarDiskAddEditSave.visibility =
+                                                View.VISIBLE
+                                        }
+                                        is Response.Success -> {
+                                            Toast.makeText(
+                                                requireActivity(),
+                                                "Add disk title success!!!",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                            view?.findNavController()?.popBackStack()
+                                            binding.btnSave.visibility = View.VISIBLE
+                                            binding.progressBarDiskAddEditSave.visibility =
+                                                View.GONE
+                                        }
+                                        is Response.Failure -> {
+                                            Toast.makeText(
+                                                requireActivity(),
+                                                "Fail to add disk title!!!",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+
+                                            binding.btnSave.visibility = View.VISIBLE
+                                            binding.progressBarDiskAddEditSave.visibility =
+                                                View.GONE
+                                        }
+                                        else -> print(resp.toString())
+                                    }
+                                }
+                        }
+                        is Response.Failure -> {
+                            binding.btnSave.visibility = View.VISIBLE
+                            binding.progressBarDiskAddEditSave.visibility = View.GONE
+                            Toast.makeText(
+                                requireActivity(),
+                                "Fail to add image to FireStore!!!",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                        else -> print(response.toString())
+                    }
+                }
+
         }
     }
 
@@ -261,6 +453,16 @@ class DiskAddEditFragment : Fragment() {
                 "Failed to load bitmap from gallery",
                 Toast.LENGTH_SHORT
             ).show()
+        }
+    }
+
+    private fun bindImage(imgView: ImageView, imgUrl: String?) {
+        imgUrl?.let {
+            val imgUri = imgUrl.toUri().buildUpon().scheme("https").build()
+            imgView.load(imgUri) {
+                placeholder(R.drawable.ic_launcher)
+                error(R.drawable.ic_app_logo)
+            }
         }
     }
 
