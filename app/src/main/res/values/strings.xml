@@ -56,4 +56,12 @@
     <string name="supplier_name">Supplier Name</string>
     <string name="req_sent">Req sent:</string>
     <string name="new_requisition">New requisition</string>
+    <string name="name_colon">Name:</string>
+    <string name="email_colon">Email:</string>
+    <string name="supplier">Supplier</string>
+    <string name="supplier_email">Supplier email</string>
+    <string name="disks_to_import">Disks to Import</string>
+    <string name="amount">Amount:</string>
+    <string name="_0_cd">0 CD</string>
+    <string name="disk_title">Disk Title</string>
 </resources>

@@ -29,4 +29,16 @@ class DiskRequisitionsFirestoreDataSource {
             }
         }
 
+    fun getRequisitionStreamById(requisitionId: String): Flow<Requisition> =
+        firestoreDb.collection("Requisition").document(requisitionId).snapshots()
+            .map {
+                Requisition(
+                    it.id,
+                    it.get("supplierName") as String,
+                    it.get("supplierEmail") as String,
+                    it.get("diskTitlesToImport") as Map<String, Long>,
+                    (it.get("sentDate") as Timestamp).toDate().toInstant()
+                        .atZone(ZoneId.of("Asia/Ho_Chi_Minh")).toLocalDate()
+                )
+            }
 }

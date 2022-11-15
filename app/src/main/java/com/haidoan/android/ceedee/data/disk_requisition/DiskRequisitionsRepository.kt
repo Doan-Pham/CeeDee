@@ -10,4 +10,8 @@ class DiskRequisitionsRepository(
 ) {
     fun getRequisitionsStream(): Flow<List<Requisition>> =
         firestoreDataSource.getRequisitionsStream()
+
+    fun getRequisitionStreamById(requisitionId: String) =
+        firestoreDataSource.getRequisitionStreamById(requisitionId)
+
 }

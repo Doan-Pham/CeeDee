@@ -40,7 +40,7 @@
         android:label="@string/Import"
         tools:layout="@layout/fragment_disk_import">
         <argument
-            android:name="currentRequisition"
-            app:argType="com.haidoan.android.ceedee.data.Requisition" />
+            android:name="requisitionId"
+            app:argType="string" />
     </fragment>
 </navigation>
