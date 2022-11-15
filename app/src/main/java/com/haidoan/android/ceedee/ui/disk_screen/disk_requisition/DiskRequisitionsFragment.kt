@@ -1,31 +1,34 @@
 package com.haidoan.android.ceedee.ui.disk_screen.disk_requisition
 
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import android.widget.SearchView
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.haidoan.android.ceedee.R
-import com.haidoan.android.ceedee.data.DiskTitle
-import com.haidoan.android.ceedee.data.Requisition
-import com.haidoan.android.ceedee.databinding.FragmentDiskRequisitionBinding
+import com.haidoan.android.ceedee.data.disk_requisition.DiskRequisitionsFirestoreDataSource
+import com.haidoan.android.ceedee.data.disk_requisition.DiskRequisitionsRepository
+import com.haidoan.android.ceedee.databinding.FragmentDiskRequisitionsBinding
 
+private const val TAG = "DiskRequisitionsFrag"
 
-class DiskRequisitionFragment : Fragment() {
+class DiskRequisitionsFragment : Fragment() {
 
-    private var _binding: FragmentDiskRequisitionBinding? = null
+    private var _binding: FragmentDiskRequisitionsBinding? = null
     private lateinit var requisitionAdapter: DiskRequisitionAdapter
-    private val fakeDate = MutableLiveData(
-        listOf(
-            Requisition("", "Sup1", "sup@", listOf(DiskTitle())),
-            Requisition("", "Sup2", "sup@", listOf(DiskTitle())),
-            Requisition("", "Sup3", "sup@", listOf(DiskTitle()))
-        )
-    )
+    private val viewModel: DiskRequisitionsViewModel by lazy {
+        ViewModelProvider(
+            this, DiskRequisitionsViewModel.Factory(
+                DiskRequisitionsRepository(DiskRequisitionsFirestoreDataSource())
+            )
+        )[DiskRequisitionsViewModel::class.java]
+    }
+
 
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -36,7 +39,7 @@ class DiskRequisitionFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         // Inflate the layout for this fragment
-        _binding = FragmentDiskRequisitionBinding.inflate(inflater, container, false)
+        _binding = FragmentDiskRequisitionsBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -50,7 +53,12 @@ class DiskRequisitionFragment : Fragment() {
             recyclerviewRequisition.adapter = requisitionAdapter
             recyclerviewRequisition.layoutManager = LinearLayoutManager(activity)
         }
-        fakeDate.observe(viewLifecycleOwner) { data -> requisitionAdapter.submitList(data) }
+        viewModel.requisitions.observe(viewLifecycleOwner) { requisitions ->
+            Log.d(TAG, requisitions.toString())
+            requisitionAdapter.submitList(
+                requisitions
+            )
+        }
     }
 
     private fun setUpOptionMenu() {
