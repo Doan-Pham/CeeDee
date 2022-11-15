@@ -8,6 +8,6 @@ data class Requisition(
     val id: String = "",
     val supplierName: String = "",
     val supplierEmail: String = "",
-    val diskTitlesToImport: List<DiskTitle> = listOf(),
+    val diskTitlesToImport: Map<String, Long> = mapOf(),
     val sentDate: LocalDate = LocalDate.now()
 )
