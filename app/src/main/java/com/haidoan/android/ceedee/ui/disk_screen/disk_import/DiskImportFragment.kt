@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.haidoan.android.ceedee.databinding.FragmentDiskImportBinding
 
 class DiskImportFragment : Fragment() {
@@ -34,5 +35,20 @@ class DiskImportFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        val disksToImportAdapter = DiskImportAdapter(
+            hashMapOf(
+                "My my my" to 4,
+                "Ye" to 5,
+                "My my mya" to 4,
+                "My my myb" to 4,
+                "My my myc" to 4,
+                "My my myd" to 4,
+                "My my mye" to 4,
+                "My my myf" to 4,
+                "My my myg" to 4
+            )
+        )
+        binding.recyclerviewDisksToImport.adapter = disksToImportAdapter
+        binding.recyclerviewDisksToImport.layoutManager = LinearLayoutManager(context)
     }
 }
