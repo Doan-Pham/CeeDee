@@ -9,11 +9,13 @@ import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.haidoan.android.ceedee.R
 import com.haidoan.android.ceedee.data.disk_requisition.DiskRequisitionsFirestoreDataSource
 import com.haidoan.android.ceedee.data.disk_requisition.DiskRequisitionsRepository
 import com.haidoan.android.ceedee.databinding.FragmentDiskRequisitionsBinding
+import com.haidoan.android.ceedee.ui.disk_screen.DiskFragmentDirections
 
 private const val TAG = "DiskRequisitionsFrag"
 
@@ -47,7 +49,15 @@ class DiskRequisitionsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setUpOptionMenu()
 
-        requisitionAdapter = DiskRequisitionAdapter { }
+
+        requisitionAdapter =
+            DiskRequisitionAdapter(onButtonImportClick = { requisition ->
+                val action =
+                    DiskFragmentDirections.actionDiskFragmentToDiskImportFragment(
+                        requisition
+                    )
+                findNavController().navigate(action)
+            })
 
         binding.apply {
             recyclerviewRequisition.adapter = requisitionAdapter
