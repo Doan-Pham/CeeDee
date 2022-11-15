@@ -22,7 +22,11 @@ private const val TAG = "DiskRequisitionsFrag"
 class DiskRequisitionsFragment : Fragment() {
 
     private var _binding: FragmentDiskRequisitionsBinding? = null
-    private lateinit var requisitionAdapter: DiskRequisitionAdapter
+
+    // This property is only valid between onCreateView and
+    // onDestroyView.
+    private val binding get() = _binding!!
+
     private val viewModel: DiskRequisitionsViewModel by lazy {
         ViewModelProvider(
             this, DiskRequisitionsViewModel.Factory(
@@ -30,11 +34,7 @@ class DiskRequisitionsFragment : Fragment() {
             )
         )[DiskRequisitionsViewModel::class.java]
     }
-
-
-    // This property is only valid between onCreateView and
-    // onDestroyView.
-    private val binding get() = _binding!!
+    private lateinit var requisitionAdapter: DiskRequisitionAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -54,7 +54,7 @@ class DiskRequisitionsFragment : Fragment() {
             DiskRequisitionAdapter(onButtonImportClick = { requisition ->
                 val action =
                     DiskFragmentDirections.actionDiskFragmentToDiskImportFragment(
-                        requisition
+                        requisition.id
                     )
                 findNavController().navigate(action)
             })

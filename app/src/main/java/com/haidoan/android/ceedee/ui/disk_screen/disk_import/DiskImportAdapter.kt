@@ -1,16 +1,20 @@
 package com.haidoan.android.ceedee.ui.disk_screen.disk_import
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.haidoan.android.ceedee.databinding.ItemDiskToImportBinding
 
-class DiskImportAdapter(private val disksToImportMap: HashMap<String, Long>) :
+class DiskImportAdapter() :
     RecyclerView.Adapter<DiskImportAdapter.DiskRequisitionViewHolder>() {
 
     private var disksToImportList: ArrayList<Pair<String, Long>> = arrayListOf()
 
-    init {
+    @SuppressLint("NotifyDataSetChanged")
+    fun setDisksToImport(disksToImportMap: Map<String, Long>) {
+        disksToImportList.clear()
+
         disksToImportMap.forEach { (diskTitle, diskAmount) ->
             disksToImportList.add(
                 Pair(
@@ -19,8 +23,8 @@ class DiskImportAdapter(private val disksToImportMap: HashMap<String, Long>) :
                 )
             )
         }
+        notifyDataSetChanged()
     }
-
 
     class DiskRequisitionViewHolder(
         private val binding: ItemDiskToImportBinding
@@ -54,6 +58,6 @@ class DiskImportAdapter(private val disksToImportMap: HashMap<String, Long>) :
     }
 
     override fun getItemCount(): Int {
-        return disksToImportMap.size
+        return disksToImportList.size
     }
 }
