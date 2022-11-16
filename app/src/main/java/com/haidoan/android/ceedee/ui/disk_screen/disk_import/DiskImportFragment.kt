@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.haidoan.android.ceedee.data.disk_requisition.DiskRequisitionsFirestoreDataSource
 import com.haidoan.android.ceedee.data.disk_requisition.DiskRequisitionsRepository
 import com.haidoan.android.ceedee.databinding.FragmentDiskImportBinding
+import com.haidoan.android.ceedee.ui.disk_screen.repository.DiskTitlesRepository
 
 class DiskImportFragment : Fragment() {
     private var _binding: FragmentDiskImportBinding? = null
@@ -22,7 +23,8 @@ class DiskImportFragment : Fragment() {
     private val viewModel: DiskImportViewModel by lazy {
         ViewModelProvider(
             this, DiskImportViewModel.Factory(
-                DiskRequisitionsRepository(DiskRequisitionsFirestoreDataSource())
+                DiskRequisitionsRepository(DiskRequisitionsFirestoreDataSource()),
+                DiskTitlesRepository(requireActivity().application)
             )
         )[DiskImportViewModel::class.java]
     }
@@ -50,21 +52,10 @@ class DiskImportFragment : Fragment() {
         viewModel.currentRequisition.observe(viewLifecycleOwner) { currentRequisition ->
             binding.textviewSupplierName.text = currentRequisition.supplierName
             binding.textviewSupplierEmail.text = currentRequisition.supplierEmail
-            disksToImportAdapter.setDisksToImport(currentRequisition.diskTitlesToImport)
         }
-//        val disksToImportAdapter = DiskImportAdapter(
-//            hashMapOf(
-//                "My my my" to 4,
-//                "Ye" to 5,
-//                "My my mya" to 4,
-//                "My my myb" to 4,
-//                "My my myc" to 4,
-//                "My my myd" to 4,
-//                "My my mye" to 4,
-//                "My my myf" to 4,
-//                "My my myg" to 4
-//            )
-//        )
 
+        viewModel.disksToImport.observe(viewLifecycleOwner) {
+            disksToImportAdapter.setDisksToImport(it)
+        }
     }
 }
