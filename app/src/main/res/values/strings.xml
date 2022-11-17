@@ -66,4 +66,5 @@
     <string name="disk_title">Disk Title</string>
     <string name="author">Author</string>
     <string name="total_payment">Total payment</string>
+    <string name="payment">Payment</string>
 </resources>

@@ -3,14 +3,18 @@ package com.haidoan.android.ceedee.ui.disk_screen.disk_import
 import androidx.lifecycle.*
 import com.haidoan.android.ceedee.data.DiskTitle
 import com.haidoan.android.ceedee.data.Requisition
+import com.haidoan.android.ceedee.data.disk_import.DiskImportRepository
+import com.haidoan.android.ceedee.data.disk_import.Import
 import com.haidoan.android.ceedee.data.disk_requisition.DiskRequisitionsRepository
 import com.haidoan.android.ceedee.ui.disk_screen.repository.DiskTitlesRepository
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 // TODO: Implement the Repository
 class DiskImportViewModel(
     private val diskRequisitionsRepository: DiskRequisitionsRepository,
-    private val diskTitlesRepository: DiskTitlesRepository
+    private val diskTitlesRepository: DiskTitlesRepository,
+    private val diskImportRepository: DiskImportRepository
 ) :
     ViewModel() {
     private val _requisitionId = MutableLiveData("")
@@ -46,15 +50,26 @@ class DiskImportViewModel(
         _requisitionId.value = requisitionId
     }
 
+    fun addNewImport(newImport: Import) {
+        viewModelScope.launch {
+            diskImportRepository.addImport(newImport)
+        }
+    }
+
     class Factory(
         private val diskRequisitionsRepository: DiskRequisitionsRepository,
-        private val diskTitlesRepository: DiskTitlesRepository
+        private val diskTitlesRepository: DiskTitlesRepository,
+        private val diskImportRepository: DiskImportRepository
     ) :
         ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             if (modelClass.isAssignableFrom(DiskImportViewModel::class.java)) {
                 @Suppress("UNCHECKED_CAST")
-                return DiskImportViewModel(diskRequisitionsRepository, diskTitlesRepository) as T
+                return DiskImportViewModel(
+                    diskRequisitionsRepository,
+                    diskTitlesRepository,
+                    diskImportRepository
+                ) as T
             }
             throw IllegalArgumentException("Unable to construct viewmodel")
         }
