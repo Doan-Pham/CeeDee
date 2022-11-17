@@ -29,6 +29,12 @@ class DiskTitlesViewModel(application: Application) : AndroidViewModel(applicati
         }
     }
 
+    fun deleteDiskTitle(diskTitleId : String) = liveData(Dispatchers.IO) {
+        diskTitlesRepository.deleteDiskTitleFromFireStore(diskTitleId).collect { response ->
+            emit(response)
+        }
+    }
+
     fun getDiskTitleFilterByGenreId(id: String) = liveData(Dispatchers.IO) {
         diskTitlesRepository.getDiskTitleFilterByGenreIdFromFireStore(id).collect { response ->
             emit(response)

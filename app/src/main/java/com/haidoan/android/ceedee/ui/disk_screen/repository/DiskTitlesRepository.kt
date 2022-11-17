@@ -39,6 +39,19 @@ class DiskTitlesRepository(private val application: Application) {
 
     }
 
+    fun deleteDiskTitleFromFireStore(id: String) = flow {
+        emit(Response.Loading())
+        emit(
+            Response.Success(
+                queryDiskTitle.document(id).delete()
+            )
+        )
+    }.catch { error ->
+        error.message?.let { errorMessage ->
+            emit(Response.Failure(errorMessage))
+        }
+    }
+
     fun getDiskTitleFilterByGenreIdFromFireStore(id: String) = flow {
         emit(Response.Loading())
         emit(
