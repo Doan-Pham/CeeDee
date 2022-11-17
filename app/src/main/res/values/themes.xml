@@ -107,6 +107,10 @@
         android:layout_marginTop="30dp"
         android:background="@drawable/background_textview_round_outline"
         android:drawablePadding="10dp"
-        android:gravity="center_vertical"
+        android:gravity="center_vertical"</style>
+
+    <style name="roundedCornerImageView">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">8dp</item>
     </style>
 </resources>

@@ -7,13 +7,16 @@
     <fragment
         android:id="@+id/diskFragment"
         android:name="com.haidoan.android.ceedee.ui.disk_screen.DiskFragment"
-        tools:layout="@layout/fragment_disk" >
+        tools:layout="@layout/fragment_disk">
         <action
             android:id="@+id/action_diskFragment_to_diskDetailsFragment"
             app:destination="@id/diskDetailsFragment" />
         <action
             android:id="@+id/action_diskFragment_to_diskAddEditFragment"
             app:destination="@id/diskAddEditFragment" />
+        <action
+            android:id="@+id/action_diskFragment_to_diskImportFragment"
+            app:destination="@id/diskImportFragment" />
     </fragment>
     <fragment
         android:id="@+id/rentalFragment"
@@ -31,4 +34,13 @@
         android:id="@+id/diskAddEditFragment"
         android:name="com.haidoan.android.ceedee.ui.disk_screen.disk_add_edit.DiskAddEditFragment"
         tools:layout="@layout/fragment_disk_add_edit" />
+    <fragment
+        android:id="@+id/diskImportFragment"
+        android:name="com.haidoan.android.ceedee.ui.disk_screen.disk_import.DiskImportFragment"
+        android:label="@string/Import"
+        tools:layout="@layout/fragment_disk_import">
+        <argument
+            android:name="requisitionId"
+            app:argType="string" />
+    </fragment>
 </navigation>

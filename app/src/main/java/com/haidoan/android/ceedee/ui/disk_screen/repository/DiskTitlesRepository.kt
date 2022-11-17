@@ -1,29 +1,19 @@
 package com.haidoan.android.ceedee.ui.disk_screen.repository
 
 import android.app.Application
-import android.net.Uri
 import android.util.Log
-import com.google.android.gms.tasks.Continuation
-import com.google.android.gms.tasks.Task
-
 import com.google.firebase.firestore.CollectionReference
+import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
-import com.google.firebase.ktx.Firebase
-import com.google.firebase.storage.FirebaseStorage
-import com.google.firebase.storage.StorageReference
-import com.google.firebase.storage.UploadTask
-import com.google.firebase.storage.ktx.storage
-
+import com.google.firebase.firestore.ktx.snapshots
 import com.haidoan.android.ceedee.data.DiskTitle
 import com.haidoan.android.ceedee.ui.disk_screen.utils.Response
 import com.haidoan.android.ceedee.ui.disk_screen.utils.TypeUtils
-
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
-
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.tasks.await
-import java.util.*
 
 class DiskTitlesRepository(private val application: Application) {
     private val db: FirebaseFirestore = FirebaseFirestore.getInstance()
@@ -93,7 +83,20 @@ class DiskTitlesRepository(private val application: Application) {
         }
     }
 
-    fun addDiskTitleToFireStore(author: String, coverImageUrl: String, description: String, genreId: String, name: String) = flow {
+    //  This won't work if listOfId has more than 10 elements due to a limit of Firestore
+    //TODO: Modify the method to allow for more than 10 disk titles
+    fun getDiskTitlesByListOfId(listOfId: List<String>) =
+        queryDiskTitle.whereIn(FieldPath.documentId(), listOfId).snapshots().mapNotNull {
+            it.toObjects(DiskTitle::class.java)
+        }
+
+    fun addDiskTitleToFireStore(
+        author: String,
+        coverImageUrl: String,
+        description: String,
+        genreId: String,
+        name: String
+    ) = flow {
         val hash = hashMapOf(
             "author" to author,
             "coverImageUrl" to coverImageUrl,
