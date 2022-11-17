@@ -1,17 +1,15 @@
 package com.haidoan.android.ceedee.ui.disk_screen.disk_titles
 
 import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.content.Context
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
-import android.widget.Filter
-import android.widget.Filterable
-import android.widget.ImageView
-import android.widget.PopupMenu
-import android.widget.Toast
+import android.widget.*
 import androidx.core.net.toUri
 import androidx.core.os.bundleOf
 import androidx.lifecycle.LifecycleOwner
@@ -248,27 +246,44 @@ class DiskTitlesAdapter(private val context: Context) :
                     Toast.LENGTH_SHORT
                 ).show()
             } else {
-                diskTitlesViewModel.deleteDiskTitle(diskTitle!!.id)
-                    .observe(viewLifecycleOwner) { response ->
-                        when (response) {
-                            is Response.Loading -> {
+                displayAlertDialogDeleteDiskTitle(diskTitle)
+            }
+        }
 
-                            }
-                            is Response.Success -> {
-                                diskTitlesTabFragment.init();
-                                Toast.makeText(
-                                    context,
-                                    "Delete disk title success!",
-                                    Toast.LENGTH_SHORT
-                                ).show()
+        private fun displayAlertDialogDeleteDiskTitle(diskTitleNeedToDelete: DiskTitle?) {
+            val builder = AlertDialog.Builder(context)
+            builder.setTitle("Delete this disk title?")
 
-                            }
-                            is Response.Failure -> {
+            builder.setPositiveButton("DELETE") { dialogInterface, i ->
+                deleteDiskTitleFromFireStore(diskTitleNeedToDelete)
+            }
+            builder.setNegativeButton("CANCEL") { dialogLayout, i ->
 
-                            }
+            }
+            builder.show()
+        }
+
+        private fun deleteDiskTitleFromFireStore(diskTitle: DiskTitle?) {
+            diskTitlesViewModel.deleteDiskTitle(diskTitle!!.id)
+                .observe(viewLifecycleOwner) { response ->
+                    when (response) {
+                        is Response.Loading -> {
+
+                        }
+                        is Response.Success -> {
+                            diskTitlesTabFragment.init();
+                            Toast.makeText(
+                                context,
+                                "Delete disk title success!",
+                                Toast.LENGTH_SHORT
+                            ).show()
+
+                        }
+                        is Response.Failure -> {
+
                         }
                     }
-            }
+                }
         }
 
         private fun goToAddEditScreen() {
