@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import android.widget.EditText
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -72,7 +73,7 @@ class DiskImportFragment : Fragment() {
             val editTextTotalPayment =
                 dialogLayout.findViewById<EditText>(R.id.edittext_total_payment)
 
-            //editTextTotalPayment.requestFocus()
+            editTextTotalPayment.requestFocus()
 
             val dialog = dialogBuilder
                 .setTitle("Payment")
@@ -85,7 +86,7 @@ class DiskImportFragment : Fragment() {
                 .create()
 
             //This shows the keyboard immediately when the dialog opens
-            //dialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE)
+            dialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE)
             dialog.show()
 
             // This is so that the dialog doesn't dismiss automatically when clicking a button
