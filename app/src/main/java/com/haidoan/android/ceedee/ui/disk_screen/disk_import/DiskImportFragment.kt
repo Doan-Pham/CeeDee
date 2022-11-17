@@ -20,6 +20,7 @@ import com.haidoan.android.ceedee.data.disk_requisition.DiskRequisitionsFirestor
 import com.haidoan.android.ceedee.data.disk_requisition.DiskRequisitionsRepository
 import com.haidoan.android.ceedee.databinding.FragmentDiskImportBinding
 import com.haidoan.android.ceedee.ui.disk_screen.repository.DiskTitlesRepository
+import com.haidoan.android.ceedee.ui.disk_screen.repository.DisksRepository
 
 
 class DiskImportFragment : Fragment() {
@@ -34,13 +35,16 @@ class DiskImportFragment : Fragment() {
             this, DiskImportViewModel.Factory(
                 DiskRequisitionsRepository(DiskRequisitionsFirestoreDataSource()),
                 DiskTitlesRepository(requireActivity().application),
-                DiskImportRepository(DiskImportFirestoreDataSource())
+                DiskImportRepository(DiskImportFirestoreDataSource()),
+                DisksRepository(requireActivity().application)
             )
         )[DiskImportViewModel::class.java]
     }
 
     private lateinit var disksToImportAdapter: DiskImportAdapter
     private val navArgs: DiskImportFragmentArgs by navArgs()
+
+    private val diskTitlesToImportAndAmount = mutableMapOf<String, Long>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -62,6 +66,9 @@ class DiskImportFragment : Fragment() {
         viewModel.currentRequisition.observe(viewLifecycleOwner) { currentRequisition ->
             binding.textviewSupplierName.text = currentRequisition.supplierName
             binding.textviewSupplierEmail.text = currentRequisition.supplierEmail
+
+            diskTitlesToImportAndAmount.clear()
+            diskTitlesToImportAndAmount.putAll(currentRequisition.diskTitlesToImport)
         }
 
         viewModel.disksToImport.observe(viewLifecycleOwner) {
@@ -83,7 +90,8 @@ class DiskImportFragment : Fragment() {
                             Import(
                                 supplierName = binding.textviewSupplierName.text.toString(),
                                 totalPayment = edittextTotalPayment.text.toString().toLong()
-                            )
+                            ),
+                            diskTitlesToImportAndAmount
                         )
                     }
                 }

@@ -7,14 +7,17 @@ import com.haidoan.android.ceedee.data.disk_import.DiskImportRepository
 import com.haidoan.android.ceedee.data.disk_import.Import
 import com.haidoan.android.ceedee.data.disk_requisition.DiskRequisitionsRepository
 import com.haidoan.android.ceedee.ui.disk_screen.repository.DiskTitlesRepository
+import com.haidoan.android.ceedee.ui.disk_screen.repository.DisksRepository
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 
 // TODO: Implement the Repository
 class DiskImportViewModel(
     private val diskRequisitionsRepository: DiskRequisitionsRepository,
     private val diskTitlesRepository: DiskTitlesRepository,
-    private val diskImportRepository: DiskImportRepository
+    private val diskImportRepository: DiskImportRepository,
+    private val disksRepository: DisksRepository
 ) :
     ViewModel() {
     private val _requisitionId = MutableLiveData("")
@@ -50,16 +53,20 @@ class DiskImportViewModel(
         _requisitionId.value = requisitionId
     }
 
-    fun addNewImport(newImport: Import) {
+    fun addNewImport(newImport: Import, diskTitlesToImportAndAmount: Map<String, Long>) {
         viewModelScope.launch {
-            diskImportRepository.addImport(newImport)
+            coroutineScope {
+                launch { diskImportRepository.addImport(newImport) }
+                launch { disksRepository.addMultipleDisks(diskTitlesToImportAndAmount) }
+            }
         }
     }
 
     class Factory(
         private val diskRequisitionsRepository: DiskRequisitionsRepository,
         private val diskTitlesRepository: DiskTitlesRepository,
-        private val diskImportRepository: DiskImportRepository
+        private val diskImportRepository: DiskImportRepository,
+        private val disksRepository: DisksRepository
     ) :
         ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -68,7 +75,8 @@ class DiskImportViewModel(
                 return DiskImportViewModel(
                     diskRequisitionsRepository,
                     diskTitlesRepository,
-                    diskImportRepository
+                    diskImportRepository,
+                    disksRepository
                 ) as T
             }
             throw IllegalArgumentException("Unable to construct viewmodel")
