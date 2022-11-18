@@ -5,31 +5,59 @@ import com.haidoan.android.ceedee.data.Requisition
 import com.haidoan.android.ceedee.data.disk_requisition.DiskRequisitionsRepository
 import kotlinx.coroutines.Dispatchers
 
+
 class DiskRequisitionsViewModel(
     private val diskRequisitionsRepository: DiskRequisitionsRepository
 ) : ViewModel() {
 
+    private val filteringCategory =
+        MutableLiveData(DiskRequisitionFilterCategory.FILTER_BY_PENDING)
+
     private val searchQuery = MutableLiveData("")
 
-    private val _requisitions = searchQuery.switchMap {
+    // This will observe all the modification events (searching, filtering) and combine into
+    // one LiveData
+    private val requisitionsModifications =
+        MediatorLiveData<Pair<DiskRequisitionFilterCategory?, String?>>().apply {
+            addSource(filteringCategory) { value = Pair(it, searchQuery.value) }
+            addSource(searchQuery) { value = Pair(filteringCategory.value, it) }
+        }
+
+    private val _requisitions = requisitionsModifications.switchMap { requisitionsModifications ->
         liveData(Dispatchers.IO) {
             diskRequisitionsRepository.getRequisitionsStream()
                 .collect { requisitions ->
-                    emit(requisitions.filter { individualRequisition ->
-                        individualRequisition.supplierName.lowercase()
-                            .contains(
-                                searchQuery.value.toString().lowercase()
-                            )
-                    })
+                    val currentFilteringCategory = requisitionsModifications.first
+                        ?: DiskRequisitionFilterCategory.FILTER_BY_PENDING
+                    val currentSearchQuery = requisitionsModifications.second ?: ""
+                    emit(
+                        requisitions.searchBySupplierName(currentSearchQuery)
+                            .filter(currentFilteringCategory)
+                    )
                 }
         }
     }
     val requisitions: LiveData<List<Requisition>> = _requisitions
 
-
     fun searchRequisition(query: String?) {
         searchQuery.value = query ?: ""
     }
+
+    private fun List<Requisition>.searchBySupplierName(supplierName: String) =
+        this.filter { individualRequisition ->
+            individualRequisition.supplierName.lowercase()
+                .contains(
+                    supplierName.lowercase()
+                )
+        }
+
+    private fun List<Requisition>.filter(filteringCategory: DiskRequisitionFilterCategory) =
+        this.filter { individualRequisition ->
+            when (filteringCategory) {
+                DiskRequisitionFilterCategory.FILTER_BY_PENDING -> individualRequisition.requisitionStatus == "Pending"
+                DiskRequisitionFilterCategory.FILTER_BY_COMPLETED -> individualRequisition.requisitionStatus == "Completed"
+            }
+        }
 
     class Factory(
         private val diskRequisitionsRepository: DiskRequisitionsRepository
@@ -43,4 +71,9 @@ class DiskRequisitionsViewModel(
             throw IllegalArgumentException("Unable to construct viewmodel")
         }
     }
+}
+
+enum class DiskRequisitionFilterCategory {
+    FILTER_BY_COMPLETED,
+    FILTER_BY_PENDING,
 }

@@ -24,7 +24,9 @@ class DiskRequisitionsFirestoreDataSource {
                     it.get("supplierEmail") as String,
                     it.get("diskTitlesToImport") as Map<String, Long>,
                     (it.get("sentDate") as Timestamp).toDate().toInstant()
-                        .atZone(ZoneId.of("Asia/Ho_Chi_Minh")).toLocalDate()
+                        .atZone(ZoneId.of("Asia/Ho_Chi_Minh")).toLocalDate(),
+                    // Naming a Firestore field as "status" somehow causes the app to crash
+                    it.get("requisitionStatus") as String
                 )
             }
         }
@@ -38,7 +40,9 @@ class DiskRequisitionsFirestoreDataSource {
                     it.get("supplierEmail") as String,
                     it.get("diskTitlesToImport") as Map<String, Long>,
                     (it.get("sentDate") as Timestamp).toDate().toInstant()
-                        .atZone(ZoneId.of("Asia/Ho_Chi_Minh")).toLocalDate()
+                        .atZone(ZoneId.of("Asia/Ho_Chi_Minh")).toLocalDate(),
+                    // Naming a Firestore field as "status" somehow causes the app to crash
+                    it.get("requisitionStatus") as String
                 )
             }
 }
