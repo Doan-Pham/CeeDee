@@ -1,29 +1,29 @@
 package com.haidoan.android.ceedee.data.report
 
-import androidx.lifecycle.LiveData
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.flow.Flow
 import java.time.LocalDate
 
 private const val TAG = "ReportRepository.kt"
 
-class ReportRepository(private val firestoreApi: FirestoreApi) {
+class ReportRepository(private val firestoreApi: FirestoreStatisticsDataSource) {
 
     suspend fun getRevenueBetweenMonths(
         startTime: LocalDate,
         endTime: LocalDate
-    ): LiveData<Map<LocalDate, Float>> {
-        return withContext(Dispatchers.IO) {
-            firestoreApi.getRevenueBetweenMonths(startTime, endTime)
-        }
-    }
+    ): Flow<Map<LocalDate, Float>> = firestoreApi.getRevenueBetweenMonths(startTime, endTime)
+
 
     suspend fun getExpensesBetweenMonths(
         startTime: LocalDate,
         endTime: LocalDate
-    ): LiveData<Map<LocalDate, Float>> {
-        return withContext(Dispatchers.IO) {
-            firestoreApi.getExpensesBetweenMonths(startTime, endTime)
-        }
-    }
+    ): Flow<Map<LocalDate, Float>> = firestoreApi.getExpensesBetweenMonths(startTime, endTime)
+
+    suspend fun getDiskAmountGroupByGenre(): Flow<Map<String, Int>> =
+        firestoreApi.getDiskAmountGroupByGenre()
+
+    suspend fun getDiskAmountGroupByStatus(): Flow<Map<String, Int>> =
+        firestoreApi.getDiskAmountGroupByStatus()
+
+    suspend fun getTotalRentalGroupByGenre(): Flow<Map<String, Int>> =
+        firestoreApi.getTotalRentalGroupByGenre()
 }

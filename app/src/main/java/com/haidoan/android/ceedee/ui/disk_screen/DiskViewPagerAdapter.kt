@@ -3,6 +3,7 @@ package com.haidoan.android.ceedee.ui.disk_screen
 import androidx.fragment.app.Fragment
 
 import androidx.viewpager2.adapter.FragmentStateAdapter
+import com.haidoan.android.ceedee.ui.disk_screen.disk_requisition.DiskRequisitionsFragment
 import com.haidoan.android.ceedee.ui.disk_screen.disk_titles.DiskTitlesTabFragment
 import com.haidoan.android.ceedee.ui.disk_screen.disks.DisksTabFragment
 
@@ -20,7 +21,7 @@ class DiskViewPagerAdapter (fragment: DiskFragment): FragmentStateAdapter(fragme
                 DisksTabFragment()
             }
             else -> {
-                Fragment()
+                DiskRequisitionsFragment()
             }
         }
     }

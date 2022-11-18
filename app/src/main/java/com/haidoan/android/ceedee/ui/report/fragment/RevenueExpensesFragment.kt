@@ -2,8 +2,10 @@ package com.haidoan.android.ceedee.ui.report.fragment
 
 import android.app.AlertDialog
 import android.content.pm.PackageManager
-import android.graphics.*
+import android.graphics.Canvas
+import android.graphics.Paint
 import android.graphics.Paint.FILTER_BITMAP_FLAG
+import android.graphics.Typeface
 import android.graphics.pdf.PdfDocument
 import android.os.Bundle
 import android.os.Environment
@@ -26,7 +28,7 @@ import com.github.mikephil.charting.components.YAxis
 import com.github.mikephil.charting.data.*
 import com.github.mikephil.charting.formatter.LargeValueFormatter
 import com.haidoan.android.ceedee.R
-import com.haidoan.android.ceedee.data.report.FirestoreApi
+import com.haidoan.android.ceedee.data.report.FirestoreStatisticsDataSource
 import com.haidoan.android.ceedee.data.report.ReportRepository
 import com.haidoan.android.ceedee.databinding.FragmentRevenueExpensesBinding
 import com.haidoan.android.ceedee.ui.report.util.*
@@ -61,7 +63,7 @@ class RevenueExpensesFragment : Fragment() {
         ViewModelProvider(
             this, ReportViewModel.Factory(
                 activity.application, ReportRepository(
-                    FirestoreApi()
+                    FirestoreStatisticsDataSource()
                 )
             )
         )[ReportViewModel::class.java]
@@ -111,8 +113,8 @@ class RevenueExpensesFragment : Fragment() {
 
         lineChart.visibility = View.GONE
 
-        setUpTextViewStartTime()
-        setUpTextViewEndTime()
+        setUpTextViewChooseStartTime()
+        setUpTextViewChooseEndTime()
         setUpOptionMenu()
         setUpButtonPrint()
 
@@ -134,10 +136,10 @@ class RevenueExpensesFragment : Fragment() {
         }
     }
 
-    private fun setUpTextViewStartTime() {
+    private fun setUpTextViewChooseStartTime() {
         val displayedStartTime = "${startTime.monthValue}/${startTime.year}"
-        binding.textviewStartMonth.text = displayedStartTime
-        binding.textviewStartMonth.setOnClickListener {
+        binding.textviewChooseStartMonth.text = displayedStartTime
+        binding.textviewChooseStartMonth.setOnClickListener {
             MonthYearPickerDialog(Calendar.getInstance().time).apply {
                 setTitle("Select start month")
                 setListener { _, month, year, _ ->
@@ -149,7 +151,7 @@ class RevenueExpensesFragment : Fragment() {
                         ).show()
                     } else {
                         val displayedTime = "$month/$year"
-                        binding.textviewStartMonth.text = displayedTime
+                        binding.textviewChooseStartMonth.text = displayedTime
                         startTime = startTime.withMonth(month).withYear(year)
                         onMonthYearChanged()
                     }
@@ -159,10 +161,10 @@ class RevenueExpensesFragment : Fragment() {
         }
     }
 
-    private fun setUpTextViewEndTime() {
+    private fun setUpTextViewChooseEndTime() {
         val displayedEndTime = "${endTime.monthValue}/${endTime.year}"
-        binding.textviewEndMonth.text = displayedEndTime
-        binding.textviewEndMonth.setOnClickListener {
+        binding.textviewChooseEndMonth.text = displayedEndTime
+        binding.textviewChooseEndMonth.setOnClickListener {
             MonthYearPickerDialog(Calendar.getInstance().time).apply {
                 setTitle("Select end month")
                 setListener { _, month, year, _ ->
@@ -174,7 +176,7 @@ class RevenueExpensesFragment : Fragment() {
                         ).show()
                     } else {
                         val displayedTime = "$month/$year"
-                        binding.textviewEndMonth.text = displayedTime
+                        binding.textviewChooseEndMonth.text = displayedTime
                         endTime = endTime.withMonth(month).withYear(year)
                         onMonthYearChanged()
                     }
@@ -354,7 +356,7 @@ class RevenueExpensesFragment : Fragment() {
         menuHost.addMenuProvider(object : MenuProvider {
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
                 // Add menu items here
-                menuInflater.inflate(R.menu.menu_report_fragment, menu)
+                menuInflater.inflate(R.menu.menu_report_revenue_fragment, menu)
                 menu.findItem(R.id.menu_item_rpfragment_chart_type).subMenu?.setHeaderTitle("Choose chart type")
             }
 

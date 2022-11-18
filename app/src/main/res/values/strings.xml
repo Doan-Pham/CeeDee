@@ -47,4 +47,25 @@
     <string name="add_to_import">Add to import</string>
     <string name="edit">Edit</string>
     <string name="delete">Delete</string>
+    <string name="options">Options</string>
+    <string name="sort_by_genre">Sort by genre</string>
+    <string name="sort_by_status">Sort by status</string>
+    <string name="disk_amount_by_genre">Disk amount by genre</string>
+    <string name="disk_amount_by_status">Disk amount by status</string>
+    <string name="total_rentals_by_genre">Total rentals by genre</string>
+    <string name="revenue_and_expenses">Revenue and Expenses</string>
+    <string name="start_time">Start time</string>
+    <string name="Import">Import</string>
+    <string name="supplier_name">Supplier Name</string>
+    <string name="req_sent">Req sent:</string>
+    <string name="new_requisition">New requisition</string>
+    <string name="name_colon">Name:</string>
+    <string name="email_colon">Email:</string>
+    <string name="supplier">Supplier</string>
+    <string name="supplier_email">Supplier email</string>
+    <string name="disks_to_import">Disks to Import</string>
+    <string name="amount">Amount:</string>
+    <string name="_0_cd">0 CD</string>
+    <string name="disk_title">Disk Title</string>
+    <string name="author">Author</string>
 </resources>

@@ -10,23 +10,28 @@ import android.graphics.pdf.PdfDocument
 import android.os.Bundle
 import android.os.Environment
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.view.MenuHost
+import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ViewModelProvider
 import com.github.mikephil.charting.charts.PieChart
 import com.github.mikephil.charting.components.Legend
 import com.github.mikephil.charting.data.PieData
 import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
-import com.github.mikephil.charting.formatter.PercentFormatter
 import com.haidoan.android.ceedee.R
+import com.haidoan.android.ceedee.data.report.FirestoreStatisticsDataSource
+import com.haidoan.android.ceedee.data.report.ReportRepository
 import com.haidoan.android.ceedee.databinding.FragmentReportDiskBinding
 import com.haidoan.android.ceedee.ui.report.util.*
+import com.haidoan.android.ceedee.ui.report.viewmodel.DiskDataGroupingCategory
+import com.haidoan.android.ceedee.ui.report.viewmodel.ReportViewModel
 import java.io.File
 import java.io.FileOutputStream
 import java.time.LocalDate
@@ -53,6 +58,19 @@ class ReportDiskFragment : Fragment() {
     private lateinit var binding: FragmentReportDiskBinding
     private lateinit var pieChart: PieChart
 
+    private val viewModel: ReportViewModel by lazy {
+        val activity = requireNotNull(this.activity) {
+            "You can only access the viewModel after onActivityCreated()"
+        }
+        ViewModelProvider(
+            this, ReportViewModel.Factory(
+                activity.application, ReportRepository(
+                    FirestoreStatisticsDataSource()
+                )
+            )
+        )[ReportViewModel::class.java]
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -65,8 +83,12 @@ class ReportDiskFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         pieChart = binding.pieChart
         setUpButtonPrint()
-        fillPieChartData()
+        setUpOptionMenu()
         styleAndDrawPieChart()
+        viewModel.diskRelatedData.observe(requireActivity()) { data ->
+            styleAndDrawPieChart()
+            fillPieChartData(data)
+        }
     }
 
     private fun styleAndDrawPieChart() {
@@ -75,27 +97,31 @@ class ReportDiskFragment : Fragment() {
         legend.horizontalAlignment = Legend.LegendHorizontalAlignment.LEFT
         legend.isWordWrapEnabled = true
         legend.orientation = Legend.LegendOrientation.HORIZONTAL
-        legend.xEntrySpace = 7f;
+        legend.xEntrySpace = 7f
         legend.textSize = 12f
         legend.setDrawInside(false)
 
-        pieChart.setUsePercentValues(true)
-        pieChart.setEntryLabelColor(Color.WHITE);
-        pieChart.setEntryLabelTextSize(14f);
+        //pieChart.setUsePercentValues(true)
+        pieChart.setEntryLabelColor(Color.WHITE)
+        pieChart.setEntryLabelTextSize(14f)
         pieChart.description.isEnabled = false
         pieChart.isDrawHoleEnabled = false
         pieChart.isHighlightPerTapEnabled = false
+        pieChart.setUsePercentValues(false)
         pieChart.invalidate()
     }
 
-    private fun fillPieChartData() {
-        val entries = mutableListOf<PieEntry>()
-        entries.add(PieEntry(90f, "Rock"))
-        entries.add(PieEntry(20f, "Punk"))
-        entries.add(PieEntry(50f, "Guitar"))
-        entries.add(PieEntry(40f, "Country"))
-        entries.add(PieEntry(30f, "Pop"))
-        entries.add(PieEntry(20f, "Blues"))
+    private fun fillPieChartData(diskData: Map<String, Int>) {
+        val pieChartEntries = mutableListOf<PieEntry>()
+
+        diskData.forEach { (key, value) ->
+            pieChartEntries.add(
+                PieEntry(
+                    value.toFloat(),
+                    key
+                )
+            )
+        }
 
         val colors =
             listOf(
@@ -104,16 +130,19 @@ class ReportDiskFragment : Fragment() {
                 CHART_COLOR_NINE, CHART_COLOR_TEN
             )
 
-        val dataSet = PieDataSet(entries, "Disks by status")
+        val dataSet = PieDataSet(pieChartEntries, "")
         dataSet.colors = colors
 
         val data = PieData(dataSet)
-        data.setValueFormatter(PercentFormatter(pieChart))
+        //data.setValueFormatter(PercentFormatter(pieChart))
         data.setValueTextSize(14f)
         data.setValueTextColor(Color.WHITE)
-        pieChart.data = data
-    }
 
+        pieChart.clear()
+        pieChart.data = data
+        pieChart.notifyDataSetChanged()
+        pieChart.invalidate()
+    }
 
     private fun setUpButtonPrint() {
         binding.buttonPrint.setOnClickListener {
@@ -129,6 +158,44 @@ class ReportDiskFragment : Fragment() {
                 .show()
 
         }
+    }
+
+    private fun setUpOptionMenu() {
+        val menuHost: MenuHost = requireActivity()
+        menuHost.addMenuProvider(object : MenuProvider {
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                // Add menu items here
+                menuInflater.inflate(R.menu.menu_report_disk_fragment, menu)
+            }
+
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                // Handle the menu selection
+                return when (menuItem.itemId) {
+                    R.id.menu_item_rpdiskfragment_genre -> {
+                        viewModel.setDiskDataGroupingCategory(DiskDataGroupingCategory.DISK_AMOUNT_BY_GENRE)
+
+                        binding.textviewChartTitle.text =
+                            resources.getString(R.string.disk_amount_by_genre)
+                        true
+                    }
+                    R.id.menu_item_rpdiskfragment_status -> {
+                        viewModel.setDiskDataGroupingCategory(DiskDataGroupingCategory.DISK_AMOUNT_BY_STATUS)
+
+                        binding.textviewChartTitle.text =
+                            resources.getString(R.string.disk_amount_by_status)
+                        true
+                    }
+                    R.id.menu_item_rpdiskfragment_rentalCount -> {
+                        viewModel.setDiskDataGroupingCategory(DiskDataGroupingCategory.TOTAL_RENTAL_BY_GENRE)
+
+                        binding.textviewChartTitle.text =
+                            resources.getString(R.string.total_rentals_by_genre)
+                        true
+                    }
+                    else -> false
+                }
+            }
+        }, viewLifecycleOwner, Lifecycle.State.RESUMED)
     }
 
     private fun printReportAsPdf() {

@@ -1,18 +1,16 @@
 package com.haidoan.android.ceedee
 
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
-import androidx.activity.OnBackPressedCallback
-import androidx.fragment.app.Fragment
+import android.view.View
+import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.NavigationUI.setupWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.haidoan.android.ceedee.databinding.ActivityMainBinding
-import com.haidoan.android.ceedee.ui.report.fragment.ReportFragment
 
 class MainActivity : AppCompatActivity() {
 
@@ -28,19 +26,26 @@ class MainActivity : AppCompatActivity() {
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.mainContainer) as NavHostFragment
         navController = navHostFragment.navController
-        val bottomNavigationView = binding.bottomNavigationView
-        setupWithNavController(bottomNavigationView, navController)
 
         //set up appbar
         setSupportActionBar(binding.toolbar)
-        val config = AppBarConfiguration(
+        val appBarConfiguration = AppBarConfiguration(
             setOf(
-                R.id.rentalFragment,
-                R.id.diskFragment,
-                R.id.reportFragment
+                R.id.rentalFragment, R.id.diskFragment, R.id.reportFragment
             )
         )
-        binding.toolbar.setupWithNavController(navController, config)
+        binding.toolbar.setupWithNavController(navController, appBarConfiguration)
+
+        // Set up bottomnav
+        val bottomNavigationView = binding.bottomNavigationView
+        setupWithNavController(bottomNavigationView, navController)
+
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            bottomNavigationView.visibility =
+                if (appBarConfiguration.topLevelDestinations.contains(destination.id)) View.VISIBLE
+                else View.GONE
+        }
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
