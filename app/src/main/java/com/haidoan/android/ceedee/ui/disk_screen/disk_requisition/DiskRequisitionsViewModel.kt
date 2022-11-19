@@ -43,6 +43,10 @@ class DiskRequisitionsViewModel(
         searchQuery.value = query ?: ""
     }
 
+    fun setFilteringCategory(inputFilteringCategory: DiskRequisitionFilterCategory) {
+        filteringCategory.value = inputFilteringCategory
+    }
+
     private fun List<Requisition>.searchBySupplierName(supplierName: String) =
         this.filter { individualRequisition ->
             individualRequisition.supplierName.lowercase()
@@ -56,6 +60,7 @@ class DiskRequisitionsViewModel(
             when (filteringCategory) {
                 DiskRequisitionFilterCategory.FILTER_BY_PENDING -> individualRequisition.requisitionStatus == "Pending"
                 DiskRequisitionFilterCategory.FILTER_BY_COMPLETED -> individualRequisition.requisitionStatus == "Completed"
+                DiskRequisitionFilterCategory.FILTER_BY_ALL -> true
             }
         }
 
@@ -76,4 +81,5 @@ class DiskRequisitionsViewModel(
 enum class DiskRequisitionFilterCategory {
     FILTER_BY_COMPLETED,
     FILTER_BY_PENDING,
+    FILTER_BY_ALL
 }

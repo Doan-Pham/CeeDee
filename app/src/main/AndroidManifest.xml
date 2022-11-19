@@ -39,7 +39,7 @@
             android:name=".MainActivity"
             android:exported="true"
             android:label="@string/app_name"
-            android:theme="@style/Theme.CeeDee.NoActionBar"
+            android:theme="@style/Theme.CeeDee"
             android:windowSoftInputMode="adjustPan">
 
         </activity>

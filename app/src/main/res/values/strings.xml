@@ -67,4 +67,7 @@
     <string name="author">Author</string>
     <string name="total_payment">Total payment</string>
     <string name="payment">Payment</string>
+    <string name="pending">Pending</string>
+    <string name="completed">Completed</string>
+    <string name="all">All</string>
 </resources>

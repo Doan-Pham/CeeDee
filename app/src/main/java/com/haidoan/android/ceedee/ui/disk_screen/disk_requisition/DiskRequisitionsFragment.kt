@@ -49,7 +49,6 @@ class DiskRequisitionsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setUpOptionMenu()
 
-
         requisitionAdapter =
             DiskRequisitionAdapter(onButtonImportClick = { requisition ->
                 val action =
@@ -62,9 +61,23 @@ class DiskRequisitionsFragment : Fragment() {
         binding.apply {
             recyclerviewRequisition.adapter = requisitionAdapter
             recyclerviewRequisition.layoutManager = LinearLayoutManager(activity)
+            chipGroupFilter.setOnCheckedStateChangeListener { group, _ ->
+                when (group.checkedChipId) {
+                    R.id.chip_filter_by_pending -> viewModel.setFilteringCategory(
+                        DiskRequisitionFilterCategory.FILTER_BY_PENDING
+                    )
+                    R.id.chip_filter_by_completed -> viewModel.setFilteringCategory(
+                        DiskRequisitionFilterCategory.FILTER_BY_COMPLETED
+                    )
+                    R.id.chip_filter_by_all -> viewModel.setFilteringCategory(
+                        DiskRequisitionFilterCategory.FILTER_BY_ALL
+                    )
+                }
+                Log.d(TAG, "CheckId change: ${group.checkedChipId}")
+            }
         }
+
         viewModel.requisitions.observe(viewLifecycleOwner) { requisitions ->
-            Log.d(TAG, requisitions.toString())
             requisitionAdapter.submitList(
                 requisitions
             )
