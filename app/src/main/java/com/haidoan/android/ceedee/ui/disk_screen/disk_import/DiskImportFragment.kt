@@ -106,7 +106,10 @@ class DiskImportFragment : Fragment() {
             currentRequisitionId
         ).observe(viewLifecycleOwner) { response ->
             when (response) {
-                is Response.Loading -> {}
+                is Response.Loading -> {
+                    binding.linearlayoutContentWrapper.visibility = View.GONE
+                    binding.progressbarImport.visibility = View.VISIBLE
+                }
                 is Response.Failure -> {}
                 is Response.Success -> {
                     findNavController().popBackStack()
