@@ -1,9 +1,10 @@
 package com.haidoan.android.ceedee.data.disk_requisition
 
 import com.haidoan.android.ceedee.data.Requisition
-import kotlinx.coroutines.coroutineScope
+import com.haidoan.android.ceedee.ui.disk_screen.utils.Response
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flow
 
 private const val TAG = "DiskRequisitionsRepo"
 
@@ -16,7 +17,9 @@ class DiskRequisitionsRepository(
     fun getRequisitionStreamById(requisitionId: String) =
         firestoreDataSource.getRequisitionStreamById(requisitionId)
 
-    suspend fun completeRequisition(requisitionId: String) {
-        coroutineScope { launch { firestoreDataSource.completeRequisition(requisitionId) } }
+    suspend fun completeRequisition(requisitionId: String) = flow {
+        emit(Response.Loading())
+        emit(Response.Success(firestoreDataSource.completeRequisition(requisitionId)))
     }
+        .catch { emit(Response.Failure(it.message.toString())) }
 }

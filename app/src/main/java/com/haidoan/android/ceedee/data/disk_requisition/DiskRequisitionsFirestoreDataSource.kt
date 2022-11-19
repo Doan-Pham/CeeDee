@@ -2,13 +2,13 @@
 
 package com.haidoan.android.ceedee.data.disk_requisition
 
-import android.util.Log
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.snapshots
 import com.haidoan.android.ceedee.data.Requisition
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.tasks.await
 import java.time.ZoneId
 
 private const val TAG = "DiskReqFirestoreDataSrc"
@@ -47,11 +47,8 @@ class DiskRequisitionsFirestoreDataSource {
                 )
             }
 
-    fun completeRequisition(requisitionId: String) {
+    suspend fun completeRequisition(requisitionId: String) =
         firestoreDb.collection("Requisition").document(requisitionId)
-            .update("requisitionStatus", "Completed")
-            .addOnSuccessListener { Log.d(TAG, "DocumentSnapshot successfully updated!") }
-            .addOnFailureListener { e -> Log.w(TAG, "Error updating document", e) }
+            .update("requisitionStatus", "Completed").await()
 
-    }
 }
