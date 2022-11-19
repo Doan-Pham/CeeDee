@@ -10,6 +10,7 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.haidoan.android.ceedee.R
@@ -21,6 +22,7 @@ import com.haidoan.android.ceedee.data.disk_requisition.DiskRequisitionsReposito
 import com.haidoan.android.ceedee.databinding.FragmentDiskImportBinding
 import com.haidoan.android.ceedee.ui.disk_screen.repository.DiskTitlesRepository
 import com.haidoan.android.ceedee.ui.disk_screen.repository.DisksRepository
+import com.haidoan.android.ceedee.ui.disk_screen.utils.Response
 
 
 class DiskImportFragment : Fragment() {
@@ -88,19 +90,33 @@ class DiskImportFragment : Fragment() {
                 ) {
                     edittextTotalPayment.error = "Invalid input!"
                 } else {
-                    showImportConfirmationDialog {
-                        viewModel.addNewImport(
-                            Import(
-                                supplierName = binding.textviewSupplierName.text.toString(),
-                                totalPayment = edittextTotalPayment.text.toString().toLong()
-                            ),
-                            diskTitlesToImportAndAmount,
-                            currentRequisitionId
-                        )
-                    }
+                    showImportConfirmationDialog { importDisks() }
                 }
             }
+        }
+    }
 
+    private fun importDisks() {
+        viewModel.addNewImport(
+            Import(
+                supplierName = binding.textviewSupplierName.text.toString(),
+                totalPayment = binding.edittextTotalPayment.text.toString().toLong()
+            ),
+            diskTitlesToImportAndAmount,
+            currentRequisitionId
+        ).observe(viewLifecycleOwner) { response ->
+            when (response) {
+                is Response.Loading -> {}
+                is Response.Failure -> {}
+                is Response.Success -> {
+                    findNavController().popBackStack()
+                    Toast.makeText(
+                        requireActivity(),
+                        "Import Success!",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            }
         }
     }
 

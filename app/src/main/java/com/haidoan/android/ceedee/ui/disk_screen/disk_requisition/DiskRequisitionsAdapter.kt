@@ -30,6 +30,7 @@ class DiskRequisitionAdapter(private val onButtonImportClick: (Requisition) -> U
                 if (requisition.requisitionStatus == "Completed") {
                     buttonImport.visibility = View.GONE
                 } else {
+                    buttonImport.visibility = View.VISIBLE
                     buttonImport.setOnClickListener { onButtonImportClick(requisition) }
                 }
             }

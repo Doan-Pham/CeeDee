@@ -1,5 +1,6 @@
 package com.haidoan.android.ceedee.ui.disk_screen.disk_import
 
+import android.util.Log
 import androidx.lifecycle.*
 import com.haidoan.android.ceedee.data.DiskTitle
 import com.haidoan.android.ceedee.data.Requisition
@@ -8,9 +9,11 @@ import com.haidoan.android.ceedee.data.disk_import.Import
 import com.haidoan.android.ceedee.data.disk_requisition.DiskRequisitionsRepository
 import com.haidoan.android.ceedee.ui.disk_screen.repository.DiskTitlesRepository
 import com.haidoan.android.ceedee.ui.disk_screen.repository.DisksRepository
+import com.haidoan.android.ceedee.ui.disk_screen.utils.Response
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
 
 // TODO: Implement the Repository
 class DiskImportViewModel(
@@ -57,14 +60,38 @@ class DiskImportViewModel(
         newImport: Import,
         diskTitlesToImportAndAmount: Map<String, Long>,
         requisitionId: String
-    ) {
-        viewModelScope.launch {
-            coroutineScope {
-                launch { diskImportRepository.addImport(newImport) }
-                launch { disksRepository.addMultipleDisks(diskTitlesToImportAndAmount) }
-                launch { diskRequisitionsRepository.completeRequisition(requisitionId) }
+    ) = liveData(context = viewModelScope.coroutineContext + Dispatchers.IO) {
+        coroutineScope {
+            val deferredTasks = listOf(
+                async { diskImportRepository.addImport(newImport) },
+                async { disksRepository.addMultipleDisks(diskTitlesToImportAndAmount) },
+                async { diskRequisitionsRepository.completeRequisition(requisitionId) }
+            )
+            val taskResponses = deferredTasks.awaitAll()
+            val taskResults = mutableListOf<Response<Any?>>()
+            for (response in taskResponses) {
+                response.collect { result ->
+                    Log.d(
+                        "DiskImportViewModel",
+                        "taskResponses.indexOf(result)" + taskResponses.indexOf(response)
+                    )
+                    taskResults.add(taskResponses.indexOf(response), result)
+
+                    // For some reason, using the set() method and [] cause app crash, so this is
+                    // a workaround for replacing old value
+                    if (taskResults.size > taskResponses.indexOf(response) + 1)
+                        taskResults.removeAt(taskResponses.indexOf(response) + 1)
+                    Log.d("DiskImportViewModel", "taskResults " + taskResults.toString())
+
+                    if (taskResults.size < taskResponses.size) return@collect
+
+                    if (taskResults.all { it is Response.Success }) emit(Response.Success(1))
+                    else if (taskResults.any { it is Response.Loading }) emit(Response.Loading<Int>())
+                    else if (taskResults.any { it is Response.Failure }) emit(Response.Failure("An error has occurred importing new disks"))
+                }
             }
         }
+
     }
 
     class Factory(
