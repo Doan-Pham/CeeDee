@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import com.haidoan.android.ceedee.data.DiskTitle
-import com.haidoan.android.ceedee.databinding.ItemDiskToImportBinding
+import com.haidoan.android.ceedee.databinding.ItemImportDiskToImportBinding
 
 class DiskImportAdapter :
     RecyclerView.Adapter<DiskImportAdapter.DiskRequisitionViewHolder>() {
@@ -29,7 +29,7 @@ class DiskImportAdapter :
     }
 
     class DiskRequisitionViewHolder(
-        private val binding: ItemDiskToImportBinding
+        private val binding: ItemImportDiskToImportBinding
     ) :
         RecyclerView.ViewHolder(binding.root) {
 
@@ -49,7 +49,7 @@ class DiskImportAdapter :
         viewType: Int
     ): DiskRequisitionViewHolder {
         val binding =
-            ItemDiskToImportBinding.inflate(
+            ItemImportDiskToImportBinding.inflate(
                 LayoutInflater.from(parent.context),
                 parent,
                 false

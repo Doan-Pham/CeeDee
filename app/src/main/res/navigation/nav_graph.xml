@@ -17,6 +17,9 @@
         <action
             android:id="@+id/action_diskFragment_to_diskImportFragment"
             app:destination="@id/diskImportFragment" />
+        <action
+            android:id="@+id/action_diskFragment_to_newRequisitionFragment"
+            app:destination="@id/newRequisitionFragment" />
     </fragment>
     <fragment
         android:id="@+id/rentalFragment"
@@ -43,4 +46,9 @@
             android:name="requisitionId"
             app:argType="string" />
     </fragment>
+    <fragment
+        android:id="@+id/newRequisitionFragment"
+        android:name="com.haidoan.android.ceedee.ui.disk_screen.disk_requisition.NewRequisitionFragment"
+        android:label="New Requisition"
+        tools:layout="@layout/fragment_new_requisition" />
 </navigation>

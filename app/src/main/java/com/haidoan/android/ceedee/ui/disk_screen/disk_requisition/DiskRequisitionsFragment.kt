@@ -113,11 +113,18 @@ class DiskRequisitionsFragment : Fragment() {
                         true
                     }
                     R.id.menu_item_disk_requisition_import -> {
+                        navigateToNewRequisitionFragment()
                         true
                     }
                     else -> false
                 }
             }
         }, viewLifecycleOwner, Lifecycle.State.RESUMED)
+    }
+
+    private fun navigateToNewRequisitionFragment() {
+        val action =
+            DiskFragmentDirections.actionDiskFragmentToNewRequisitionFragment()
+        findNavController().navigate(action)
     }
 }
