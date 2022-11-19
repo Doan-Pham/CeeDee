@@ -53,11 +53,16 @@ class DiskImportViewModel(
         _requisitionId.value = requisitionId
     }
 
-    fun addNewImport(newImport: Import, diskTitlesToImportAndAmount: Map<String, Long>) {
+    fun addNewImport(
+        newImport: Import,
+        diskTitlesToImportAndAmount: Map<String, Long>,
+        requisitionId: String
+    ) {
         viewModelScope.launch {
             coroutineScope {
                 launch { diskImportRepository.addImport(newImport) }
                 launch { disksRepository.addMultipleDisks(diskTitlesToImportAndAmount) }
+                launch { diskRequisitionsRepository.completeRequisition(requisitionId) }
             }
         }
     }

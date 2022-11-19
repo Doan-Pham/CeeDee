@@ -2,6 +2,7 @@
 
 package com.haidoan.android.ceedee.data.disk_requisition
 
+import android.util.Log
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.snapshots
@@ -45,4 +46,12 @@ class DiskRequisitionsFirestoreDataSource {
                     it.get("requisitionStatus") as String
                 )
             }
+
+    fun completeRequisition(requisitionId: String) {
+        firestoreDb.collection("Requisition").document(requisitionId)
+            .update("requisitionStatus", "Completed")
+            .addOnSuccessListener { Log.d(TAG, "DocumentSnapshot successfully updated!") }
+            .addOnFailureListener { e -> Log.w(TAG, "Error updating document", e) }
+
+    }
 }

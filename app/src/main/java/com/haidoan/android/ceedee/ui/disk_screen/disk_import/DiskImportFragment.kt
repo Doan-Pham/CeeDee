@@ -44,6 +44,7 @@ class DiskImportFragment : Fragment() {
     private lateinit var disksToImportAdapter: DiskImportAdapter
     private val navArgs: DiskImportFragmentArgs by navArgs()
 
+    private var currentRequisitionId = ""
     private val diskTitlesToImportAndAmount = mutableMapOf<String, Long>()
 
     override fun onCreateView(
@@ -66,6 +67,8 @@ class DiskImportFragment : Fragment() {
         viewModel.currentRequisition.observe(viewLifecycleOwner) { currentRequisition ->
             binding.textviewSupplierName.text = currentRequisition.supplierName
             binding.textviewSupplierEmail.text = currentRequisition.supplierEmail
+
+            currentRequisitionId = currentRequisition.id
 
             diskTitlesToImportAndAmount.clear()
             diskTitlesToImportAndAmount.putAll(currentRequisition.diskTitlesToImport)
@@ -91,7 +94,8 @@ class DiskImportFragment : Fragment() {
                                 supplierName = binding.textviewSupplierName.text.toString(),
                                 totalPayment = edittextTotalPayment.text.toString().toLong()
                             ),
-                            diskTitlesToImportAndAmount
+                            diskTitlesToImportAndAmount,
+                            currentRequisitionId
                         )
                     }
                 }
