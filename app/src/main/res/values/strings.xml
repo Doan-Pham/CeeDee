@@ -70,4 +70,5 @@
     <string name="pending">Pending</string>
     <string name="completed">Completed</string>
     <string name="all">All</string>
+    <string name="minus">Minus</string>
 </resources>
