@@ -3,6 +3,7 @@ package com.haidoan.android.ceedee.ui.disk_screen.disk_requisition
 import android.app.Dialog
 import android.os.Bundle
 import android.util.Log
+import android.widget.SearchView
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
@@ -36,10 +37,22 @@ class DisksToImportDialog : DialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         binding = DialogAddDiskToImportBinding.inflate(requireActivity().layoutInflater)
 
-
         disksToImportAdapter = DiskImportAdapter()
         binding.recyclerviewDisksToImport.adapter = disksToImportAdapter
         binding.recyclerviewDisksToImport.layoutManager = LinearLayoutManager(context)
+
+        binding.searchviewDiskToImport.setOnQueryTextListener(object :
+            SearchView.OnQueryTextListener,
+            androidx.appcompat.widget.SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                return false
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                disksToImportViewModel.searchDiskTitle(newText)
+                return false
+            }
+        })
 
         disksToImportViewModel.diskTitlesInStore.observe(this) { diskTitlesList ->
             val diskTitlesMap = mutableMapOf<DiskTitle, Long>()
@@ -52,8 +65,6 @@ class DisksToImportDialog : DialogFragment() {
 
         return AlertDialog.Builder(requireContext())
             .setView(binding.root)
-            .setPositiveButton("Ok") { _, _ ->
-            }
             .setNegativeButton("Cancel") { _, _ -> dialog?.cancel() }
             .create()
     }

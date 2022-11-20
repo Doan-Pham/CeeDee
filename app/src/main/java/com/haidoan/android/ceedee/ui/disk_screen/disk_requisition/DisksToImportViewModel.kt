@@ -7,14 +7,31 @@ import kotlinx.coroutines.Dispatchers
 
 class DisksToImportViewModel(private val diskTitlesRepository: DiskTitlesRepository) :
     ViewModel() {
-    private val _diskTitlesInStore =
+
+    private val searchQuery = MutableLiveData("")
+
+    private val _diskTitlesInStore = searchQuery.switchMap { currentSearchQuery ->
         liveData(context = viewModelScope.coroutineContext + Dispatchers.IO) {
             diskTitlesRepository.getDiskTitlesAvailableInStore()
-                .collect { emit(it) }
+                .collect {
+                    emit(it.filter { diskTitle ->
+                        diskTitle.name.contains(
+                            currentSearchQuery.toString(),
+                            true
+                        )
+                    })
+                }
         }
+    }
+
 
     val diskTitlesInStore: LiveData<List<DiskTitle>>
         get() = _diskTitlesInStore
+
+
+    fun searchDiskTitle(query: String?) {
+        searchQuery.value = query ?: ""
+    }
 
     class Factory(
         private val diskTitlesRepository: DiskTitlesRepository
