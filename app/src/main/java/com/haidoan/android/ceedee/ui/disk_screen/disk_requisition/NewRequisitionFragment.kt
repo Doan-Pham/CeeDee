@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.haidoan.android.ceedee.data.disk_requisition.DiskRequisitionsFirestoreDataSource
 import com.haidoan.android.ceedee.data.disk_requisition.DiskRequisitionsRepository
 import com.haidoan.android.ceedee.data.supplier.SupplierFirestoreDataSource
@@ -33,6 +34,7 @@ class NewRequisitionFragment : Fragment() {
             )
         )[NewRequisitionViewModel::class.java]
     }
+    private lateinit var disksToImportAdapter: NewRequisitionDiskAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -46,12 +48,21 @@ class NewRequisitionFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        disksToImportAdapter = NewRequisitionDiskAdapter()
+        binding.recyclerviewDisksToImport.adapter = disksToImportAdapter
+        binding.recyclerviewDisksToImport.layoutManager = LinearLayoutManager(context)
+
+
         viewModel.allSuppliers.observe(viewLifecycleOwner) { suppliers ->
             binding.spinnerSupplier.adapter = ArrayAdapter(
                 requireActivity().baseContext,
                 android.R.layout.simple_spinner_dropdown_item,
                 suppliers.map { it.name }
             )
+        }
+
+        viewModel.disksToImport.observe(viewLifecycleOwner) {
+            disksToImportAdapter.setDisksToImport(it)
         }
     }
 

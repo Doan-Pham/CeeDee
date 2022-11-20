@@ -26,7 +26,12 @@ class NewRequisitionViewModel(
 
     val disksToImport: LiveData<Map<DiskTitle, Long>>
         get() = _disksToImport
-    private val _disksToImport = MutableLiveData<Map<DiskTitle, Long>>()
+    private val _disksToImport = MutableLiveData<Map<DiskTitle, Long>>(
+        mapOf(
+            DiskTitle(name = "Ha") to 1.toLong(), DiskTitle(name = "Ba") to 1.toLong()
+        )
+
+    )
 
     class Factory(
         private val diskRequisitionsRepository: DiskRequisitionsRepository,

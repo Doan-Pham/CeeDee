@@ -54,36 +54,37 @@
                 android:orientation="horizontal">
 
                 <ImageButton
-                    android:id="@+id/button_plus"
+                    android:id="@+id/button_minus"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
-                    android:background="@drawable/background_imagebutton_roundcorner"
+                    android:backgroundTint="@color/white"
                     android:clickable="true"
-                    android:contentDescription="@string/Import"
+                    android:contentDescription="@string/minus"
                     android:focusable="true"
-                    android:src="@drawable/ic_baseline_calendar_month_24" />
+                    android:src="@drawable/ic_minus_black_round_16dp" />
 
                 <TextView
                     android:id="@+id/textview_disk_amount"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
-                    android:layout_marginHorizontal="10dp"
-                    android:text="1"
+                    android:text="@string/default_disk_to_import_count"
                     android:textColor="#474646"
                     android:textSize="14sp" />
 
                 <ImageButton
-                    android:id="@+id/button_minus"
-                    android:layout_width="14dp"
-                    android:layout_height="14dp"
+                    android:id="@+id/button_plus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
-                    android:backgroundTint="@color/light_grey"
+                    android:backgroundTint="@color/white"
                     android:clickable="true"
-                    android:contentDescription="@string/minus"
+                    android:contentDescription="@string/plus"
                     android:focusable="true"
-                    android:src="@drawable/ic_baseline_calendar_month_24" />
+                    android:src="@drawable/ic_plus_black_round_16dp" />
+
+
             </LinearLayout>
 
         </LinearLayout>
@@ -91,13 +92,16 @@
 
     <ImageButton
         android:id="@+id/button_delete"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:backgroundTint="@color/white"
         android:clickable="true"
         android:contentDescription="@string/Import"
         android:focusable="true"
-        android:src="@drawable/ic_baseline_calendar_month_24"
+        android:paddingHorizontal="10dp"
+        android:scaleX="1.5"
+        android:scaleY="1.5"
+        android:src="@drawable/ic_delete_black_24dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

@@ -66,13 +66,14 @@
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <ImageButton
+                    android:id="@+id/button_add_disk"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:backgroundTint="@color/white"
                     android:clickable="true"
                     android:contentDescription="@string/Import"
                     android:focusable="true"
-                    android:src="@drawable/ic_baseline_playlist_play_24" />
+                    android:src="@drawable/ic_round_add_24" />
             </LinearLayout>
 
 
