@@ -10,6 +10,7 @@ import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.haidoan.android.ceedee.data.disk_requisition.DiskRequisitionsFirestoreDataSource
 import com.haidoan.android.ceedee.data.disk_requisition.DiskRequisitionsRepository
@@ -101,8 +102,18 @@ class NewRequisitionFragment : Fragment() {
             else {
                 viewModel.addRequisition().observe(viewLifecycleOwner) { result ->
                     when (result) {
-                        is Response.Loading -> {}
-                        is Response.Success -> {}
+                        is Response.Loading -> {
+                            binding.linearlayoutContentWrapper.visibility = View.GONE
+                            binding.progressbarImport.visibility = View.VISIBLE
+                        }
+                        is Response.Success -> {
+                            findNavController().popBackStack()
+                            Toast.makeText(
+                                requireActivity(),
+                                "Requisition sent!",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
                         is Response.Failure -> {
                             Log.d(TAG, "Error: ${result.errorMessage}")
                         }

@@ -7,6 +7,7 @@
     <fragment
         android:id="@+id/diskFragment"
         android:name="com.haidoan.android.ceedee.ui.disk_screen.DiskFragment"
+        android:label="Disk"
         tools:layout="@layout/fragment_disk">
         <action
             android:id="@+id/action_diskFragment_to_diskDetailsFragment"
@@ -24,10 +25,12 @@
     <fragment
         android:id="@+id/rentalFragment"
         android:name="com.haidoan.android.ceedee.RentalFragment"
-        tools:layout="@layout/fragment_rental" />
+        tools:layout="@layout/fragment_rental"
+        android:label="Rental" />
     <fragment
         android:id="@+id/reportFragment"
         android:name="com.haidoan.android.ceedee.ui.report.fragment.ReportFragment"
+        android:label="Report"
         tools:layout="@layout/fragment_report" />
     <fragment
         android:id="@+id/diskDetailsFragment"
