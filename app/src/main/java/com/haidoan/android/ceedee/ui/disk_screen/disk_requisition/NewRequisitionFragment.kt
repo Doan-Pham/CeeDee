@@ -1,6 +1,7 @@
 package com.haidoan.android.ceedee.ui.disk_screen.disk_requisition
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -27,13 +28,14 @@ class NewRequisitionFragment : Fragment() {
     // onDestroyView.
     private val binding get() = _binding!!
 
-    private val viewModel: NewRequisitionViewModel by viewModels {
-        NewRequisitionViewModel.Factory(
-            DiskRequisitionsRepository(DiskRequisitionsFirestoreDataSource()),
-            DiskTitlesRepository(requireActivity().application),
-            SupplierRepository(SupplierFirestoreDataSource()),
-        )
-    }
+    private val viewModel: NewRequisitionViewModel by viewModels(
+        factoryProducer = {
+            NewRequisitionViewModel.Factory(
+                DiskRequisitionsRepository(DiskRequisitionsFirestoreDataSource()),
+                DiskTitlesRepository(requireActivity().application),
+                SupplierRepository(SupplierFirestoreDataSource()),
+            )
+        })
 
     private lateinit var disksToImportAdapter: NewRequisitionDiskAdapter
     private val suppliers = mutableListOf<Supplier>()
@@ -80,7 +82,8 @@ class NewRequisitionFragment : Fragment() {
 
         binding.buttonAddDisk.setOnClickListener {
             val disksToImportDialog = DisksToImportDialog()
-            disksToImportDialog.show(childFragmentManager, disksToImportDialog.tag)
+            disksToImportDialog.show(childFragmentManager, "DISK_TO_IMPORT_DIALOG")
+            //viewModel.addDiskTitleToImport(DiskTitle(name = "What"))
         }
         viewModel.allSuppliers.observe(viewLifecycleOwner) { allSuppliers ->
 
@@ -96,6 +99,7 @@ class NewRequisitionFragment : Fragment() {
 
         viewModel.disksToImport.observe(viewLifecycleOwner) {
             disksToImportAdapter.setDisksToImport(it)
+            Log.d(TAG, "disksToImport: $it")
         }
     }
 

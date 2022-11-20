@@ -10,6 +10,7 @@ import com.haidoan.android.ceedee.ui.disk_screen.repository.DiskTitlesRepository
 import kotlinx.coroutines.Dispatchers
 
 private const val TAG = "NewRequisitionViewModel"
+
 class NewRequisitionViewModel(
     private val diskRequisitionsRepository: DiskRequisitionsRepository,
     private val diskTitlesRepository: DiskTitlesRepository,
@@ -26,14 +27,18 @@ class NewRequisitionViewModel(
             }
         }
 
-    val disksToImport: LiveData<Map<DiskTitle, Long>>
-        get() = _disksToImport
+    val disksToImport: LiveData<MutableMap<DiskTitle, Long>>
+        get() = _diskTitlesToImport
 
-    private val _disksToImport = MutableLiveData<Map<DiskTitle, Long>>(
-        mapOf(
-            DiskTitle(name = "Ha") to 1.toLong(), DiskTitle(name = "Ba") to 1.toLong()
-        )
-    )
+    private val _diskTitlesToImport = MutableLiveData<MutableMap<DiskTitle, Long>>(mutableMapOf())
+
+    fun addDiskTitleToImport(diskTitle: DiskTitle) {
+        // Have to write all of this, or else livedata won't update
+        val currentDiskTitlesMap = _diskTitlesToImport.value
+        currentDiskTitlesMap?.put(diskTitle, 1)
+        _diskTitlesToImport.value = currentDiskTitlesMap!!
+        //Log.d(TAG, "addDiskTitleToImport : ${disksToImport.value}")
+    }
 
     private val _supplierOfNewRequisition = MutableLiveData<Supplier>()
 

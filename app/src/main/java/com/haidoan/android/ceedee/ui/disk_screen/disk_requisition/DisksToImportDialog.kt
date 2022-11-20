@@ -2,16 +2,13 @@ package com.haidoan.android.ceedee.ui.disk_screen.disk_requisition
 
 import android.app.Dialog
 import android.os.Bundle
-import android.util.Log
 import android.widget.SearchView
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.haidoan.android.ceedee.data.DiskTitle
 import com.haidoan.android.ceedee.databinding.DialogAddDiskToImportBinding
-import com.haidoan.android.ceedee.ui.disk_screen.disk_import.DiskImportAdapter
 import com.haidoan.android.ceedee.ui.disk_screen.repository.DiskTitlesRepository
 
 class DisksToImportDialog : DialogFragment() {
@@ -21,8 +18,12 @@ class DisksToImportDialog : DialogFragment() {
     }
 
     private lateinit var binding: DialogAddDiskToImportBinding
-    private val newRequisitionViewModel: NewRequisitionViewModel by viewModels(ownerProducer = { requireParentFragment() })
-    private val disksToImportViewModel: DisksToImportViewModel by lazy {
+
+    private val newRequisitionViewModel: NewRequisitionViewModel by viewModels(
+        ownerProducer = { requireParentFragment() })
+
+    private
+    val disksToImportViewModel: DisksToImportViewModel by lazy {
         ViewModelProvider(
             this, DisksToImportViewModel.Factory(
                 DiskTitlesRepository(requireActivity().application),
@@ -30,14 +31,18 @@ class DisksToImportDialog : DialogFragment() {
         )[DisksToImportViewModel::class.java]
     }
 
-    private lateinit var disksToImportAdapter: DiskImportAdapter
-    private val diskTitlesToImportAndAmount = mutableMapOf<String, Long>()
+    private lateinit var disksToImportAdapter: DisksToImportAdapter
+
+    private
+    val diskTitlesToImportAndAmount = mutableMapOf<String, Long>()
 
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         binding = DialogAddDiskToImportBinding.inflate(requireActivity().layoutInflater)
 
-        disksToImportAdapter = DiskImportAdapter()
+        disksToImportAdapter = DisksToImportAdapter { diskTitle ->
+            newRequisitionViewModel.addDiskTitleToImport(diskTitle)
+        }
         binding.recyclerviewDisksToImport.adapter = disksToImportAdapter
         binding.recyclerviewDisksToImport.layoutManager = LinearLayoutManager(context)
 
@@ -54,18 +59,13 @@ class DisksToImportDialog : DialogFragment() {
             }
         })
 
-        disksToImportViewModel.diskTitlesInStore.observe(this) { diskTitlesList ->
-            val diskTitlesMap = mutableMapOf<DiskTitle, Long>()
-            for (diskTitle in diskTitlesList) {
-                diskTitlesMap[diskTitle] = diskTitle.diskAmount
-            }
-            Log.d(TAG, "diskTitlesMap $diskTitlesMap")
-            disksToImportAdapter.setDisksToImport(diskTitlesMap)
+        disksToImportViewModel.diskTitlesInStore.observe(this) {
+            disksToImportAdapter.submitList(it)
         }
 
         return AlertDialog.Builder(requireContext())
             .setView(binding.root)
-            .setNegativeButton("Cancel") { _, _ -> dialog?.cancel() }
+            .setNegativeButton("Finish") { _, _ -> dialog?.cancel() }
             .create()
     }
 
