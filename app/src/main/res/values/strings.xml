@@ -65,4 +65,14 @@
     <string name="_0_cd">0 CD</string>
     <string name="disk_title">Disk Title</string>
     <string name="author">Author</string>
+    <string name="total_payment">Total payment</string>
+    <string name="payment">Payment</string>
+    <string name="pending">Pending</string>
+    <string name="completed">Completed</string>
+    <string name="all">All</string>
+    <string name="minus">Minus</string>
+    <string name="plus">Plus</string>
+    <string name="default_disk_to_import_count">1</string>
+    <string name="choose_disk_titles_to_import">Choose Disk Titles to Import</string>
+    <string name="proceed">Proceed</string>
 </resources>

@@ -1,6 +1,7 @@
 package com.haidoan.android.ceedee.ui.disk_screen.disk_requisition
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -25,8 +26,13 @@ class DiskRequisitionAdapter(private val onButtonImportClick: (Requisition) -> U
 
                 val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy")
                 textviewRequisitionSentDate.text = dateFormatter.format(requisition.sentDate)
-                buttonImport.setOnClickListener { onButtonImportClick(requisition) }
 
+                if (requisition.requisitionStatus == "Completed") {
+                    buttonImport.visibility = View.GONE
+                } else {
+                    buttonImport.visibility = View.VISIBLE
+                    buttonImport.setOnClickListener { onButtonImportClick(requisition) }
+                }
             }
         }
     }

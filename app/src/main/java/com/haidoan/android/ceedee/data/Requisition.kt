@@ -1,7 +1,6 @@
 package com.haidoan.android.ceedee.data
 
 import com.google.firebase.firestore.DocumentId
-import java.io.Serializable
 import java.time.LocalDate
 
 data class Requisition(
@@ -10,5 +9,6 @@ data class Requisition(
     val supplierName: String = "",
     val supplierEmail: String = "",
     val diskTitlesToImport: Map<String, Long> = mapOf(),
-    val sentDate: LocalDate = LocalDate.now()
-) : Serializable
+    val sentDate: LocalDate = LocalDate.now(),
+    val requisitionStatus: String = ""
+)

@@ -6,13 +6,11 @@ import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
-import com.google.firebase.firestore.ktx.snapshots
 import com.haidoan.android.ceedee.data.DiskTitle
 import com.haidoan.android.ceedee.ui.disk_screen.utils.Response
 import com.haidoan.android.ceedee.ui.disk_screen.utils.TypeUtils
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.tasks.await
 
 class DiskTitlesRepository(private val application: Application) {
@@ -83,12 +81,22 @@ class DiskTitlesRepository(private val application: Application) {
         }
     }
 
+    fun getDiskTitlesAvailableInStore() = flow {
+        emit(queryDiskTitle.whereGreaterThan("diskAmount", 0).get()
+            .await().documents.mapNotNull { it.toObject(DiskTitle::class.java) })
+    }
+
+
     //  This won't work if listOfId has more than 10 elements due to a limit of Firestore
-    //TODO: Modify the method to allow for more than 10 disk titles
-    fun getDiskTitlesByListOfId(listOfId: List<String>) =
-        queryDiskTitle.whereIn(FieldPath.documentId(), listOfId).snapshots().mapNotNull {
-            it.toObjects(DiskTitle::class.java)
-        }
+//TODO: Modify the method to allow for more than 10 disk titles
+    fun getDiskTitlesByListOfId(listOfId: List<String>) = flow {
+        emit(
+            queryDiskTitle.whereIn(FieldPath.documentId(), listOfId).get()
+                .await().documents.mapNotNull {
+                    it.toObject(DiskTitle::class.java)
+                })
+    }
+
 
     fun addDiskTitleToFireStore(
         author: String,
