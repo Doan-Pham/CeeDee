@@ -1,11 +1,13 @@
 package com.haidoan.android.ceedee.ui.disk_screen.disk_requisition
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -16,6 +18,7 @@ import com.haidoan.android.ceedee.data.supplier.SupplierFirestoreDataSource
 import com.haidoan.android.ceedee.data.supplier.SupplierRepository
 import com.haidoan.android.ceedee.databinding.FragmentNewRequisitionBinding
 import com.haidoan.android.ceedee.ui.disk_screen.repository.DiskTitlesRepository
+import com.haidoan.android.ceedee.ui.disk_screen.utils.Response
 
 private const val TAG = "NewRequisitionFrag"
 
@@ -87,6 +90,26 @@ class NewRequisitionFragment : Fragment() {
             val disksToImportDialog = DisksToImportDialog()
             disksToImportDialog.show(childFragmentManager, "DISK_TO_IMPORT_DIALOG")
             //viewModel.addDiskTitleToImport(DiskTitle(name = "What"))
+        }
+
+        binding.buttonProceed.setOnClickListener {
+            if (disksToImportAdapter.itemCount == 0) Toast.makeText(
+                requireActivity(),
+                "You need to enter at least 1 disk title",
+                Toast.LENGTH_LONG
+            ).show()
+            else {
+                viewModel.addRequisition().observe(viewLifecycleOwner) { result ->
+                    when (result) {
+                        is Response.Loading -> {}
+                        is Response.Success -> {}
+                        is Response.Failure -> {
+                            Log.d(TAG, "Error: ${result.errorMessage}")
+                        }
+                    }
+                }
+            }
+
         }
         viewModel.allSuppliers.observe(viewLifecycleOwner) { allSuppliers ->
 

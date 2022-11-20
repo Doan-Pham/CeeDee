@@ -1,6 +1,8 @@
 package com.haidoan.android.ceedee.data.disk_requisition
 
+import com.haidoan.android.ceedee.data.DiskTitle
 import com.haidoan.android.ceedee.data.Requisition
+import com.haidoan.android.ceedee.data.supplier.Supplier
 import com.haidoan.android.ceedee.ui.disk_screen.utils.Response
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -22,4 +24,12 @@ class DiskRequisitionsRepository(
         emit(Response.Success(firestoreDataSource.completeRequisition(requisitionId)))
     }
         .catch { emit(Response.Failure(it.message.toString())) }
+
+    suspend fun addRequisition(supplier: Supplier?, diskTitlesToImport: Map<DiskTitle, Long>) =
+        flow {
+            emit(Response.Loading())
+            emit(Response.Success(firestoreDataSource.addRequisition(supplier, diskTitlesToImport)))
+        }
+            .catch { emit(Response.Failure(it.message.toString())) }
+
 }

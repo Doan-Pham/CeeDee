@@ -6,7 +6,9 @@ import com.haidoan.android.ceedee.data.disk_requisition.DiskRequisitionsReposito
 import com.haidoan.android.ceedee.data.supplier.Supplier
 import com.haidoan.android.ceedee.data.supplier.SupplierRepository
 import com.haidoan.android.ceedee.ui.disk_screen.repository.DiskTitlesRepository
+import com.haidoan.android.ceedee.ui.disk_screen.utils.Response
 import kotlinx.coroutines.Dispatchers
+import okhttp3.internal.toImmutableMap
 
 private const val TAG = "NewRequisitionViewModel"
 
@@ -72,6 +74,15 @@ class NewRequisitionViewModel(
         _diskTitlesToImport.value = currentDiskTitlesMap!!
         //Log.d(TAG, "addDiskTitleToImport : ${disksToImport.value}")
     }
+
+    fun addRequisition() =
+        liveData(context = viewModelScope.coroutineContext + Dispatchers.IO) {
+            emit(Response.Loading())
+            diskRequisitionsRepository.addRequisition(
+                _supplierOfNewRequisition.value,
+                _diskTitlesToImport.value?.toImmutableMap()!!
+            ).collect { response -> emit(response) }
+        }
 
     private val _supplierOfNewRequisition = MutableLiveData<Supplier>()
 

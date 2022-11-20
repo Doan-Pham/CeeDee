@@ -74,4 +74,5 @@
     <string name="plus">Plus</string>
     <string name="default_disk_to_import_count">1</string>
     <string name="choose_disk_titles_to_import">Choose Disk Titles to Import</string>
+    <string name="proceed">Proceed</string>
 </resources>
