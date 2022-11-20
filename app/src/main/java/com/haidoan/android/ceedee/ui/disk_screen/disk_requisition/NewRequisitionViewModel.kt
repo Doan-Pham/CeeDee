@@ -1,5 +1,6 @@
 package com.haidoan.android.ceedee.ui.disk_screen.disk_requisition
 
+import android.util.Log
 import androidx.lifecycle.*
 import com.haidoan.android.ceedee.data.DiskTitle
 import com.haidoan.android.ceedee.data.disk_requisition.DiskRequisitionsRepository
@@ -8,6 +9,7 @@ import com.haidoan.android.ceedee.data.supplier.SupplierRepository
 import com.haidoan.android.ceedee.ui.disk_screen.repository.DiskTitlesRepository
 import kotlinx.coroutines.Dispatchers
 
+private const val TAG = "NewRequisitionViewModel"
 class NewRequisitionViewModel(
     private val diskRequisitionsRepository: DiskRequisitionsRepository,
     private val diskTitlesRepository: DiskTitlesRepository,
@@ -26,12 +28,20 @@ class NewRequisitionViewModel(
 
     val disksToImport: LiveData<Map<DiskTitle, Long>>
         get() = _disksToImport
+
     private val _disksToImport = MutableLiveData<Map<DiskTitle, Long>>(
         mapOf(
             DiskTitle(name = "Ha") to 1.toLong(), DiskTitle(name = "Ba") to 1.toLong()
         )
-
     )
+
+    private val _supplierOfNewRequisition = MutableLiveData<Supplier>()
+
+    fun setSupplierOfNewRequisition(supplier: Supplier) {
+        _supplierOfNewRequisition.value = supplier
+        Log.d(TAG, "Current supplier: ${_supplierOfNewRequisition.value}")
+    }
+
 
     class Factory(
         private val diskRequisitionsRepository: DiskRequisitionsRepository,

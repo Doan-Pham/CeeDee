@@ -4,12 +4,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.haidoan.android.ceedee.data.disk_requisition.DiskRequisitionsFirestoreDataSource
 import com.haidoan.android.ceedee.data.disk_requisition.DiskRequisitionsRepository
+import com.haidoan.android.ceedee.data.supplier.Supplier
 import com.haidoan.android.ceedee.data.supplier.SupplierFirestoreDataSource
 import com.haidoan.android.ceedee.data.supplier.SupplierRepository
 import com.haidoan.android.ceedee.databinding.FragmentNewRequisitionBinding
@@ -35,6 +37,7 @@ class NewRequisitionFragment : Fragment() {
         )[NewRequisitionViewModel::class.java]
     }
     private lateinit var disksToImportAdapter: NewRequisitionDiskAdapter
+    private val suppliers = mutableListOf<Supplier>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -52,8 +55,34 @@ class NewRequisitionFragment : Fragment() {
         binding.recyclerviewDisksToImport.adapter = disksToImportAdapter
         binding.recyclerviewDisksToImport.layoutManager = LinearLayoutManager(context)
 
+        binding.spinnerSupplier.onItemSelectedListener = object : AdapterView.OnItemClickListener,
+            AdapterView.OnItemSelectedListener {
 
-        viewModel.allSuppliers.observe(viewLifecycleOwner) { suppliers ->
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
+                viewModel.setSupplierOfNewRequisition(suppliers[position])
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {}
+
+            override fun onItemClick(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
+            }
+
+        }
+        viewModel.allSuppliers.observe(viewLifecycleOwner) { allSuppliers ->
+
+            suppliers.clear()
+            suppliers.addAll(allSuppliers)
+
             binding.spinnerSupplier.adapter = ArrayAdapter(
                 requireActivity().baseContext,
                 android.R.layout.simple_spinner_dropdown_item,

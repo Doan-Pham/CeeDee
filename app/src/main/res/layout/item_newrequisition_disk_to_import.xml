@@ -99,8 +99,6 @@
         android:contentDescription="@string/Import"
         android:focusable="true"
         android:paddingHorizontal="10dp"
-        android:scaleX="1.5"
-        android:scaleY="1.5"
         android:src="@drawable/ic_delete_black_24dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
