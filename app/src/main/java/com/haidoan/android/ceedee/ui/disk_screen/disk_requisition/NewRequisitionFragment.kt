@@ -1,7 +1,6 @@
 package com.haidoan.android.ceedee.ui.disk_screen.disk_requisition
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -52,7 +51,10 @@ class NewRequisitionFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        disksToImportAdapter = NewRequisitionDiskAdapter()
+        disksToImportAdapter = NewRequisitionDiskAdapter(
+            onButtonMinusClick = { diskTitle -> viewModel.decrementDiskTitleAmount(diskTitle) },
+            onButtonPlusClick = { diskTitle -> viewModel.incrementDiskTitleAmount(diskTitle) })
+
         binding.recyclerviewDisksToImport.adapter = disksToImportAdapter
         binding.recyclerviewDisksToImport.layoutManager = LinearLayoutManager(context)
 
@@ -99,7 +101,7 @@ class NewRequisitionFragment : Fragment() {
 
         viewModel.disksToImport.observe(viewLifecycleOwner) {
             disksToImportAdapter.setDisksToImport(it)
-            Log.d(TAG, "disksToImport: $it")
+            //Log.d(TAG, "disksToImport: $it")
         }
     }
 

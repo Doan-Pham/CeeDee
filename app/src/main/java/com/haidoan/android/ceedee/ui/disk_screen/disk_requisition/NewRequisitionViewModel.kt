@@ -1,6 +1,5 @@
 package com.haidoan.android.ceedee.ui.disk_screen.disk_requisition
 
-import android.util.Log
 import androidx.lifecycle.*
 import com.haidoan.android.ceedee.data.DiskTitle
 import com.haidoan.android.ceedee.data.disk_requisition.DiskRequisitionsRepository
@@ -40,11 +39,39 @@ class NewRequisitionViewModel(
         //Log.d(TAG, "addDiskTitleToImport : ${disksToImport.value}")
     }
 
+    fun incrementDiskTitleAmount(diskTitle: DiskTitle) {
+        val currentDiskTitlesMap = _diskTitlesToImport.value
+        val diskTitleCurrentAmount = currentDiskTitlesMap?.get(diskTitle) ?: 1
+        if (diskTitleCurrentAmount < diskTitle.diskAmount) {
+            currentDiskTitlesMap?.put(
+                diskTitle,
+                diskTitleCurrentAmount + 1
+            )
+        }
+
+        _diskTitlesToImport.value = currentDiskTitlesMap!!
+        //Log.d(TAG, "addDiskTitleToImport : ${disksToImport.value}")
+    }
+
+    fun decrementDiskTitleAmount(diskTitle: DiskTitle) {
+        val currentDiskTitlesMap = _diskTitlesToImport.value
+        val diskTitleCurrentAmount = currentDiskTitlesMap?.get(diskTitle) ?: 1
+        if (diskTitleCurrentAmount > 1) {
+            currentDiskTitlesMap?.put(
+                diskTitle,
+                diskTitleCurrentAmount - 1
+            )
+        }
+        _diskTitlesToImport.value = currentDiskTitlesMap!!
+        //Log.d(TAG, "addDiskTitleToImport : ${disksToImport.value}")
+    }
+
+
     private val _supplierOfNewRequisition = MutableLiveData<Supplier>()
 
     fun setSupplierOfNewRequisition(supplier: Supplier) {
         _supplierOfNewRequisition.value = supplier
-        Log.d(TAG, "Current supplier: ${_supplierOfNewRequisition.value}")
+        //Log.d(TAG, "Current supplier: ${_supplierOfNewRequisition.value}")
     }
 
 

@@ -8,7 +8,10 @@ import coil.load
 import com.haidoan.android.ceedee.data.DiskTitle
 import com.haidoan.android.ceedee.databinding.ItemNewrequisitionDiskToImportBinding
 
-class NewRequisitionDiskAdapter :
+class NewRequisitionDiskAdapter(
+    private val onButtonMinusClick: (DiskTitle) -> Unit,
+    private val onButtonPlusClick: (DiskTitle) -> Unit
+) :
     RecyclerView.Adapter<NewRequisitionDiskAdapter.NewRequisitionDiskViewHolder>() {
 
     private var disksToImportList: ArrayList<Pair<DiskTitle, Long>> = arrayListOf()
@@ -29,7 +32,9 @@ class NewRequisitionDiskAdapter :
     }
 
     class NewRequisitionDiskViewHolder(
-        private val binding: ItemNewrequisitionDiskToImportBinding
+        private val binding: ItemNewrequisitionDiskToImportBinding,
+        private val onButtonMinusClick: (DiskTitle) -> Unit,
+        private val onButtonPlusClick: (DiskTitle) -> Unit
     ) :
         RecyclerView.ViewHolder(binding.root) {
 
@@ -39,6 +44,9 @@ class NewRequisitionDiskAdapter :
                 textviewDiskTitle.text = diskTitle.name
                 val diskAmountString = "${diskAmount ?: 0}"
                 textviewDiskAmount.text = diskAmountString
+
+                buttonMinus.setOnClickListener { onButtonMinusClick(diskTitle) }
+                buttonPlus.setOnClickListener { onButtonPlusClick(diskTitle) }
             }
         }
     }
@@ -53,7 +61,7 @@ class NewRequisitionDiskAdapter :
                 parent,
                 false
             )
-        return NewRequisitionDiskViewHolder(binding)
+        return NewRequisitionDiskViewHolder(binding, onButtonMinusClick, onButtonPlusClick)
     }
 
     override fun onBindViewHolder(holder: NewRequisitionDiskViewHolder, position: Int) {
