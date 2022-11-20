@@ -53,7 +53,8 @@ class NewRequisitionFragment : Fragment() {
 
         disksToImportAdapter = NewRequisitionDiskAdapter(
             onButtonMinusClick = { diskTitle -> viewModel.decrementDiskTitleAmount(diskTitle) },
-            onButtonPlusClick = { diskTitle -> viewModel.incrementDiskTitleAmount(diskTitle) })
+            onButtonPlusClick = { diskTitle -> viewModel.incrementDiskTitleAmount(diskTitle) },
+            onButtonRemoveClick = { diskTitle -> viewModel.removeDiskTitleToImport(diskTitle) })
 
         binding.recyclerviewDisksToImport.adapter = disksToImportAdapter
         binding.recyclerviewDisksToImport.layoutManager = LinearLayoutManager(context)

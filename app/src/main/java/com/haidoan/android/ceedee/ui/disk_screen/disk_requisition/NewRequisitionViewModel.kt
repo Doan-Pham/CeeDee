@@ -66,6 +66,12 @@ class NewRequisitionViewModel(
         //Log.d(TAG, "addDiskTitleToImport : ${disksToImport.value}")
     }
 
+    fun removeDiskTitleToImport(diskTitle: DiskTitle) {
+        val currentDiskTitlesMap = _diskTitlesToImport.value
+        currentDiskTitlesMap?.remove(diskTitle)
+        _diskTitlesToImport.value = currentDiskTitlesMap!!
+        //Log.d(TAG, "addDiskTitleToImport : ${disksToImport.value}")
+    }
 
     private val _supplierOfNewRequisition = MutableLiveData<Supplier>()
 
