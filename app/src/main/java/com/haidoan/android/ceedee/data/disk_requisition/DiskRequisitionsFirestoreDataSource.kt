@@ -19,7 +19,7 @@ private const val TAG = "DiskReqFirestoreDataSrc"
 class DiskRequisitionsFirestoreDataSource {
     private val firestoreDb: FirebaseFirestore = FirebaseFirestore.getInstance()
 
-
+    // For some reason, the snapshots() API is very buggy and sometimes causes app crash
     fun getRequisitionsStream(): Flow<List<Requisition>> = flow {
         emit(firestoreDb.collection("Requisition").get().await().documents.mapNotNull {
             Requisition(

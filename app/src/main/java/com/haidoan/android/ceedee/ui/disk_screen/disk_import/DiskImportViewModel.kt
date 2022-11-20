@@ -39,6 +39,7 @@ class DiskImportViewModel(
         liveData(context = viewModelScope.coroutineContext + Dispatchers.IO) {
             diskTitlesRepository.getDiskTitlesByListOfId(requisition.diskTitlesToImport.keys.toList())
                 .collect { diskTitlesList ->
+                    if (diskTitlesList.isEmpty()) return@collect
                     val diskTitlesToImportMap = mutableMapOf<DiskTitle, Long>()
                     for (key in requisition.diskTitlesToImport.keys) {
                         diskTitlesToImportMap[diskTitlesList.first { it.id == key }] =
