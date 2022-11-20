@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.haidoan.android.ceedee.data.disk_requisition.DiskRequisitionsFirestoreDataSource
 import com.haidoan.android.ceedee.data.disk_requisition.DiskRequisitionsRepository
@@ -27,15 +27,14 @@ class NewRequisitionFragment : Fragment() {
     // onDestroyView.
     private val binding get() = _binding!!
 
-    private val viewModel: NewRequisitionViewModel by lazy {
-        ViewModelProvider(
-            this, NewRequisitionViewModel.Factory(
-                DiskRequisitionsRepository(DiskRequisitionsFirestoreDataSource()),
-                DiskTitlesRepository(requireActivity().application),
-                SupplierRepository(SupplierFirestoreDataSource()),
-            )
-        )[NewRequisitionViewModel::class.java]
+    private val viewModel: NewRequisitionViewModel by viewModels {
+        NewRequisitionViewModel.Factory(
+            DiskRequisitionsRepository(DiskRequisitionsFirestoreDataSource()),
+            DiskTitlesRepository(requireActivity().application),
+            SupplierRepository(SupplierFirestoreDataSource()),
+        )
     }
+
     private lateinit var disksToImportAdapter: NewRequisitionDiskAdapter
     private val suppliers = mutableListOf<Supplier>()
 
@@ -77,6 +76,11 @@ class NewRequisitionFragment : Fragment() {
             ) {
             }
 
+        }
+
+        binding.buttonAddDisk.setOnClickListener {
+            val disksToImportDialog = DisksToImportDialog()
+            disksToImportDialog.show(childFragmentManager, disksToImportDialog.tag)
         }
         viewModel.allSuppliers.observe(viewLifecycleOwner) { allSuppliers ->
 

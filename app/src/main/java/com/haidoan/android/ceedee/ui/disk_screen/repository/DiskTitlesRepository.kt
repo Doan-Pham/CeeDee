@@ -83,8 +83,12 @@ class DiskTitlesRepository(private val application: Application) {
         }
     }
 
+    fun getDiskTitlesAvailableInStore() =
+        queryDiskTitle.whereGreaterThan("diskAmount", 0).snapshots()
+            .mapNotNull { it.toObjects(DiskTitle::class.java) }
+
     //  This won't work if listOfId has more than 10 elements due to a limit of Firestore
-    //TODO: Modify the method to allow for more than 10 disk titles
+//TODO: Modify the method to allow for more than 10 disk titles
     fun getDiskTitlesByListOfId(listOfId: List<String>) =
         queryDiskTitle.whereIn(FieldPath.documentId(), listOfId).snapshots().mapNotNull {
             it.toObjects(DiskTitle::class.java)
