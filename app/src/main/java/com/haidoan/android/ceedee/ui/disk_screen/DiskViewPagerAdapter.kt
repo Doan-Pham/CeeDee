@@ -7,17 +7,17 @@ import com.haidoan.android.ceedee.ui.disk_screen.disk_requisition.DiskRequisitio
 import com.haidoan.android.ceedee.ui.disk_screen.disk_titles.DiskTitlesTabFragment
 import com.haidoan.android.ceedee.ui.disk_screen.disks.DisksTabFragment
 
-class DiskViewPagerAdapter (fragment: DiskFragment): FragmentStateAdapter(fragment) {
+class DiskViewPagerAdapter(fragment: DiskFragment) : FragmentStateAdapter(fragment) {
     override fun getItemCount(): Int {
-        return 2
+        return 3
     }
 
     override fun createFragment(position: Int): Fragment {
-        return when(position){
-            0->{
+        return when (position) {
+            0 -> {
                 DiskTitlesTabFragment()
             }
-            1->{
+            1 -> {
                 DisksTabFragment()
             }
             else -> {
