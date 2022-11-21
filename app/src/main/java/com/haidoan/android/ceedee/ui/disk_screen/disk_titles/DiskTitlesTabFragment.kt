@@ -62,14 +62,13 @@ class DiskTitlesTabFragment : Fragment() {
         createMenu()
     }
 
-    private fun init() {
+     fun init() {
         diskTitlesViewModel = ViewModelProvider(requireActivity())[DiskTitlesViewModel::class.java]
 
-        diskTitleAdapter = DiskTitlesAdapter()
+        diskTitleAdapter = DiskTitlesAdapter(requireActivity())
         diskTitleAdapter.setDiskTitlesViewModel(diskTitlesViewModel)
         diskTitleAdapter.setLifecycleOwner(viewLifecycleOwner)
-        diskTitleAdapter.setNavController(requireActivity().findNavController(R.id.mainContainer))
-
+        diskTitleAdapter.setDiskTitlesTabFragment(this)
         genreAdapter = GenreAdapter(
             context = requireActivity().baseContext,
             diskTitlesViewModel = diskTitlesViewModel,
@@ -210,7 +209,6 @@ class DiskTitlesTabFragment : Fragment() {
         }, viewLifecycleOwner, Lifecycle.State.RESUMED)
     }
 
-
     private fun sortByCDAmount(type: TypeUtils.SORT_BY_AMOUNT) {
         diskTitleAdapter.sortByCDAmount(type)
     }
@@ -264,7 +262,6 @@ class DiskTitlesTabFragment : Fragment() {
                     makeToast("Add genre fail!")
                 }
             }
-
         }
     }
 

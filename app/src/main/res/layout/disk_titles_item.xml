@@ -65,9 +65,9 @@
 
     <ImageButton
         android:id="@+id/img_disk_titles_btn_more"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:layout_marginEnd="20dp"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginEnd="2dp"
         android:background="?attr/selectableItemBackground"
 
         android:contentDescription="@string/more"

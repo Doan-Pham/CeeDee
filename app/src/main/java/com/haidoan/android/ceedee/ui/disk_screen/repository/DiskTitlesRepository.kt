@@ -1,11 +1,15 @@
 package com.haidoan.android.ceedee.ui.disk_screen.repository
 
 import android.app.Application
+import android.net.Uri
 import android.util.Log
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+import com.google.firebase.firestore.ktx.snapshots
+import com.google.firebase.storage.FirebaseStorage
+
 import com.haidoan.android.ceedee.data.DiskTitle
 import com.haidoan.android.ceedee.ui.disk_screen.utils.Response
 import com.haidoan.android.ceedee.ui.disk_screen.utils.TypeUtils
@@ -17,9 +21,23 @@ class DiskTitlesRepository(private val application: Application) {
     private val db: FirebaseFirestore = FirebaseFirestore.getInstance()
 
     private var queryDiskTitle: CollectionReference = db.collection("DiskTitle")
+    private val storageReference = FirebaseStorage.getInstance().reference
 
     init {
 
+    }
+
+    fun deleteDiskTitleFromFireStore(id: String) = flow {
+        emit(Response.Loading())
+        emit(
+            Response.Success(
+                queryDiskTitle.document(id).delete()
+            )
+        )
+    }.catch { error ->
+        error.message?.let { errorMessage ->
+            emit(Response.Failure(errorMessage))
+        }
     }
 
     fun getDiskTitleFilterByGenreIdFromFireStore(id: String) = flow {
@@ -123,4 +141,67 @@ class DiskTitlesRepository(private val application: Application) {
             emit(Response.Failure(errorMessage))
         }
     }
+
+    fun updateDiskTitleToFireStore(
+        id: String,
+        author: String,
+        coverImageUrl: String,
+        description: String,
+        genreId: String,
+        name: String
+    ) = flow {
+        val hash = hashMapOf(
+            "author" to author,
+            "coverImageUrl" to coverImageUrl,
+            "description" to description,
+            "genreId" to genreId,
+            "name" to name
+        )
+
+        emit(Response.Loading())
+        emit(
+            Response.Success(
+                queryDiskTitle.document(id).update(
+                    "author", author,
+                    "coverImageUrl", coverImageUrl,
+                    "description", description,
+                    "genreId", genreId,
+                    "name", name
+                ).await()
+            )
+        )
+    }.catch { error ->
+        error.message?.let { errorMessage ->
+            emit(Response.Failure(errorMessage))
+        }
+    }
+
+    fun addImageToFireStore(
+        filePath: Uri?,
+        name: String?
+    ) = flow {
+        val ref = storageReference
+            .child("disk_titles_img/$name")
+        emit(Response.Loading())
+        emit(
+            Response.Success(
+                ref
+                    .putFile(filePath!!)
+                    .continueWithTask { task ->
+                        if (!task.isSuccessful) {
+                            task.exception?.let {
+                                throw it
+                            }
+                        }
+                        return@continueWithTask ref.downloadUrl
+                    }
+                    .await()
+            )
+        )
+    }.catch { error ->
+        error.message?.let { errorMessage ->
+            emit(Response.Failure(errorMessage))
+        }
+    }
+
 }

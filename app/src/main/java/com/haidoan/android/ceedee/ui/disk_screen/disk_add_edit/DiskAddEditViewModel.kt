@@ -1,6 +1,7 @@
 package com.haidoan.android.ceedee.ui.disk_screen.disk_add_edit
 
 import android.app.Application
+import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.liveData
 import com.haidoan.android.ceedee.ui.disk_screen.repository.DiskTitlesRepository
@@ -16,14 +17,52 @@ class DiskAddEditViewModel(application: Application) : AndroidViewModel(applicat
         diskTitlesRepository = DiskTitlesRepository(application)
     }
 
-    fun addDiskTitle(author: String, coverImageUrl: String, description: String, genreId: String, name: String) = liveData(Dispatchers.IO) {
-        diskTitlesRepository.addDiskTitleToFireStore(author,coverImageUrl,description,genreId,name).collect { response ->
+    fun addDiskTitle(
+        author: String,
+        coverImageUrl: String,
+        description: String,
+        genreId: String,
+        name: String
+    ) = liveData(Dispatchers.IO) {
+        diskTitlesRepository.addDiskTitleToFireStore(
+            author,
+            coverImageUrl,
+            description,
+            genreId,
+            name
+        ).collect { response ->
+            emit(response)
+        }
+    }
+
+    fun updateDiskTitle(
+        id: String,
+        author: String,
+        coverImageUrl: String,
+        description: String,
+        genreId: String,
+        name: String
+    ) = liveData(Dispatchers.IO) {
+        diskTitlesRepository.updateDiskTitleToFireStore(
+            id,
+            author,
+            coverImageUrl,
+            description,
+            genreId,
+            name
+        ).collect { response ->
             emit(response)
         }
     }
 
     fun getGenres() = liveData(Dispatchers.IO) {
         genreRepository.getGenresFromFireStore().collect { response ->
+            emit(response)
+        }
+    }
+
+    fun addImage(filePath: Uri?, name: String?) = liveData(Dispatchers.IO) {
+        diskTitlesRepository.addImageToFireStore(filePath,name).collect { response ->
             emit(response)
         }
     }

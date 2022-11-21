@@ -1,12 +1,15 @@
 package com.haidoan.android.ceedee.ui.disk_screen.disk_titles
 
 import android.annotation.SuppressLint
+import android.app.AlertDialog
+import android.content.Context
+import android.os.Build
+import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
-import android.widget.Filter
-import android.widget.Filterable
-import android.widget.ImageView
+import android.widget.*
 import androidx.core.net.toUri
 import androidx.core.os.bundleOf
 import androidx.lifecycle.LifecycleOwner
@@ -19,22 +22,25 @@ import coil.load
 import com.haidoan.android.ceedee.R
 import com.haidoan.android.ceedee.data.DiskTitle
 import com.haidoan.android.ceedee.databinding.DiskTitlesItemBinding
+import com.haidoan.android.ceedee.databinding.FragmentDiskTabDiskTitlesBinding
 import com.haidoan.android.ceedee.ui.disk_screen.utils.Response
 
 import com.haidoan.android.ceedee.ui.disk_screen.utils.TypeUtils
+import java.io.Serializable
 import java.util.*
 
 @SuppressLint("NotifyDataSetChanged")
-class DiskTitlesAdapter: ListAdapter<DiskTitle, DiskTitlesAdapter.DiskTitlesViewHolder>(DiskTitleUtils()),
+class DiskTitlesAdapter(private val context: Context) :
+    ListAdapter<DiskTitle, DiskTitlesAdapter.DiskTitlesViewHolder>(DiskTitleUtils()),
     Filterable {
 
     private val displayedDiskTitles = arrayListOf<DiskTitle>()
     private val allDiskTitles = arrayListOf<DiskTitle>()
     private val allDiskTitleFilterByGenre = arrayListOf<DiskTitle>()
 
-    private lateinit var navController: NavController
     private lateinit var diskTitlesViewModel: DiskTitlesViewModel
     private lateinit var viewLifecycleOwner: LifecycleOwner
+    private lateinit var diskTitlesTabFragment: DiskTitlesTabFragment
 
     private lateinit var genreAdapter: GenreAdapter
 
@@ -55,21 +61,20 @@ class DiskTitlesAdapter: ListAdapter<DiskTitle, DiskTitlesAdapter.DiskTitlesView
         allDiskTitleFilterByGenre.addAll(newList.toList())
     }
 
-    fun setGenreAdapter(g: GenreAdapter){
-        genreAdapter=g
+    fun setDiskTitlesTabFragment(fragment: DiskTitlesTabFragment) {
+        diskTitlesTabFragment = fragment;
     }
 
-
-    fun setLifecycleOwner(lco: LifecycleOwner){
-        viewLifecycleOwner=lco
+    fun setGenreAdapter(g: GenreAdapter) {
+        genreAdapter = g
     }
 
-    fun setNavController(nav: NavController){
-        navController=nav
+    fun setLifecycleOwner(lco: LifecycleOwner) {
+        viewLifecycleOwner = lco
     }
 
-    fun setDiskTitlesViewModel(viewModel: DiskTitlesViewModel){
-        diskTitlesViewModel=viewModel
+    fun setDiskTitlesViewModel(viewModel: DiskTitlesViewModel) {
+        diskTitlesViewModel = viewModel
     }
 
     fun getListData(): ArrayList<DiskTitle> {
@@ -136,7 +141,6 @@ class DiskTitlesAdapter: ListAdapter<DiskTitle, DiskTitlesAdapter.DiskTitlesView
             binding = binding,
             viewLifecycleOwner = viewLifecycleOwner,
             diskTitlesViewModel = diskTitlesViewModel,
-            nav = navController
         )
     }
 
@@ -159,7 +163,6 @@ class DiskTitlesAdapter: ListAdapter<DiskTitle, DiskTitlesAdapter.DiskTitlesView
         private val binding: DiskTitlesItemBinding,
         private val diskTitlesViewModel: DiskTitlesViewModel,
         private val viewLifecycleOwner: LifecycleOwner,
-        private val nav: NavController
     ) : RecyclerView.ViewHolder(binding.root) {
         fun setData(item: DiskTitle) {
             binding.apply {
@@ -202,27 +205,118 @@ class DiskTitlesAdapter: ListAdapter<DiskTitle, DiskTitlesAdapter.DiskTitlesView
         }
 
         init {
-            itemView.setOnClickListener { view->
-                val diskTitle = getItemAt(bindingAdapterPosition)
-
-                val listGenre = genreAdapter.getAllGenres()
-                lateinit var genre: String
-                for (item in listGenre){
-                    if (item.id==diskTitle.genreId){
-                        genre = item.name
-                        break
-                    }
-                }
-                Log.d("TAG_GENRE", listGenre.toString())
-                val bundle = bundleOf("disk_title" to diskTitle,
-                                        "amount_disk_title" to mapDiskTitleAmount[diskTitle],
-                                        "genre_name" to genre)
+            itemView.setOnClickListener { view ->
+                val bundle = getBundleDiskTitle()
                 view.findNavController().navigate(R.id.diskDetailsFragment, bundle)
             }
 
             binding.imgDiskTitlesBtnMore.setOnClickListener {
+                val popupMenu = PopupMenu(context, binding.imgDiskTitlesBtnMore)
+                popupMenu.menuInflater.inflate(
+                    R.menu.popup_menu_disk_title_tab_more_btn,
+                    popupMenu.menu
+                )
+                popupMenu.setOnMenuItemClickListener(PopupMenu.OnMenuItemClickListener { item ->
+                    when (item.itemId) {
+                        R.id.popup_disk_title_add_to_import -> {
+                            //TODO: Add to import
+                        }
+                        R.id.popup_disk_title_edit -> {
+                            goToAddEditScreen()
+                        }
+                        R.id.popup_disk_title_delete -> {
+                            deleteDiskTitle()
+                        }
+                    }
+                    true
+                })
+                popupMenu.show()
+            }
+        }
+
+        private fun deleteDiskTitle() {
+            val bundle = getBundleDiskTitle()
+            val amount = bundle.getLong("amount_disk_title")
+            val diskTitle = bundle.customGetSerializable<DiskTitle>("disk_title")
+
+            if (amount > 0) {
+                Toast.makeText(
+                    context,
+                    "Can't be delete disk title because it contain disks",
+                    Toast.LENGTH_SHORT
+                ).show()
+            } else {
+                displayAlertDialogDeleteDiskTitle(diskTitle)
+            }
+        }
+
+        private fun displayAlertDialogDeleteDiskTitle(diskTitleNeedToDelete: DiskTitle?) {
+            val builder = AlertDialog.Builder(context)
+            builder.setTitle("Delete this disk title?")
+
+            builder.setPositiveButton("DELETE") { dialogInterface, i ->
+                deleteDiskTitleFromFireStore(diskTitleNeedToDelete)
+            }
+            builder.setNegativeButton("CANCEL") { dialogLayout, i ->
 
             }
+            builder.show()
+        }
+
+        private fun deleteDiskTitleFromFireStore(diskTitle: DiskTitle?) {
+            diskTitlesViewModel.deleteDiskTitle(diskTitle!!.id)
+                .observe(viewLifecycleOwner) { response ->
+                    when (response) {
+                        is Response.Loading -> {
+
+                        }
+                        is Response.Success -> {
+                            diskTitlesTabFragment.init();
+                            Toast.makeText(
+                                context,
+                                "Delete disk title success!",
+                                Toast.LENGTH_SHORT
+                            ).show()
+
+                        }
+                        is Response.Failure -> {
+
+                        }
+                    }
+                }
+        }
+
+        private fun goToAddEditScreen() {
+            val bundle = getBundleDiskTitle()
+            itemView.findNavController().navigate(R.id.diskAddEditFragment, bundle)
+        }
+
+        private fun getBundleDiskTitle(): Bundle {
+            val diskTitle = getItemAt(bindingAdapterPosition)
+
+            val listGenre = genreAdapter.getAllGenres()
+            lateinit var genre: String
+            for (item in listGenre) {
+                if (item.id == diskTitle.genreId) {
+                    genre = item.name
+                    break
+                }
+            }
+
+            return bundleOf(
+                "disk_title" to diskTitle,
+                "amount_disk_title" to mapDiskTitleAmount[diskTitle],
+                "genre_name" to genre
+            )
+        }
+    }
+
+    @Suppress("DEPRECATION")
+    inline fun <reified T : Serializable> Bundle.customGetSerializable(key: String): T? {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            getSerializable(key, T::class.java)
+        } else {
+            getSerializable(key) as? T
         }
     }
 
