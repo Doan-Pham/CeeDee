@@ -6,10 +6,10 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import com.haidoan.android.ceedee.data.DiskTitle
-import com.haidoan.android.ceedee.databinding.ItemDiskToImportBinding
+import com.haidoan.android.ceedee.databinding.ItemImportDiskToImportBinding
 
 class DiskImportAdapter :
-    RecyclerView.Adapter<DiskImportAdapter.DiskRequisitionViewHolder>() {
+    RecyclerView.Adapter<DiskImportAdapter.DiskImportViewHolder>() {
 
     private var disksToImportList: ArrayList<Pair<DiskTitle, Long>> = arrayListOf()
 
@@ -28,8 +28,8 @@ class DiskImportAdapter :
         notifyDataSetChanged()
     }
 
-    class DiskRequisitionViewHolder(
-        private val binding: ItemDiskToImportBinding
+    class DiskImportViewHolder(
+        private val binding: ItemImportDiskToImportBinding
     ) :
         RecyclerView.ViewHolder(binding.root) {
 
@@ -47,17 +47,17 @@ class DiskImportAdapter :
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
-    ): DiskRequisitionViewHolder {
+    ): DiskImportViewHolder {
         val binding =
-            ItemDiskToImportBinding.inflate(
+            ItemImportDiskToImportBinding.inflate(
                 LayoutInflater.from(parent.context),
                 parent,
                 false
             )
-        return DiskRequisitionViewHolder(binding)
+        return DiskImportViewHolder(binding)
     }
 
-    override fun onBindViewHolder(holder: DiskRequisitionViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: DiskImportViewHolder, position: Int) {
         holder.bind(disksToImportList[position].first, disksToImportList[position].second)
     }
 
