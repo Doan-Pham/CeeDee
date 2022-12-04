@@ -84,6 +84,9 @@ class NewRequisitionViewModel(
             ).collect { response -> emit(response) }
         }
 
+    val supplierOfNewRequisition: LiveData<Supplier>
+        get() = _supplierOfNewRequisition
+
     private val _supplierOfNewRequisition = MutableLiveData<Supplier>()
 
     fun setSupplierOfNewRequisition(supplier: Supplier) {
