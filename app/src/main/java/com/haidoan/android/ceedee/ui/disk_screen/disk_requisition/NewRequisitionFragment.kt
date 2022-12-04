@@ -12,6 +12,7 @@ import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.haidoan.android.ceedee.data.DiskTitle
 import com.haidoan.android.ceedee.data.disk_requisition.DiskRequisitionsFirestoreDataSource
@@ -21,6 +22,7 @@ import com.haidoan.android.ceedee.data.supplier.SupplierFirestoreDataSource
 import com.haidoan.android.ceedee.data.supplier.SupplierRepository
 import com.haidoan.android.ceedee.databinding.FragmentNewRequisitionBinding
 import com.haidoan.android.ceedee.ui.disk_screen.repository.DiskTitlesRepository
+import com.haidoan.android.ceedee.ui.disk_screen.utils.Response
 
 private const val TAG = "NewRequisitionFrag"
 private const val REQUISITION_EMAIL_SUBJECT = "Requisition for New Disk Titles "
@@ -120,26 +122,12 @@ class NewRequisitionFragment : Fragment() {
                 Toast.LENGTH_LONG
             ).show()
             else {
-                sendEmailToSupplier()
-//                viewModel.addRequisition().observe(viewLifecycleOwner) { result ->
-//                    when (result) {
-//                        is Response.Loading -> {
-//                            binding.linearlayoutContentWrapper.visibility = View.GONE
-//                            binding.progressbarImport.visibility = View.VISIBLE
-//                        }
-//                        is Response.Success -> {
-//                            findNavController().popBackStack()
-//                            Toast.makeText(
-//                                requireActivity(),
-//                                "Requisition sent!",
-//                                Toast.LENGTH_LONG
-//                            ).show()
-//                        }
-//                        is Response.Failure -> {
-//                            Log.d(TAG, "Error: ${result.errorMessage}")
-//                        }
-//                    }
-//                }
+                val bottomSheetFragment =
+                    NewRequisitionBottomSheetFragment(
+                        { sendEmailToSupplier() },
+                        { addRequisition() })
+                bottomSheetFragment.show(childFragmentManager, bottomSheetFragment.tag)
+
             }
 
         }
@@ -174,6 +162,28 @@ class NewRequisitionFragment : Fragment() {
         }
         if (intent.resolveActivity(requireActivity().packageManager) != null) {
             startActivity(intent)
+        }
+    }
+
+    private fun addRequisition() {
+        viewModel.addRequisition().observe(viewLifecycleOwner) { result ->
+            when (result) {
+                is Response.Loading -> {
+                    binding.linearlayoutContentWrapper.visibility = View.GONE
+                    binding.progressbarImport.visibility = View.VISIBLE
+                }
+                is Response.Success -> {
+                    findNavController().popBackStack()
+                    Toast.makeText(
+                        requireActivity(),
+                        "Requisition sent!",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+                is Response.Failure -> {
+                    Log.d(TAG, "Error: ${result.errorMessage}")
+                }
+            }
         }
     }
 
