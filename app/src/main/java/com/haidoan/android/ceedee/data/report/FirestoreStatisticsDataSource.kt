@@ -5,6 +5,7 @@ import com.google.firebase.Timestamp
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import com.haidoan.android.ceedee.data.Genre
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -161,32 +162,37 @@ class FirestoreStatisticsDataSource {
     }
 
     suspend fun getDiskAmountGroupByGenre() = callbackFlow<Map<String, Int>> {
-
-        val diskAmountGroupByGenre = TreeMap<String, Int>()
+        // Using TreeMap with data class as key causes app to crash, USE HASHMAP INSTEAD!!
+        val diskAmountGroupByGenre = HashMap<Genre, Int>()
         for (document in databaseRef.collection("Genre").get().await().documents) {
-            diskAmountGroupByGenre[document.get("name") as String] = 0
+            diskAmountGroupByGenre[Genre(document.id, document.get("name") as String)] = 0
         }
 
         // Registers callback to firestore, which will be called on new events
         val subscription =
             databaseRef
-                .collection("Disk")
-                .orderBy("genre", Query.Direction.ASCENDING)
+                .collection("DiskTitle")
                 .addSnapshotListener { snapshot, _ ->
                     if (snapshot == null) {
                         return@addSnapshotListener
                     }
-                    diskAmountGroupByGenre.clear()
+
                     for (document in snapshot.documents) {
 
-                        val currentDiskGenre = document.get("genre") as String
+                        val currentDiskGenreId = document.get("genreId") as String
+                        val currentDiskTitleDiskAmount =
+                            (document.get("diskAmount") as Long).toInt()
+
+                        val currentDiskGenre =
+                            diskAmountGroupByGenre.keys.first { it.id == currentDiskGenreId };
 
                         val diskAmountAtCurrentGenre = diskAmountGroupByGenre[currentDiskGenre] ?: 0
-                        diskAmountGroupByGenre[currentDiskGenre] = diskAmountAtCurrentGenre + 1
+                        diskAmountGroupByGenre[currentDiskGenre] =
+                            diskAmountAtCurrentGenre + currentDiskTitleDiskAmount
                     }
                     // Sends events to the flow! Consumers will get the new events
                     try {
-                        trySend(diskAmountGroupByGenre).isSuccess
+                        trySend(diskAmountGroupByGenre.mapKeys { it.key.name }).isSuccess
                     } catch (e: Throwable) {
                         // Event couldn't be sent to the flow
                     }
@@ -247,36 +253,38 @@ class FirestoreStatisticsDataSource {
 
     suspend fun getTotalRentalGroupByGenre() = callbackFlow<Map<String, Int>> {
 
-        val totalRentalsGroupByGenre = TreeMap<String, Int>()
+        val totalRentalsGroupByGenre = HashMap<Genre, Int>()
         for (document in databaseRef.collection("Genre").get().await().documents) {
-            totalRentalsGroupByGenre[document.get("name") as String] = 0
+            totalRentalsGroupByGenre[Genre(document.id, document.get("name") as String)] = 0
         }
 
         // Registers callback to firestore, which will be called on new events
         val subscription =
             databaseRef
-                .collection("Disk")
+                .collection("DiskTitle")
                 .addSnapshotListener { snapshot, _ ->
                     if (snapshot == null) {
                         return@addSnapshotListener
                     }
-                    totalRentalsGroupByGenre.clear()
+
                     for (document in snapshot.documents) {
 
-                        val currentGenre = document.get("genre") as String
+                        val currentDiskGenreId = document.get("genreId") as String
+                        val currentDiskTitleTotalRentalAmount =
+                            (document.get("totalRentalAmount") as Long).toInt()
 
-                        // DO NOT cast as Int, Firestore stores numbers as Long
-                        val totalRentalCurrentDisk = document.get("totalRentalCount") as Long
+                        val currentDiskGenre =
+                            totalRentalsGroupByGenre.keys.first { it.id == currentDiskGenreId }
 
                         val totalRentalAtCurrentGenre =
-                            totalRentalsGroupByGenre[currentGenre] ?: 0
+                            totalRentalsGroupByGenre[currentDiskGenre] ?: 0
 
-                        totalRentalsGroupByGenre[currentGenre] =
-                            totalRentalAtCurrentGenre + totalRentalCurrentDisk.toInt()
+                        totalRentalsGroupByGenre[currentDiskGenre] =
+                            totalRentalAtCurrentGenre + currentDiskTitleTotalRentalAmount
                     }
                     // Sends events to the flow! Consumers will get the new events
                     try {
-                        trySend(totalRentalsGroupByGenre).isSuccess
+                        trySend(totalRentalsGroupByGenre.mapKeys { it.key.name }).isSuccess
                     } catch (e: Throwable) {
                         // Event couldn't be sent to the flow
                     }
