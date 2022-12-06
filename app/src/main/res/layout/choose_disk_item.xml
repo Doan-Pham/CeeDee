@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?attr/selectableItemBackground"
+    android:clickable="true"
+    android:focusable="true"
+    android:orientation="horizontal"
+    android:padding="20dp"
+    tools:ignore="RtlSymmetry">
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardView_disk_titles"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="12dp"
+
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/img_disk_titles_cover_img"
+            android:layout_width="84dp"
+            android:layout_height="84dp"
+
+            android:src="@drawable/ic_launcher" />
+
+    </androidx.cardview.widget.CardView>
+
+    <LinearLayout
+        android:id="@+id/layout_info"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:orientation="vertical"
+
+        app:layout_constraintBottom_toBottomOf="@id/cardView_disk_titles"
+        app:layout_constraintStart_toEndOf="@id/cardView_disk_titles"
+        app:layout_constraintTop_toTopOf="@id/cardView_disk_titles">
+
+        <TextView
+            android:id="@+id/tv_disk_titles_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Kid A"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tv_disk_titles_author"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:text="Radio head" />
+
+        <TextView
+            android:id="@+id/tv_disk_titles_amount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:text="Amount: 34CD" />
+    </LinearLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
