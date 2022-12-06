@@ -26,7 +26,11 @@
         android:id="@+id/rentalFragment"
         android:name="com.haidoan.android.ceedee.RentalFragment"
         tools:layout="@layout/fragment_rental"
-        android:label="Rental" />
+        android:label="Rental" >
+        <action
+            android:id="@+id/action_rentalFragment_to_newRentalScreen2"
+            app:destination="@id/newRentalScreen" />
+    </fragment>
     <fragment
         android:id="@+id/reportFragment"
         android:name="com.haidoan.android.ceedee.ui.report.fragment.ReportFragment"
@@ -54,4 +58,9 @@
         android:name="com.haidoan.android.ceedee.ui.disk_screen.disk_requisition.NewRequisitionFragment"
         android:label="New Requisition"
         tools:layout="@layout/fragment_new_requisition" />
+    <fragment
+        android:id="@+id/newRentalScreen"
+        android:name="com.haidoan.android.ceedee.NewRentalScreen"
+        android:label="Rental Screen"
+        tools:layout="@layout/fragment_new_rental_screen" />
 </navigation>

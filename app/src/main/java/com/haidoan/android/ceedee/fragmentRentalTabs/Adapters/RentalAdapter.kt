@@ -9,7 +9,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.Timestamp
 import com.haidoan.android.ceedee.R
-import com.haidoan.android.ceedee.fragmentRentalTabs.Rental
+import com.haidoan.android.ceedee.data.Rental
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -31,7 +31,7 @@ class RentalAdapter(var rentalList: ArrayList<Rental>) :
 
         val currentitem: Rental = rentalList[position]
 
-        when (currentitem.status) {
+        when (currentitem.rentalStatus) {
             "Complete" -> {
                 holder.image.setImageResource(R.drawable.check)
             }
@@ -43,7 +43,7 @@ class RentalAdapter(var rentalList: ArrayList<Rental>) :
             }
         }
 
-        holder.customerName.text = currentitem.customerId
+        holder.customerName.text = currentitem.customerName
         holder.rentDate.text = convertToLocalDate(currentitem.rentDate)
         holder.dueDate.text = convertToLocalDate(currentitem.dueDate)
     }

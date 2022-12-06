@@ -1,8 +1,9 @@
-package com.haidoan.android.ceedee.fragmentRentalTabs
+package com.haidoan.android.ceedee.fragmentRentalTabs.Repository
 
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.google.firebase.firestore.*
+import com.haidoan.android.ceedee.data.Rental
 
 class RentalRepository {
 
@@ -35,7 +36,7 @@ class RentalRepository {
                     rentalList.postValue(_rentalList)
                     return
                 } else {
-                    _rentalList.filterTo(tempList, { it.status == s })
+                    _rentalList.filterTo(tempList, { it.rentalStatus == s })
                     rentalList.postValue(tempList)
                 }
             }
