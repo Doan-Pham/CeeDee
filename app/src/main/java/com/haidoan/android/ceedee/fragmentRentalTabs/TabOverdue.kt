@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.firestore.*
 import com.google.firebase.firestore.EventListener
 import com.haidoan.android.ceedee.R
+import com.haidoan.android.ceedee.data.Rental
 import com.haidoan.android.ceedee.fragmentRentalTabs.Adapters.RentalAdapter
 import com.haidoan.android.ceedee.fragmentRentalTabs.ViewModels.TabOverdueViewModel
 import java.util.*
@@ -57,7 +58,7 @@ class TabOverdue : Fragment() {
                         val searchText = newText!!.lowercase(Locale.getDefault())
                         if (searchText.isNotEmpty()) {
                             tempRentalList.forEach {
-                                if (it.customerId!!.lowercase(Locale.getDefault())
+                                if (it.customerName!!.lowercase(Locale.getDefault())
                                         .contains(searchText)
                                 ) {
                                     rentalList.add(it)
@@ -111,7 +112,7 @@ class TabOverdue : Fragment() {
                     }
                 }
                 for (i in _rentalList) {
-                    if (i.status == "Overdue")
+                    if (i.rentalStatus == "Overdue")
                         temp.add(i)
                 }
                 return

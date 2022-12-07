@@ -1,5 +1,7 @@
 package com.haidoan.android.ceedee.ui.disk_screen.disk_details
 
+import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -12,6 +14,7 @@ import com.haidoan.android.ceedee.R
 import com.haidoan.android.ceedee.data.DiskTitle
 
 import com.haidoan.android.ceedee.databinding.FragmentDiskDetailsBinding
+import java.io.Serializable
 
 class DiskDetailsFragment : Fragment() {
 
@@ -20,6 +23,15 @@ class DiskDetailsFragment : Fragment() {
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
+
+    @Suppress("DEPRECATION")
+    inline fun <reified T : Serializable> Bundle.customGetSerializable(key: String): T? {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            getSerializable(key, T::class.java)
+        } else {
+            getSerializable(key) as? T
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -33,7 +45,7 @@ class DiskDetailsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val diskTitle = arguments?.getSerializable("disk_title") as DiskTitle
+        val diskTitle = arguments?.customGetSerializable<DiskTitle>("disk_title") as DiskTitle
         val amount = arguments?.getLong("amount_disk_title") as Long
         val genreName = arguments?.getString("genre_name") as String
         if (arguments!=null){

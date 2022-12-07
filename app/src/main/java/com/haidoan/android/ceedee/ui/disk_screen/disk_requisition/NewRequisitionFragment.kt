@@ -34,7 +34,6 @@ class NewRequisitionFragment : Fragment() {
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
-
     private val viewModel: NewRequisitionViewModel by viewModels(
         factoryProducer = {
             NewRequisitionViewModel.Factory(
@@ -43,7 +42,6 @@ class NewRequisitionFragment : Fragment() {
                 SupplierRepository(SupplierFirestoreDataSource()),
             )
         })
-
     private lateinit var disksToImportAdapter: NewRequisitionDiskAdapter
     private val suppliers = mutableListOf<Supplier>()
     private var currentSupplier = Supplier()
@@ -101,12 +99,11 @@ class NewRequisitionFragment : Fragment() {
                 id: Long
             ) {
             }
-
         }
-
     }
 
     private fun setUpButtonAddDisk() {
+
         binding.buttonAddDisk.setOnClickListener {
             val disksToImportDialog = DisksToImportDialog()
             disksToImportDialog.show(childFragmentManager, "DISK_TO_IMPORT_DIALOG")
@@ -189,7 +186,6 @@ class NewRequisitionFragment : Fragment() {
 
     private fun observeViewModel() {
         viewModel.allSuppliers.observe(viewLifecycleOwner) { allSuppliers ->
-
             suppliers.clear()
             suppliers.addAll(allSuppliers)
 

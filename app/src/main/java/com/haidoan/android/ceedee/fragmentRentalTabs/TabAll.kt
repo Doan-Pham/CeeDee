@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.firestore.*
 import com.google.firebase.firestore.EventListener
 import com.haidoan.android.ceedee.R
+import com.haidoan.android.ceedee.data.Rental
 import com.haidoan.android.ceedee.fragmentRentalTabs.Adapters.RentalAdapter
 import com.haidoan.android.ceedee.fragmentRentalTabs.ViewModels.RentalViewModel
 import java.util.*
@@ -55,7 +56,7 @@ class TabAll : Fragment() {
                         val searchText = newText!!.lowercase(Locale.getDefault())
                         if (searchText.isNotEmpty()) {
                             tempRentalList.forEach {
-                                if (it.customerId!!.lowercase(Locale.getDefault()).contains(searchText)) {
+                                if (it.customerName!!.lowercase(Locale.getDefault()).contains(searchText)) {
                                     rentalList.add(it)
                                 }
                             }
