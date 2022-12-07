@@ -1,22 +1,18 @@
-package com.haidoan.android.ceedee.fragmentRentalTabs.Adapters
+package com.haidoan.android.ceedee.ui.rental.adapters
 
 import android.annotation.SuppressLint
-import android.util.Log
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
-import androidx.core.net.toUri
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
-import com.haidoan.android.ceedee.R
 import com.haidoan.android.ceedee.data.DiskTitle
 import com.haidoan.android.ceedee.databinding.ItemNewrequisitionDiskToImportBinding
 
-class NewRentalAdapter(private val onButtonMinusClick: (DiskTitle) -> Unit,
-                       private val onButtonPlusClick: (DiskTitle) -> Unit,
-                       private val onButtonRemoveClick: (DiskTitle) -> Unit) :
+class NewRentalAdapter(
+    private val onButtonMinusClick: (DiskTitle) -> Unit,
+    private val onButtonPlusClick: (DiskTitle) -> Unit,
+    private val onButtonRemoveClick: (DiskTitle) -> Unit
+) :
     RecyclerView.Adapter<NewRentalAdapter.NewRentalViewHolder>() {
 
     private var disksToRentList: ArrayList<Pair<DiskTitle, Long>> = arrayListOf()

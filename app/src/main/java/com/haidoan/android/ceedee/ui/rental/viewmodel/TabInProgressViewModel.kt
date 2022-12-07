@@ -1,13 +1,12 @@
-package com.haidoan.android.ceedee.fragmentRentalTabs.ViewModels
+package com.haidoan.android.ceedee.ui.rental.viewmodel
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.haidoan.android.ceedee.data.Rental
-import com.haidoan.android.ceedee.fragmentRentalTabs.Repository.RentalRepository
+import com.haidoan.android.ceedee.ui.rental.repository.RentalRepository
 
-class TabCompleteViewModel : ViewModel() {
-
+class TabInProgressViewModel : ViewModel() {
     private val repository: RentalRepository
     private val _completeRentals = MutableLiveData<ArrayList<Rental>>()
 
@@ -15,7 +14,6 @@ class TabCompleteViewModel : ViewModel() {
 
     init {
         repository = RentalRepository().getInstance()
-        repository.loadUsers(_completeRentals, "Complete")
+        repository.loadUsers(_completeRentals, "In progress")
     }
-
 }

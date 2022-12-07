@@ -1,4 +1,4 @@
-package com.haidoan.android.ceedee.fragmentRentalTabs
+package com.haidoan.android.ceedee.ui.rental.fragment
 
 import android.annotation.SuppressLint
 import android.os.Bundle
@@ -16,8 +16,8 @@ import com.google.firebase.firestore.*
 import com.google.firebase.firestore.EventListener
 import com.haidoan.android.ceedee.R
 import com.haidoan.android.ceedee.data.Rental
-import com.haidoan.android.ceedee.fragmentRentalTabs.Adapters.RentalAdapter
-import com.haidoan.android.ceedee.fragmentRentalTabs.ViewModels.TabInProgressViewModel
+import com.haidoan.android.ceedee.ui.rental.adapters.RentalAdapter
+import com.haidoan.android.ceedee.ui.rental.viewmodel.TabInProgressViewModel
 import java.util.*
 
 private lateinit var viewModel: TabInProgressViewModel

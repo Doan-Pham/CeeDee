@@ -1,4 +1,4 @@
-package com.haidoan.android.ceedee.fragmentRentalTabs
+package com.haidoan.android.ceedee.ui.rental.fragment
 
 import android.annotation.SuppressLint
 import android.os.Bundle
@@ -16,19 +16,18 @@ import com.google.firebase.firestore.*
 import com.google.firebase.firestore.EventListener
 import com.haidoan.android.ceedee.R
 import com.haidoan.android.ceedee.data.Rental
-import com.haidoan.android.ceedee.fragmentRentalTabs.Adapters.RentalAdapter
-import com.haidoan.android.ceedee.fragmentRentalTabs.ViewModels.TabCompleteViewModel
+import com.haidoan.android.ceedee.ui.rental.adapters.RentalAdapter
+import com.haidoan.android.ceedee.ui.rental.viewmodel.TabOverdueViewModel
 import java.util.*
 
 
-private lateinit var viewModel: TabCompleteViewModel
+private lateinit var viewModel: TabOverdueViewModel
 private lateinit var rentalRecyclerView: RecyclerView
 private lateinit var rental_adapter: RentalAdapter
 private lateinit var rentalList: ArrayList<Rental>
 private lateinit var tempRentalList: ArrayList<Rental>
 
-class TabComplete : Fragment() {
-
+class TabOverdue : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -38,8 +37,9 @@ class TabComplete : Fragment() {
         rentalList = arrayListOf<Rental>()
         getUserData(tempRentalList)
         createMenu()
-        return inflater.inflate(R.layout.fragment_tab_complete, container, false)
+        return inflater.inflate(R.layout.fragment_tab_overdue, container, false)
     }
+
     private fun createMenu() {
         val menuHost: MenuHost = requireActivity()
         menuHost.addMenuProvider(object : MenuProvider {
@@ -58,7 +58,9 @@ class TabComplete : Fragment() {
                         val searchText = newText!!.lowercase(Locale.getDefault())
                         if (searchText.isNotEmpty()) {
                             tempRentalList.forEach {
-                                if (it.customerName!!.lowercase(Locale.getDefault()).contains(searchText)) {
+                                if (it.customerName!!.lowercase(Locale.getDefault())
+                                        .contains(searchText)
+                                ) {
                                     rentalList.add(it)
                                 }
                             }
@@ -72,7 +74,6 @@ class TabComplete : Fragment() {
                     }
 
                 })
-
             }
 
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
@@ -81,15 +82,16 @@ class TabComplete : Fragment() {
             }
         }, viewLifecycleOwner, Lifecycle.State.RESUMED)
     }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        rentalRecyclerView = view.findViewById(R.id.tabCompleteRecyclerView)
+        rentalRecyclerView = view.findViewById(R.id.tabOverdueRecyclerView)
         rentalRecyclerView.layoutManager = LinearLayoutManager(context)
         rentalRecyclerView.setHasFixedSize(true)
         rental_adapter = RentalAdapter(rentalList)
         rentalRecyclerView.adapter = rental_adapter
-        viewModel = ViewModelProvider(this).get(TabCompleteViewModel::class.java)
+        viewModel = ViewModelProvider(this).get(TabOverdueViewModel::class.java)
         viewModel.completeRentals.observe(viewLifecycleOwner) {
             rental_adapter.updateUserList(it)
         }
@@ -109,17 +111,13 @@ class TabComplete : Fragment() {
                         _rentalList.add(dc.document.toObject(Rental::class.java))
                     }
                 }
-                for(i in _rentalList)
-                {
-                    if(i.rentalStatus=="Complete")
+                for (i in _rentalList) {
+                    if (i.rentalStatus == "Overdue")
                         temp.add(i)
                 }
                 return
             }
 
         })
-
-
     }
-
 }

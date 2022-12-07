@@ -1,4 +1,4 @@
-package com.haidoan.android.ceedee.fragmentRentalTabs.Repository
+package com.haidoan.android.ceedee.ui.rental.repository
 
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
@@ -10,6 +10,7 @@ class RentalRepository {
     private val dbf: FirebaseFirestore = FirebaseFirestore.getInstance()
     private val tempList: ArrayList<Rental> = arrayListOf<Rental>()
     private val _rentalList: ArrayList<Rental> = arrayListOf<Rental>()
+
     @Volatile
     private var inst: RentalRepository? = null
 
@@ -20,6 +21,7 @@ class RentalRepository {
             instance
         }
     }
+
     fun loadUsers(rentalList: MutableLiveData<ArrayList<Rental>>, s: String) {
         dbf.collection("Rental").addSnapshotListener(object : EventListener<QuerySnapshot> {
             override fun onEvent(value: QuerySnapshot?, error: FirebaseFirestoreException?) {

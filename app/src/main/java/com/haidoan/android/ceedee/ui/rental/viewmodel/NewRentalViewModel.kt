@@ -1,12 +1,8 @@
-package com.haidoan.android.ceedee.fragmentRentalTabs.ViewModels
+package com.haidoan.android.ceedee.ui.rental.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.*
 import com.haidoan.android.ceedee.data.DiskTitle
 import com.haidoan.android.ceedee.data.disk_rental.DiskRentalRepository
-import com.haidoan.android.ceedee.data.disk_requisition.DiskRequisitionsRepository
-import com.haidoan.android.ceedee.data.supplier.SupplierRepository
-import com.haidoan.android.ceedee.ui.disk_screen.disk_requisition.NewRequisitionViewModel
 import com.haidoan.android.ceedee.ui.disk_screen.repository.DiskTitlesRepository
 import com.haidoan.android.ceedee.ui.disk_screen.utils.Response
 import kotlinx.coroutines.Dispatchers

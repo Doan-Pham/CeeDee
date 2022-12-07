@@ -24,7 +24,7 @@
     </fragment>
     <fragment
         android:id="@+id/rentalFragment"
-        android:name="com.haidoan.android.ceedee.RentalFragment"
+        android:name="com.haidoan.android.ceedee.ui.rental.fragment.RentalFragment"
         tools:layout="@layout/fragment_rental"
         android:label="Rental" >
         <action
@@ -60,7 +60,7 @@
         tools:layout="@layout/fragment_new_requisition" />
     <fragment
         android:id="@+id/newRentalScreen"
-        android:name="com.haidoan.android.ceedee.NewRentalScreen"
+        android:name="com.haidoan.android.ceedee.ui.rental.fragment.NewRentalScreen"
         android:label="Rental Screen"
         tools:layout="@layout/fragment_new_rental_screen" />
 </navigation>

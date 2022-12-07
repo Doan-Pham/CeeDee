@@ -1,5 +1,6 @@
-package com.haidoan.android.ceedee.fragmentRentalTabs
+package com.haidoan.android.ceedee.ui.rental.fragment
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import android.view.*
@@ -15,18 +16,18 @@ import com.google.firebase.firestore.*
 import com.google.firebase.firestore.EventListener
 import com.haidoan.android.ceedee.R
 import com.haidoan.android.ceedee.data.Rental
-import com.haidoan.android.ceedee.fragmentRentalTabs.Adapters.RentalAdapter
-import com.haidoan.android.ceedee.fragmentRentalTabs.ViewModels.RentalViewModel
+import com.haidoan.android.ceedee.ui.rental.adapters.RentalAdapter
+import com.haidoan.android.ceedee.ui.rental.viewmodel.TabCompleteViewModel
 import java.util.*
-import kotlin.collections.ArrayList
 
-private lateinit var viewModel: RentalViewModel
+
+private lateinit var viewModel: TabCompleteViewModel
 private lateinit var rentalRecyclerView: RecyclerView
 private lateinit var rental_adapter: RentalAdapter
 private lateinit var rentalList: ArrayList<Rental>
 private lateinit var tempRentalList: ArrayList<Rental>
 
-class TabAll : Fragment() {
+class TabComplete : Fragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -37,26 +38,30 @@ class TabAll : Fragment() {
         rentalList = arrayListOf<Rental>()
         getUserData(tempRentalList)
         createMenu()
-        return inflater.inflate(R.layout.fragment_tab_all, container, false)
+        return inflater.inflate(R.layout.fragment_tab_complete, container, false)
     }
+
     private fun createMenu() {
         val menuHost: MenuHost = requireActivity()
         menuHost.addMenuProvider(object : MenuProvider {
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
                 menuInflater.inflate(R.menu.menu_rental, menu)
-                val item = menu?.findItem(R.id.action_search)
+                val item = menu.findItem(R.id.action_search)
                 val searchView = item?.actionView as SearchView
                 searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
                     override fun onQueryTextSubmit(p0: String?): Boolean {
                         TODO("Not yet implemented")
                     }
 
+                    @SuppressLint("NotifyDataSetChanged")
                     override fun onQueryTextChange(newText: String?): Boolean {
                         rentalList.clear()
                         val searchText = newText!!.lowercase(Locale.getDefault())
                         if (searchText.isNotEmpty()) {
                             tempRentalList.forEach {
-                                if (it.customerName!!.lowercase(Locale.getDefault()).contains(searchText)) {
+                                if (it.customerName!!.lowercase(Locale.getDefault())
+                                        .contains(searchText)
+                                ) {
                                     rentalList.add(it)
                                 }
                             }
@@ -79,16 +84,17 @@ class TabAll : Fragment() {
             }
         }, viewLifecycleOwner, Lifecycle.State.RESUMED)
     }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        rentalRecyclerView = view.findViewById(R.id.tabAllRecyclerView)
+        rentalRecyclerView = view.findViewById(R.id.tabCompleteRecyclerView)
         rentalRecyclerView.layoutManager = LinearLayoutManager(context)
         rentalRecyclerView.setHasFixedSize(true)
         rental_adapter = RentalAdapter(rentalList)
         rentalRecyclerView.adapter = rental_adapter
-        viewModel = ViewModelProvider(this).get(RentalViewModel::class.java)
-        viewModel.allRentals.observe(viewLifecycleOwner) {
+        viewModel = ViewModelProvider(this).get(TabCompleteViewModel::class.java)
+        viewModel.completeRentals.observe(viewLifecycleOwner) {
             rental_adapter.updateUserList(it)
         }
     }
@@ -107,13 +113,16 @@ class TabAll : Fragment() {
                         _rentalList.add(dc.document.toObject(Rental::class.java))
                     }
                 }
-                    temp.addAll(_rentalList)
-                    return
+                for (i in _rentalList) {
+                    if (i.rentalStatus == "Complete")
+                        temp.add(i)
+                }
+                return
             }
 
         })
 
 
     }
-}
 
+}

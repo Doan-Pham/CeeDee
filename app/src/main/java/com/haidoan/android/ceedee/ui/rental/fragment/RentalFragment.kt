@@ -1,4 +1,4 @@
-package com.haidoan.android.ceedee
+package com.haidoan.android.ceedee.ui.rental.fragment
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -11,14 +11,10 @@ import androidx.viewpager.widget.ViewPager
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.tabs.TabLayout
 import com.google.firebase.auth.FirebaseAuth
+import com.haidoan.android.ceedee.R
 import com.haidoan.android.ceedee.databinding.FragmentRentalBinding
-import com.haidoan.android.ceedee.fragmentRentalTabs.Adapters.TabRentalAdapter
-import com.haidoan.android.ceedee.fragmentRentalTabs.TabAll
-import com.haidoan.android.ceedee.fragmentRentalTabs.TabComplete
-import com.haidoan.android.ceedee.fragmentRentalTabs.TabInProgress
-import com.haidoan.android.ceedee.fragmentRentalTabs.TabOverdue
 import com.haidoan.android.ceedee.ui.login.AuthenticationViewModel
-
+import com.haidoan.android.ceedee.ui.rental.adapters.TabRentalAdapter
 
 
 class RentalFragment : Fragment() {

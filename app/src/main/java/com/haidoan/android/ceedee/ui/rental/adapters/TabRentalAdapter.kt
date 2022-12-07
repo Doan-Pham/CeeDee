@@ -1,4 +1,4 @@
-package com.haidoan.android.ceedee.fragmentRentalTabs.Adapters
+package com.haidoan.android.ceedee.ui.rental.adapters
 
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager

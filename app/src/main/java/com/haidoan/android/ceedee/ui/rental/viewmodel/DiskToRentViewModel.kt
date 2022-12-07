@@ -1,12 +1,11 @@
-package com.haidoan.android.ceedee.fragmentRentalTabs.ViewModels
+package com.haidoan.android.ceedee.ui.rental.viewmodel
 
 import androidx.lifecycle.*
 import com.haidoan.android.ceedee.data.DiskTitle
-import com.haidoan.android.ceedee.ui.disk_screen.disk_requisition.DisksToImportViewModel
 import com.haidoan.android.ceedee.ui.disk_screen.repository.DiskTitlesRepository
 import kotlinx.coroutines.Dispatchers
 
-class DiskToRentViewModel(private val diskTitlesRepository: DiskTitlesRepository):ViewModel() {
+class DiskToRentViewModel(private val diskTitlesRepository: DiskTitlesRepository) : ViewModel() {
     private val searchQuery = MutableLiveData("")
 
     private val _diskTitlesInStore = searchQuery.switchMap { currentSearchQuery ->

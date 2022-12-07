@@ -1,6 +1,5 @@
-package com.haidoan.android.ceedee.fragmentRentalTabs
+package com.haidoan.android.ceedee.ui.rental.fragment
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import android.view.*
@@ -16,18 +15,18 @@ import com.google.firebase.firestore.*
 import com.google.firebase.firestore.EventListener
 import com.haidoan.android.ceedee.R
 import com.haidoan.android.ceedee.data.Rental
-import com.haidoan.android.ceedee.fragmentRentalTabs.Adapters.RentalAdapter
-import com.haidoan.android.ceedee.fragmentRentalTabs.ViewModels.TabOverdueViewModel
+import com.haidoan.android.ceedee.ui.rental.adapters.RentalAdapter
+import com.haidoan.android.ceedee.ui.rental.viewmodel.RentalViewModel
 import java.util.*
 
-
-private lateinit var viewModel: TabOverdueViewModel
+private lateinit var viewModel: RentalViewModel
 private lateinit var rentalRecyclerView: RecyclerView
 private lateinit var rental_adapter: RentalAdapter
 private lateinit var rentalList: ArrayList<Rental>
 private lateinit var tempRentalList: ArrayList<Rental>
 
-class TabOverdue : Fragment() {
+class TabAll : Fragment() {
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -37,7 +36,7 @@ class TabOverdue : Fragment() {
         rentalList = arrayListOf<Rental>()
         getUserData(tempRentalList)
         createMenu()
-        return inflater.inflate(R.layout.fragment_tab_overdue, container, false)
+        return inflater.inflate(R.layout.fragment_tab_all, container, false)
     }
 
     private fun createMenu() {
@@ -45,14 +44,13 @@ class TabOverdue : Fragment() {
         menuHost.addMenuProvider(object : MenuProvider {
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
                 menuInflater.inflate(R.menu.menu_rental, menu)
-                val item = menu.findItem(R.id.action_search)
+                val item = menu?.findItem(R.id.action_search)
                 val searchView = item?.actionView as SearchView
                 searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
                     override fun onQueryTextSubmit(p0: String?): Boolean {
                         TODO("Not yet implemented")
                     }
 
-                    @SuppressLint("NotifyDataSetChanged")
                     override fun onQueryTextChange(newText: String?): Boolean {
                         rentalList.clear()
                         val searchText = newText!!.lowercase(Locale.getDefault())
@@ -74,6 +72,7 @@ class TabOverdue : Fragment() {
                     }
 
                 })
+
             }
 
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
@@ -86,13 +85,13 @@ class TabOverdue : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        rentalRecyclerView = view.findViewById(R.id.tabOverdueRecyclerView)
+        rentalRecyclerView = view.findViewById(R.id.tabAllRecyclerView)
         rentalRecyclerView.layoutManager = LinearLayoutManager(context)
         rentalRecyclerView.setHasFixedSize(true)
         rental_adapter = RentalAdapter(rentalList)
         rentalRecyclerView.adapter = rental_adapter
-        viewModel = ViewModelProvider(this).get(TabOverdueViewModel::class.java)
-        viewModel.completeRentals.observe(viewLifecycleOwner) {
+        viewModel = ViewModelProvider(this).get(RentalViewModel::class.java)
+        viewModel.allRentals.observe(viewLifecycleOwner) {
             rental_adapter.updateUserList(it)
         }
     }
@@ -111,13 +110,13 @@ class TabOverdue : Fragment() {
                         _rentalList.add(dc.document.toObject(Rental::class.java))
                     }
                 }
-                for (i in _rentalList) {
-                    if (i.rentalStatus == "Overdue")
-                        temp.add(i)
-                }
+                temp.addAll(_rentalList)
                 return
             }
 
         })
+
+
     }
 }
+

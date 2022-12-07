@@ -1,38 +1,23 @@
-package com.haidoan.android.ceedee
+package com.haidoan.android.ceedee.ui.rental.fragment
 
 
-import android.R
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.firebase.firestore.*
 import com.haidoan.android.ceedee.data.disk_rental.DiskRentalFiresoreDataSource
 import com.haidoan.android.ceedee.data.disk_rental.DiskRentalRepository
-import com.haidoan.android.ceedee.data.disk_requisition.DiskRequisitionsFirestoreDataSource
-import com.haidoan.android.ceedee.data.disk_requisition.DiskRequisitionsRepository
-import com.haidoan.android.ceedee.data.supplier.Supplier
-import com.haidoan.android.ceedee.data.supplier.SupplierFirestoreDataSource
-import com.haidoan.android.ceedee.data.supplier.SupplierRepository
 import com.haidoan.android.ceedee.databinding.FragmentNewRentalScreenBinding
-import com.haidoan.android.ceedee.fragmentRentalTabs.Adapters.NewRentalAdapter
-import com.haidoan.android.ceedee.fragmentRentalTabs.DiskToRentDialog
-import com.haidoan.android.ceedee.fragmentRentalTabs.ViewModels.NewRentalViewModel
-import com.haidoan.android.ceedee.ui.disk_screen.disk_requisition.DisksToImportDialog
-import com.haidoan.android.ceedee.ui.disk_screen.disk_requisition.NewRequisitionDiskAdapter
-import com.haidoan.android.ceedee.ui.disk_screen.disk_requisition.NewRequisitionViewModel
 import com.haidoan.android.ceedee.ui.disk_screen.repository.DiskTitlesRepository
 import com.haidoan.android.ceedee.ui.disk_screen.utils.Response
-import kotlinx.android.synthetic.main.dialog_choose_disk.*
-import java.util.*
+import com.haidoan.android.ceedee.ui.rental.adapters.NewRentalAdapter
+import com.haidoan.android.ceedee.ui.rental.viewmodel.NewRentalViewModel
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
