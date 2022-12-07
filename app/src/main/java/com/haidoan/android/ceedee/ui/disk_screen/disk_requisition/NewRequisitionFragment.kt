@@ -1,5 +1,7 @@
 package com.haidoan.android.ceedee.ui.disk_screen.disk_requisition
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -12,6 +14,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.haidoan.android.ceedee.data.DiskTitle
 import com.haidoan.android.ceedee.data.disk_requisition.DiskRequisitionsFirestoreDataSource
 import com.haidoan.android.ceedee.data.disk_requisition.DiskRequisitionsRepository
 import com.haidoan.android.ceedee.data.supplier.Supplier
@@ -22,6 +25,7 @@ import com.haidoan.android.ceedee.ui.disk_screen.repository.DiskTitlesRepository
 import com.haidoan.android.ceedee.ui.disk_screen.utils.Response
 
 private const val TAG = "NewRequisitionFrag"
+private const val REQUISITION_EMAIL_SUBJECT = "Requisition for New Disk Titles "
 
 class NewRequisitionFragment : Fragment() {
 
@@ -40,6 +44,8 @@ class NewRequisitionFragment : Fragment() {
         })
     private lateinit var disksToImportAdapter: NewRequisitionDiskAdapter
     private val suppliers = mutableListOf<Supplier>()
+    private var currentSupplier = Supplier()
+    private var disksToImportAndAmount = mutableMapOf<DiskTitle, Long>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -53,6 +59,14 @@ class NewRequisitionFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        setUpRecyclerViewDisksToImport()
+        setUpSpinnerSupplier()
+        setUpButtonAddDisk()
+        setUpButtonProceed()
+        observeViewModel()
+    }
+
+    private fun setUpRecyclerViewDisksToImport() {
         disksToImportAdapter = NewRequisitionDiskAdapter(
             onButtonMinusClick = { diskTitle -> viewModel.decrementDiskTitleAmount(diskTitle) },
             onButtonPlusClick = { diskTitle -> viewModel.incrementDiskTitleAmount(diskTitle) },
@@ -61,6 +75,9 @@ class NewRequisitionFragment : Fragment() {
         binding.recyclerviewDisksToImport.adapter = disksToImportAdapter
         binding.recyclerviewDisksToImport.layoutManager = LinearLayoutManager(context)
 
+    }
+
+    private fun setUpSpinnerSupplier() {
         binding.spinnerSupplier.onItemSelectedListener = object : AdapterView.OnItemClickListener,
             AdapterView.OnItemSelectedListener {
 
@@ -82,14 +99,19 @@ class NewRequisitionFragment : Fragment() {
                 id: Long
             ) {
             }
-
         }
+    }
+
+    private fun setUpButtonAddDisk() {
+
         binding.buttonAddDisk.setOnClickListener {
             val disksToImportDialog = DisksToImportDialog()
             disksToImportDialog.show(childFragmentManager, "DISK_TO_IMPORT_DIALOG")
             //viewModel.addDiskTitleToImport(DiskTitle(name = "What"))
         }
+    }
 
+    private fun setUpButtonProceed() {
         binding.buttonProceed.setOnClickListener {
             if (disksToImportAdapter.itemCount == 0) Toast.makeText(
                 requireActivity(),
@@ -97,28 +119,72 @@ class NewRequisitionFragment : Fragment() {
                 Toast.LENGTH_LONG
             ).show()
             else {
-                viewModel.addRequisition().observe(viewLifecycleOwner) { result ->
-                    when (result) {
-                        is Response.Loading -> {
-                            binding.linearlayoutContentWrapper.visibility = View.GONE
-                            binding.progressbarImport.visibility = View.VISIBLE
-                        }
-                        is Response.Success -> {
-                            findNavController().popBackStack()
-                            Toast.makeText(
-                                requireActivity(),
-                                "Requisition sent!",
-                                Toast.LENGTH_LONG
-                            ).show()
-                        }
-                        is Response.Failure -> {
-                            Log.d(TAG, "Error: ${result.errorMessage}")
-                        }
-                    }
-                }
+                val bottomSheetFragment =
+                    NewRequisitionBottomSheetFragment(
+                        { sendEmailToSupplier() },
+                        { addRequisition() })
+                bottomSheetFragment.show(childFragmentManager, bottomSheetFragment.tag)
+
             }
 
         }
+    }
+
+    private fun sendEmailToSupplier() {
+        val emailBodyStringBuilder =
+            StringBuilder("Dear ${currentSupplier.name}, \n\nWe are CeeDee, and we would like to import the following disk titles: \n")
+
+        for (diskTitleAndAmount in disksToImportAndAmount) {
+            emailBodyStringBuilder.append("${diskTitleAndAmount.key.name} - ${diskTitleAndAmount.key.author}: ${diskTitleAndAmount.value} CD\n")
+        }
+        Log.d(TAG, "disksToImportAndAmount $disksToImportAndAmount")
+        emailBodyStringBuilder
+            .append("\n\nThank you for your time. We hope to receive a response from you soon.\n")
+            .append("\nYours sincerely,\n\n")
+            .append("CeeDee")
+
+        composeEmail(
+            arrayOf(currentSupplier.email),
+            REQUISITION_EMAIL_SUBJECT,
+            emailBodyStringBuilder.toString()
+        )
+    }
+
+    private fun composeEmail(addresses: Array<String>, subject: String, body: String) {
+        val intent = Intent(Intent.ACTION_SENDTO).apply {
+            data = Uri.parse("mailto:") // only email apps should handle this
+            putExtra(Intent.EXTRA_EMAIL, addresses)
+            putExtra(Intent.EXTRA_SUBJECT, subject)
+            putExtra(Intent.EXTRA_TEXT, body)
+        }
+        if (intent.resolveActivity(requireActivity().packageManager) != null) {
+            startActivity(intent)
+        }
+    }
+
+    private fun addRequisition() {
+        viewModel.addRequisition().observe(viewLifecycleOwner) { result ->
+            when (result) {
+                is Response.Loading -> {
+                    binding.linearlayoutContentWrapper.visibility = View.GONE
+                    binding.progressbarImport.visibility = View.VISIBLE
+                }
+                is Response.Success -> {
+                    findNavController().popBackStack()
+                    Toast.makeText(
+                        requireActivity(),
+                        "Requisition sent!",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+                is Response.Failure -> {
+                    Log.d(TAG, "Error: ${result.errorMessage}")
+                }
+            }
+        }
+    }
+
+    private fun observeViewModel() {
         viewModel.allSuppliers.observe(viewLifecycleOwner) { allSuppliers ->
             suppliers.clear()
             suppliers.addAll(allSuppliers)
@@ -129,11 +195,11 @@ class NewRequisitionFragment : Fragment() {
                 suppliers.map { it.name }
             )
         }
-
         viewModel.disksToImport.observe(viewLifecycleOwner) {
             disksToImportAdapter.setDisksToImport(it)
+            disksToImportAndAmount = it
             //Log.d(TAG, "disksToImport: $it")
         }
+        viewModel.supplierOfNewRequisition.observe(viewLifecycleOwner) { currentSupplier = it }
     }
-
 }

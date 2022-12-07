@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <item
+        android:id="@+id/menu_item_disk_parentfrag_import"
+        android:icon="@drawable/ic_import_black_24dp"
+        android:title="@string/new_requisition"
+        app:iconTint="@color/black"
+        app:showAsAction="always"
+        tools:ignore="AlwaysShowAction" />
+
+
+</menu>

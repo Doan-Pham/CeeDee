@@ -2,21 +2,15 @@ package com.haidoan.android.ceedee.ui.disk_screen.disk_titles
 
 import android.annotation.SuppressLint
 import android.app.AlertDialog
-
 import android.os.Bundle
 import android.util.Log
 import android.view.*
-import android.widget.EditText
-import android.widget.SearchView
+import android.widget.*
 import android.widget.SearchView.OnQueryTextListener
-import android.widget.TextView
-import android.widget.Toast
 import androidx.core.view.MenuHost
-
-import androidx.fragment.app.Fragment
 import androidx.core.view.MenuProvider
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
-
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -26,12 +20,7 @@ import com.haidoan.android.ceedee.data.Genre
 import com.haidoan.android.ceedee.databinding.FragmentDiskTabDiskTitlesBinding
 import com.haidoan.android.ceedee.ui.disk_screen.repository.GenreRepository
 import com.haidoan.android.ceedee.ui.disk_screen.utils.Response
-
 import com.haidoan.android.ceedee.ui.disk_screen.utils.TypeUtils
-
-import kotlinx.android.synthetic.main.activity_main.*
-
-import java.util.*
 
 class DiskTitlesTabFragment : Fragment() {
     private var _binding: FragmentDiskTabDiskTitlesBinding? = null
@@ -152,6 +141,18 @@ class DiskTitlesTabFragment : Fragment() {
                 // Add menu items here
                 menuInflater.inflate(R.menu.menu_disk_titles, menu)
 
+                val menuItemNewRequisition =
+                    menu.findItem(R.id.menu_item_disk_title_tab_new_requisition)
+
+                val newRequisitionActionView = (menuItemNewRequisition.actionView as FrameLayout)
+                val textViewNewRequisitionBadge =
+                    newRequisitionActionView.findViewById(R.id.textview_requisition_badge) as TextView
+                textViewNewRequisitionBadge.text = "10"
+
+                newRequisitionActionView.setOnClickListener {
+                    onMenuItemSelected(menuItemNewRequisition)
+                }
+
                 val searchView: SearchView =
                     (menu.findItem(R.id.menu_disk_titles_search).actionView as SearchView)
                 searchView.queryHint = "Type here to search"
@@ -171,8 +172,8 @@ class DiskTitlesTabFragment : Fragment() {
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
                 // Handle the menu selection
                 return when (menuItem.itemId) {
-                    R.id.menu_disk_titles_cart -> {
-                        Log.d("TAG_MENU", "DISKTITLE_CART")
+                    R.id.menu_item_disk_title_tab_new_requisition -> {
+                        Log.d("DiskTitleTab", "Clicked Import")
                         true
                     }
                     R.id.menu_disk_titles_add_genre -> {
@@ -205,6 +206,10 @@ class DiskTitlesTabFragment : Fragment() {
                     }
                     else -> false
                 }
+            }
+
+            override fun onPrepareMenu(menu: Menu) {
+                super.onPrepareMenu(menu)
             }
         }, viewLifecycleOwner, Lifecycle.State.RESUMED)
     }

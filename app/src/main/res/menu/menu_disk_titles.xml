@@ -1,19 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:tools="http://schemas.android.com/tools"
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    >
+    xmlns:tools="http://schemas.android.com/tools">
 
     <item
         android:id="@+id/menu_disk_titles_search"
         android:icon="@drawable/ic_round_search_24"
         android:orderInCategory="100"
-        app:iconTint="@color/white"
         android:title="@string/search"
+        app:actionViewClass="android.widget.SearchView"
+        app:iconTint="@color/white"
         app:showAsAction="always"
-        tools:targetApi="o"
         tools:ignore="AlwaysShowAction"
-        app:actionViewClass="android.widget.SearchView">
+        tools:targetApi="o">
 
     </item>
 
@@ -22,12 +21,11 @@
         android:icon="@drawable/ic_round_filter_alt_24"
         android:orderInCategory="102"
         android:title="@string/sort_by"
-        tools:targetApi="o"
         android:visible="true"
-        app:showAsAction="always">
+        app:showAsAction="always"
+        tools:targetApi="o">
         <menu>
-            <item android:title="@string/sort_by_name"
-                >
+            <item android:title="@string/sort_by_name">
                 <menu>
                     <item
                         android:id="@+id/menu_disk_title_tab_sort_by_name_ascending"
@@ -39,8 +37,7 @@
                 </menu>
             </item>
 
-            <item android:title="@string/sort_by_cd_amount"
-                >
+            <item android:title="@string/sort_by_cd_amount">
                 <menu>
                     <item
                         android:id="@+id/menu_disk_title_tab_sort_by_CD_amount_ascending"
@@ -59,33 +56,28 @@
         android:icon="@drawable/ic_round_add_24"
         android:orderInCategory="102"
         android:title="@string/sort_by"
-        tools:targetApi="o"
         android:visible="true"
-        app:showAsAction="always">
+        app:showAsAction="always"
+        tools:targetApi="o">
         <menu>
             <item
                 android:id="@+id/menu_disk_titles_add_genre"
-                android:title="Add new genre"
-                />
+                android:title="Add new genre" />
             <item
                 android:id="@+id/menu_disk_titles_add_supplier"
-                android:title="Add new supplier"
-                />
+                android:title="Add new supplier" />
             <item
                 android:id="@+id/menu_disk_titles_add_disk_title"
-                android:title="Add new disk title"
-                />
+                android:title="Add new disk title" />
         </menu>
     </item>
-
-
     <item
-        android:id="@+id/menu_disk_titles_cart"
-        android:icon="@drawable/ic_round_shopping_cart_24"
-        android:orderInCategory="104"
-        android:title="@string/cart"
+        android:id="@+id/menu_item_disk_title_tab_new_requisition"
+        app:actionLayout="@layout/menu_item_badge"
+        android:orderInCategory="1000"
+        android:title="@string/new_requisition"
         app:showAsAction="always"
-        tools:targetApi="o">
-    </item>
+        tools:ignore="AlwaysShowAction" />
+
 
 </menu>
