@@ -82,4 +82,14 @@
     <string name="complete_sending_requisition">Complete sending requisition</string>
     <string name="import_icon">Import icon</string>
     <string name="return_disks">Return disks</string>
+    <string name="customer">Customer</string>
+    <string name="customer_name">Customer name</string>
+    <string name="phone_colon">Phone:</string>
+    <string name="address">Address:</string>
+    <string name="customer_address">Customer address</string>
+    <string name="customer_phone">Customer phone</string>
+    <string name="total">Total</string>
+    <string name="rent_date_colon">Rent date:</string>
+    <string name="due_date_colon">Due date:</string>
+    <string name="overdue_colon">Overdue:</string>
 </resources>
