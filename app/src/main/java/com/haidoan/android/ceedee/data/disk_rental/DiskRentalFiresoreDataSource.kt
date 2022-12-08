@@ -5,11 +5,8 @@ import com.google.firebase.Timestamp
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.snapshots
-import com.google.type.Date
 import com.haidoan.android.ceedee.data.DiskTitle
 import com.haidoan.android.ceedee.data.Rental
-import com.haidoan.android.ceedee.data.Requisition
-import com.haidoan.android.ceedee.data.supplier.Supplier
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
@@ -17,8 +14,13 @@ import kotlinx.coroutines.tasks.await
 import java.time.LocalDate
 import java.time.ZoneId
 
+@Suppress("UNCHECKED_CAST")
+
+
 class DiskRentalFiresoreDataSource {
     private val firestoreDb: FirebaseFirestore = FirebaseFirestore.getInstance()
+    private val zoneId = ZoneId.of("Asia/Ho_Chi_Minh")
+
     fun getRentalStream(): Flow<List<Rental>> =
         firestoreDb.collection("Rental").snapshots().map { querySnapshot ->
             querySnapshot.documents.map {
@@ -45,7 +47,7 @@ class DiskRentalFiresoreDataSource {
                 result.get("customerName") as String,
                 result.get("customerAddress") as String,
                 result.get("customerPhone") as String,
-                result.get("diskTitlesToImport") as Map<String, Long>,
+                result.get("diskTitlesToAdd") as Map<String, Long>,
                 result.get("dueDate") as Timestamp,
                 result.get("rentDate") as Timestamp,
                 result.get("returnDate") as Timestamp,
@@ -68,11 +70,13 @@ class DiskRentalFiresoreDataSource {
 
         //val diskTitleIdToAmountMap = diskTitlesToAdd
         val newRentalAsMap = hashMapOf(
-            "customerName" to (customerName?: "") ,
+            "customerName" to (customerName ?: ""),
             "customerAddress" to (customerAddress ?: ""),
             "customerPhone" to (customerPhone ?: ""),
             "rentDate" to Timestamp.now(),
-            "dueDate" to Timestamp(java.util.Date(LocalDate.now().plusDays(30).toString())),
+            "dueDate" to Timestamp(
+                (LocalDate.now().plusDays(30).atStartOfDay(zoneId).toEpochSecond()), 0
+            ),
             "returnDate" to Timestamp.now(),
             "rentalStatus" to "In progress",
             "diskTitlesToAdd" to diskTitlesToAdd.mapKeys { it.key.id },

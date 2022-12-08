@@ -6,10 +6,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
+import com.haidoan.android.ceedee.data.disk_rental.DiskRentalFiresoreDataSource
+import com.haidoan.android.ceedee.data.disk_rental.DiskRentalRepository
 import com.haidoan.android.ceedee.databinding.FragmentDiskReturnBinding
+import com.haidoan.android.ceedee.ui.disk_screen.repository.DiskTitlesRepository
 
-const val TAG = "DiskReturnFragment"
+private const val TAG = "DiskReturnFragment"
 
 class DiskReturnFragment : Fragment() {
     private var _binding: FragmentDiskReturnBinding? = null
@@ -18,8 +22,15 @@ class DiskReturnFragment : Fragment() {
     // onDestroyView.
     private val binding get() = _binding!!
 
-    private val navArgs: DiskReturnFragmentArgs by navArgs()
+    private val viewModel: DiskReturnViewModel by viewModels {
+        DiskReturnViewModel.Factory(
+            DiskRentalRepository(DiskRentalFiresoreDataSource()),
+            DiskTitlesRepository(requireActivity().application),
+            this
+        )
+    }
 
+    private val navArgs: DiskReturnFragmentArgs by navArgs()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -32,7 +43,13 @@ class DiskReturnFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        Log.d(TAG, navArgs.currentRentalId ?: "An error has occurred. No rental found!")
+        viewModel.setRentalId(navArgs.currentRentalId)
+        viewModel.uiState.observe(viewLifecycleOwner) { diskReturnUiState ->
+            Log.d(TAG, "UiState: $diskReturnUiState")
+            binding.apply {
+                textviewTest.text = diskReturnUiState.customerName
+            }
+        }
     }
 
 }
