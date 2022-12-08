@@ -89,7 +89,7 @@ class TabOverdue : Fragment() {
         rentalRecyclerView = view.findViewById(R.id.tabOverdueRecyclerView)
         rentalRecyclerView.layoutManager = LinearLayoutManager(context)
         rentalRecyclerView.setHasFixedSize(true)
-        rental_adapter = RentalAdapter(rentalList)
+        rental_adapter = RentalAdapter(rentalList) {}
         rentalRecyclerView.adapter = rental_adapter
         viewModel = ViewModelProvider(this).get(TabOverdueViewModel::class.java)
         viewModel.completeRentals.observe(viewLifecycleOwner) {

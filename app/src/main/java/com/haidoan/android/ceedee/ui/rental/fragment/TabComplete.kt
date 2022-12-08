@@ -91,7 +91,7 @@ class TabComplete : Fragment() {
         rentalRecyclerView = view.findViewById(R.id.tabCompleteRecyclerView)
         rentalRecyclerView.layoutManager = LinearLayoutManager(context)
         rentalRecyclerView.setHasFixedSize(true)
-        rental_adapter = RentalAdapter(rentalList)
+        rental_adapter = RentalAdapter(rentalList) {}
         rentalRecyclerView.adapter = rental_adapter
         viewModel = ViewModelProvider(this).get(TabCompleteViewModel::class.java)
         viewModel.completeRentals.observe(viewLifecycleOwner) {

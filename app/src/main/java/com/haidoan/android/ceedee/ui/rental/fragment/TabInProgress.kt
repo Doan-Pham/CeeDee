@@ -10,6 +10,7 @@ import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.firestore.*
@@ -90,7 +91,11 @@ class TabInProgress : Fragment() {
         rentalRecyclerView = view.findViewById(R.id.tabInProgressRecyclerView)
         rentalRecyclerView.layoutManager = LinearLayoutManager(context)
         rentalRecyclerView.setHasFixedSize(true)
-        rental_adapter = RentalAdapter(rentalList)
+        rental_adapter = RentalAdapter(rentalList) {
+            val action =
+                RentalFragmentDirections.actionRentalFragmentToDiskReturnFragment(it)
+            findNavController().navigate(action)
+        }
         rentalRecyclerView.adapter = rental_adapter
         viewModel = ViewModelProvider(this).get(TabInProgressViewModel::class.java)
         viewModel.completeRentals.observe(viewLifecycleOwner) {
