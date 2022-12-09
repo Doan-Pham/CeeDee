@@ -1,7 +1,7 @@
 package com.haidoan.android.ceedee.ui.disk_return
 
+import android.annotation.SuppressLint
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,6 +12,9 @@ import com.haidoan.android.ceedee.data.disk_rental.DiskRentalFiresoreDataSource
 import com.haidoan.android.ceedee.data.disk_rental.DiskRentalRepository
 import com.haidoan.android.ceedee.databinding.FragmentDiskReturnBinding
 import com.haidoan.android.ceedee.ui.disk_screen.repository.DiskTitlesRepository
+import com.haidoan.android.ceedee.ui.report.util.toFormattedCurrencyString
+import com.haidoan.android.ceedee.ui.report.util.toFormattedString
+import java.time.LocalDate
 
 private const val TAG = "DiskReturnFragment"
 
@@ -41,15 +44,41 @@ class DiskReturnFragment : Fragment() {
         return binding.root
     }
 
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel.setRentalId(navArgs.currentRentalId)
-        viewModel.uiState.observe(viewLifecycleOwner) { diskReturnUiState ->
-            Log.d(TAG, "UiState: $diskReturnUiState")
+        observeViewModel()
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun observeViewModel() {
+        viewModel.uiState.observe(viewLifecycleOwner) { uiState ->
+            //Log.d(TAG, "UiState: $uiState")
             binding.apply {
-                textviewTest.text = diskReturnUiState.customerName
+                textviewCustomerName.text = uiState.customerName;
+                textviewCustomerAddress.text = uiState.customerAddress
+                textviewCustomerPhone.text = uiState.customerPhone
+                textviewRentDate.text = uiState.rentDate?.toFormattedString()
+                textviewDueDate.text = uiState.dueDate?.toFormattedString()
+
+                if (uiState.overdueDateCount <= 0L) {
+                    textviewOverdueFee.text = ""
+                    textviewOverdueDateRange.text = ""
+                } else {
+
+                    textviewOverdueFee.text = uiState.overdueFee.toFormattedCurrencyString()
+                    textviewOverdueDateRange.text = "${uiState.dueDate?.toFormattedString()} - ${
+                        LocalDate.now().toFormattedString()
+                    }"
+                }
+
+                textviewOverdueDateCount.text = "${uiState.overdueDateCount} days"
+                textviewTotalPayment.text = uiState.totalPayment.toFormattedCurrencyString()
             }
         }
     }
 
 }
+
+

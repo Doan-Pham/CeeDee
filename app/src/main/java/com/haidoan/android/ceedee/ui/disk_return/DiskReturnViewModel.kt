@@ -12,6 +12,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import java.time.LocalDate
 import java.time.ZoneId
+import java.time.temporal.ChronoUnit
 
 private const val TAG = "DiskReturnViewModel"
 private const val SAVED_STATE_KEY_RENTAL_ID = "currentRentalId"
@@ -34,7 +35,13 @@ class DiskReturnViewModel(
                                 customerName = rental.customerName,
                                 customerPhone = rental.customerPhone,
                                 customerAddress = rental.customerAddress,
-                                disksToReturn = rental.diskTitlesRentedAndAmount.mapKeys { diskTitleAndAmount -> diskTitles.first { it.id == diskTitleAndAmount.key } },
+                                diskTitlesToReturn = rental.diskTitlesRentedAndAmount
+                                    .mapKeys { diskTitleIdAndAmount ->
+                                        Pair(
+                                            diskTitles.first { it.id == diskTitleIdAndAmount.key },
+                                            diskTitleIdAndAmount.value
+                                        )
+                                    }.mapValues { it.value * 3000 },
                                 dueDate = rental.dueDate?.toLocalDate(),
                                 rentDate = rental.rentDate?.toLocalDate(),
                                 returnDate = rental.returnDate?.toLocalDate()
@@ -72,12 +79,26 @@ data class DiskReturnUiState(
     val customerName: String? = "",
     val customerPhone: String? = "",
     val customerAddress: String? = "",
-    val disksToReturn: Map<DiskTitle, Long>? = mapOf(),
+    /**
+     * Pair<DiskTitle, Long> = diskTitle & its amount. Final "Long" = total fee for that disk title
+     */
+    val diskTitlesToReturn: Map<Pair<DiskTitle, Long>, Long>? = mapOf(),
     val dueDate: LocalDate? = LocalDate.now(),
     val rentDate: LocalDate? = LocalDate.now(),
     val returnDate: LocalDate? = LocalDate.now(),
-    val totalPayment: Float? = 0f,
-)
+
+    ) {
+    val overdueDateCount: Long =
+        if (LocalDate.now().isBefore(dueDate)) 0
+        else ChronoUnit.DAYS.between(
+            dueDate,
+            LocalDate.now()
+        )
+
+    //TODO: Fetch the overdueFeePerDay from database
+    val overdueFee: Long = overdueDateCount * 4000
+    val totalPayment: Long = (diskTitlesToReturn?.values?.sum() ?: 0) + overdueFee
+}
 
 fun Timestamp.toLocalDate(): LocalDate {
     val zoneId = ZoneId.of("Asia/Ho_Chi_Minh")
