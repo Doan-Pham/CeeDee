@@ -35,13 +35,13 @@ class DiskReturnViewModel(
                                 customerName = rental.customerName,
                                 customerPhone = rental.customerPhone,
                                 customerAddress = rental.customerAddress,
-                                diskTitlesToReturn = rental.diskTitlesRentedAndAmount
-                                    .mapKeys { diskTitleIdAndAmount ->
-                                        Pair(
-                                            diskTitles.first { it.id == diskTitleIdAndAmount.key },
-                                            diskTitleIdAndAmount.value
-                                        )
-                                    }.mapValues { it.value * 3000 },
+                                diskTitlesToReturn = rental.diskTitlesRentedAndAmount.map { diskTitleIdAndAmount ->
+                                    Triple(
+                                        diskTitles.first { it.id == diskTitleIdAndAmount.key },
+                                        diskTitleIdAndAmount.value,
+                                        diskTitleIdAndAmount.value * 3000
+                                    )
+                                }.toList(),
                                 dueDate = rental.dueDate?.toLocalDate(),
                                 rentDate = rental.rentDate?.toLocalDate(),
                                 returnDate = rental.returnDate?.toLocalDate()
@@ -82,7 +82,7 @@ data class DiskReturnUiState(
     /**
      * Pair<DiskTitle, Long> = diskTitle & its amount. Final "Long" = total fee for that disk title
      */
-    val diskTitlesToReturn: Map<Pair<DiskTitle, Long>, Long>? = mapOf(),
+    val diskTitlesToReturn: List<Triple<DiskTitle, Long, Long>> = listOf(),
     val dueDate: LocalDate? = LocalDate.now(),
     val rentDate: LocalDate? = LocalDate.now(),
     val returnDate: LocalDate? = LocalDate.now(),
@@ -97,7 +97,7 @@ data class DiskReturnUiState(
 
     //TODO: Fetch the overdueFeePerDay from database
     val overdueFee: Long = overdueDateCount * 4000
-    val totalPayment: Long = (diskTitlesToReturn?.values?.sum() ?: 0) + overdueFee
+    val totalPayment = diskTitlesToReturn.sumOf { it.third }
 }
 
 fun Timestamp.toLocalDate(): LocalDate {

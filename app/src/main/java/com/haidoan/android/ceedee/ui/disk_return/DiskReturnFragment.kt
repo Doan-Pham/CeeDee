@@ -8,10 +8,12 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.haidoan.android.ceedee.data.disk_rental.DiskRentalFiresoreDataSource
 import com.haidoan.android.ceedee.data.disk_rental.DiskRentalRepository
 import com.haidoan.android.ceedee.databinding.FragmentDiskReturnBinding
 import com.haidoan.android.ceedee.ui.disk_screen.repository.DiskTitlesRepository
+import com.haidoan.android.ceedee.ui.rental.adapters.DisksToReturnAdapter
 import com.haidoan.android.ceedee.ui.report.util.toFormattedCurrencyString
 import com.haidoan.android.ceedee.ui.report.util.toFormattedString
 import java.time.LocalDate
@@ -33,6 +35,7 @@ class DiskReturnFragment : Fragment() {
         )
     }
 
+    private lateinit var diskTitlesToReturnAdapter: DisksToReturnAdapter
     private val navArgs: DiskReturnFragmentArgs by navArgs()
 
     override fun onCreateView(
@@ -48,6 +51,7 @@ class DiskReturnFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel.setRentalId(navArgs.currentRentalId)
+        setupRecyclerview()
         observeViewModel()
     }
 
@@ -56,7 +60,7 @@ class DiskReturnFragment : Fragment() {
         viewModel.uiState.observe(viewLifecycleOwner) { uiState ->
             //Log.d(TAG, "UiState: $uiState")
             binding.apply {
-                textviewCustomerName.text = uiState.customerName;
+                textviewCustomerName.text = uiState.customerName
                 textviewCustomerAddress.text = uiState.customerAddress
                 textviewCustomerPhone.text = uiState.customerPhone
                 textviewRentDate.text = uiState.rentDate?.toFormattedString()
@@ -66,17 +70,22 @@ class DiskReturnFragment : Fragment() {
                     textviewOverdueFee.text = ""
                     textviewOverdueDateRange.text = ""
                 } else {
-
                     textviewOverdueFee.text = uiState.overdueFee.toFormattedCurrencyString()
                     textviewOverdueDateRange.text = "${uiState.dueDate?.toFormattedString()} - ${
                         LocalDate.now().toFormattedString()
                     }"
                 }
-
                 textviewOverdueDateCount.text = "${uiState.overdueDateCount} days"
                 textviewTotalPayment.text = uiState.totalPayment.toFormattedCurrencyString()
+                diskTitlesToReturnAdapter.submitList(uiState.diskTitlesToReturn)
             }
         }
+    }
+
+    private fun setupRecyclerview() {
+        diskTitlesToReturnAdapter = DisksToReturnAdapter()
+        binding.recyclerviewDisksToReturn.adapter = diskTitlesToReturnAdapter
+        binding.recyclerviewDisksToReturn.layoutManager = LinearLayoutManager(context)
     }
 
 }
