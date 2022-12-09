@@ -57,9 +57,15 @@ class DiskRentalFiresoreDataSource {
         )
     }
 
-    suspend fun completeRental(rentalId: String) =
+    suspend fun completeRental(rentalId: String, totalPayment: Long) =
         firestoreDb.collection("Rental").document(rentalId)
-            .update("rentalStatus", "Completed").await()
+            .update(
+                mapOf(
+                    "rentalStatus" to "Complete",
+                    "totalPayment" to totalPayment,
+                    "returnDate" to Timestamp.now()
+                )
+            ).await()
 
     suspend fun addRental(
         customerName: String?,

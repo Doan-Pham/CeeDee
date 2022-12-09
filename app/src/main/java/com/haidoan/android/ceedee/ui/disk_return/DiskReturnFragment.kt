@@ -13,6 +13,7 @@ import com.haidoan.android.ceedee.data.disk_rental.DiskRentalFiresoreDataSource
 import com.haidoan.android.ceedee.data.disk_rental.DiskRentalRepository
 import com.haidoan.android.ceedee.databinding.FragmentDiskReturnBinding
 import com.haidoan.android.ceedee.ui.disk_screen.repository.DiskTitlesRepository
+import com.haidoan.android.ceedee.ui.disk_screen.repository.DisksRepository
 import com.haidoan.android.ceedee.ui.rental.adapters.DisksToReturnAdapter
 import com.haidoan.android.ceedee.ui.report.util.toFormattedCurrencyString
 import com.haidoan.android.ceedee.ui.report.util.toFormattedString
@@ -31,6 +32,7 @@ class DiskReturnFragment : Fragment() {
         DiskReturnViewModel.Factory(
             DiskRentalRepository(DiskRentalFiresoreDataSource()),
             DiskTitlesRepository(requireActivity().application),
+            DisksRepository(requireActivity().application),
             this
         )
     }
@@ -52,6 +54,7 @@ class DiskReturnFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         viewModel.setRentalId(navArgs.currentRentalId)
         setupRecyclerview()
+        setUpButtonProceed()
         observeViewModel()
     }
 
@@ -88,6 +91,11 @@ class DiskReturnFragment : Fragment() {
         binding.recyclerviewDisksToReturn.layoutManager = LinearLayoutManager(context)
     }
 
+    private fun setUpButtonProceed() {
+        binding.buttonProceed.setOnClickListener {
+            viewModel.completeRental()
+        }
+    }
 }
 
 

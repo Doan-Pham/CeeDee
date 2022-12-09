@@ -1,11 +1,7 @@
 package com.haidoan.android.ceedee.data.disk_rental
 
-import android.util.Log
 import com.haidoan.android.ceedee.data.DiskTitle
 import com.haidoan.android.ceedee.data.Rental
-import com.haidoan.android.ceedee.data.Requisition
-import com.haidoan.android.ceedee.data.disk_requisition.DiskRequisitionsFirestoreDataSource
-import com.haidoan.android.ceedee.data.supplier.Supplier
 import com.haidoan.android.ceedee.ui.disk_screen.utils.Response
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -18,9 +14,9 @@ class DiskRentalRepository(private val firestoreDataSource: DiskRentalFiresoreDa
     fun getRentalStreamById(rentalId: String) =
         firestoreDataSource.getRentalStreamById(rentalId)
 
-    suspend fun completeRental(rentalId: String) = flow {
+    suspend fun completeRental(rentalId: String, totalPayment: Long) = flow {
         emit(Response.Loading())
-        emit(Response.Success(firestoreDataSource.completeRental(rentalId)))
+        emit(Response.Success(firestoreDataSource.completeRental(rentalId, totalPayment)))
     }
         .catch { emit(Response.Failure(it.message.toString())) }
 

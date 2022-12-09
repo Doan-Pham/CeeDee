@@ -1,6 +1,7 @@
 package com.haidoan.android.ceedee.ui.disk_screen.repository
 
 import android.app.Application
+import android.util.Log
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.AggregateSource
 import com.google.firebase.firestore.CollectionReference
@@ -16,10 +17,6 @@ class DisksRepository(private val application: Application) {
     private val db: FirebaseFirestore = FirebaseFirestore.getInstance()
 
     private var queryDisk: CollectionReference = db.collection("Disk")
-
-    init {
-
-    }
 
     fun getDiskAmountInDiskTitlesFromFireStore(diskTitleId: String) = flow {
         emit(Response.Loading())
@@ -62,4 +59,23 @@ class DisksRepository(private val application: Application) {
         }.await()))
     }
         .catch { emit(Response.Failure(it.message.toString())) }
+
+    suspend fun returnDisksRented(rentalId: String) {
+        queryDisk.whereEqualTo("currentRentalId", rentalId).get()
+            .addOnSuccessListener { documents ->
+                db.runBatch { batch ->
+                    for (document in documents) {
+                        Log.d(TAG, "${document.id} => ${document.data}")
+                        batch.update(
+                            queryDisk.document(document.id),
+                            mapOf("status" to "In Store", "currentRentalId" to "")
+                        )
+                    }
+                }
+
+            }
+            .addOnFailureListener { exception ->
+                Log.w(TAG, "Error getting documents: ", exception)
+            }
+    }
 }

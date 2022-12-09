@@ -8,8 +8,11 @@ import com.google.firebase.Timestamp
 import com.haidoan.android.ceedee.data.DiskTitle
 import com.haidoan.android.ceedee.data.disk_rental.DiskRentalRepository
 import com.haidoan.android.ceedee.ui.disk_screen.repository.DiskTitlesRepository
+import com.haidoan.android.ceedee.ui.disk_screen.repository.DisksRepository
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.temporal.ChronoUnit
@@ -20,7 +23,8 @@ private const val SAVED_STATE_KEY_RENTAL_ID = "currentRentalId"
 class DiskReturnViewModel(
     private val savedStateHandle: SavedStateHandle,
     private val diskRentalRepository: DiskRentalRepository,
-    private val diskTitlesRepository: DiskTitlesRepository
+    private val diskTitlesRepository: DiskTitlesRepository,
+    private val disksRepository: DisksRepository
 ) : ViewModel() {
 
     val uiState: LiveData<DiskReturnUiState> =
@@ -56,21 +60,41 @@ class DiskReturnViewModel(
         Log.d(TAG, "Called setRentalId - new id: $rentalId")
     }
 
+    fun completeRental() {
+        viewModelScope.launch {
+            diskRentalRepository.completeRental(
+                savedStateHandle.get<String>(SAVED_STATE_KEY_RENTAL_ID) ?: "",
+                uiState.value?.totalPayment ?: 0L
+            ).collect()
+        }
+        viewModelScope.launch {
+            disksRepository.returnDisksRented(
+                savedStateHandle.get<String>(SAVED_STATE_KEY_RENTAL_ID) ?: ""
+            )
+        }
+    }
+
     @Suppress("UNCHECKED_CAST")
     class Factory(
         private val diskRentalRepository: DiskRentalRepository,
         private val diskTitlesRepository: DiskTitlesRepository,
+        private val disksRepository: DisksRepository,
         owner: SavedStateRegistryOwner,
         defaultArgs: Bundle? = null
-    ) :
-        AbstractSavedStateViewModelFactory(owner, defaultArgs) {
+    ) : AbstractSavedStateViewModelFactory(owner, defaultArgs) {
 
         override fun <T : ViewModel> create(
             key: String,
             modelClass: Class<T>,
             handle: SavedStateHandle
         ): T {
-            return DiskReturnViewModel(handle, diskRentalRepository, diskTitlesRepository) as T
+            return DiskReturnViewModel(
+                handle,
+                diskRentalRepository,
+                diskTitlesRepository,
+                disksRepository
+            ) as T
+
         }
     }
 }
