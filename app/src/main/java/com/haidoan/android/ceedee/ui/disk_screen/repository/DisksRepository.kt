@@ -78,4 +78,38 @@ class DisksRepository(private val application: Application) {
                 Log.w(TAG, "Error getting documents: ", exception)
             }
     }
+
+    suspend fun rentDisksOfDiskTitleIds(rentalId: String, diskTitleIdsAndAmount: Map<String, Long>) {
+
+        // This tracker makes sure the amount of disks marked as "Rented" does not exceed the
+        // amount to rent for each disk title
+        val disksRentedTracker = diskTitleIdsAndAmount.toMutableMap()
+
+        queryDisk.whereIn("diskTitleId", diskTitleIdsAndAmount.keys.toList())
+            .whereEqualTo("status", "In Store").get()
+            .addOnSuccessListener { documents ->
+                db.runBatch { batch ->
+                    for (document in documents) {
+                        Log.d(
+                            TAG,
+                            "Called rentDisksOfDiskTitleIds: ${document.id} => ${document.data}"
+                        )
+                        val currentDocDiskTitleId = document.get("diskTitleId") as String
+                        if (disksRentedTracker[currentDocDiskTitleId]!! > 0) {
+                            batch.update(
+                                queryDisk.document(document.id),
+                                mapOf("status" to "Rented", "currentRentalId" to rentalId)
+                            )
+                            disksRentedTracker[currentDocDiskTitleId] =
+                                (disksRentedTracker[currentDocDiskTitleId] ?: 0) - 1
+                        }
+
+                    }
+                }
+
+            }
+            .addOnFailureListener { exception ->
+                Log.w(TAG, "Error getting documents: ", exception)
+            }
+    }
 }

@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.haidoan.android.ceedee.data.disk_rental.DiskRentalFiresoreDataSource
 import com.haidoan.android.ceedee.data.disk_rental.DiskRentalRepository
 import com.haidoan.android.ceedee.databinding.FragmentNewRentalScreenBinding
-import com.haidoan.android.ceedee.ui.disk_screen.repository.DiskTitlesRepository
+import com.haidoan.android.ceedee.ui.disk_screen.repository.DisksRepository
 import com.haidoan.android.ceedee.ui.disk_screen.utils.Response
 import com.haidoan.android.ceedee.ui.rental.adapters.NewRentalAdapter
 import com.haidoan.android.ceedee.ui.rental.viewmodel.NewRentalViewModel
@@ -34,7 +34,7 @@ class NewRentalScreen : Fragment() {
         factoryProducer = {
             NewRentalViewModel.Factory(
                 DiskRentalRepository(DiskRentalFiresoreDataSource()),
-                DiskTitlesRepository(requireActivity().application),
+                DisksRepository(requireActivity().application),
             )
         })
     private lateinit var disksToRentAdapter: NewRentalAdapter

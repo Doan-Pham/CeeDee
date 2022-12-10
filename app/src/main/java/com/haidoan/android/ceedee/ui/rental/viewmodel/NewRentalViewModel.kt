@@ -3,12 +3,15 @@ package com.haidoan.android.ceedee.ui.rental.viewmodel
 import androidx.lifecycle.*
 import com.haidoan.android.ceedee.data.DiskTitle
 import com.haidoan.android.ceedee.data.disk_rental.DiskRentalRepository
-import com.haidoan.android.ceedee.ui.disk_screen.repository.DiskTitlesRepository
+import com.haidoan.android.ceedee.ui.disk_screen.repository.DisksRepository
 import com.haidoan.android.ceedee.ui.disk_screen.utils.Response
 import kotlinx.coroutines.Dispatchers
 import okhttp3.internal.toImmutableMap
 
-class NewRentalViewModel(private val diskRentalRepository: DiskRentalRepository) : ViewModel() {
+class NewRentalViewModel(
+    private val diskRentalRepository: DiskRentalRepository,
+    private val disksRepository: DisksRepository
+) : ViewModel() {
 
     val disksToRent: LiveData<MutableMap<DiskTitle, Long>>
         get() = _diskTitlesToRent
@@ -64,7 +67,15 @@ class NewRentalViewModel(private val diskRentalRepository: DiskRentalRepository)
                 _customerAddress.value,
                 _customerPhone.value,
                 _diskTitlesToRent.value?.toImmutableMap()!!
-            ).collect { response -> emit(response) }
+            ).collect { response ->
+                if (response is Response.Success) {
+                    disksRepository.rentDisksOfDiskTitleIds(
+                        response.data?.id ?: "",
+                        disksToRent.value?.mapKeys { it.key.id } ?: mutableMapOf())
+                }
+                emit(response)
+            }
+
         }
 
     private val _customerName = MutableLiveData<String>()
@@ -82,14 +93,14 @@ class NewRentalViewModel(private val diskRentalRepository: DiskRentalRepository)
 
     class Factory(
         private val diskRentalRepository: DiskRentalRepository,
-        private val diskTitlesRepository: DiskTitlesRepository,
+        private val disksRepository: DisksRepository,
     ) :
         ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             if (modelClass.isAssignableFrom(NewRentalViewModel::class.java)) {
                 @Suppress("UNCHECKED_CAST")
                 return NewRentalViewModel(
-                    diskRentalRepository,
+                    diskRentalRepository, disksRepository
                 ) as T
             }
             throw IllegalArgumentException("Unable to construct viewmodel")

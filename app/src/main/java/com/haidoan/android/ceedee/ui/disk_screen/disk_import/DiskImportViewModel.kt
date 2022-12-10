@@ -63,12 +63,12 @@ class DiskImportViewModel(
         requisitionId: String
     ) = liveData(context = viewModelScope.coroutineContext + Dispatchers.IO) {
         coroutineScope {
-            val deferredTasks = listOf(
+            val tasks = listOf(
                 async { diskImportRepository.addImport(newImport) },
                 async { disksRepository.addMultipleDisks(diskTitlesToImportAndAmount) },
                 async { diskRequisitionsRepository.completeRequisition(requisitionId) }
             )
-            val taskResponses = deferredTasks.awaitAll()
+            val taskResponses = tasks.awaitAll()
             val taskResults = mutableListOf<Response<Any?>>()
             for (response in taskResponses) {
                 response.collect { result ->
