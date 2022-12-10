@@ -149,7 +149,7 @@ class DiskTitlesAdapter(private val context: Context) :
         holder.setIsRecyclable(true)
     }
 
-    private class DiskTitleUtils : DiffUtil.ItemCallback<DiskTitle>() {
+    class DiskTitleUtils : DiffUtil.ItemCallback<DiskTitle>() {
         override fun areItemsTheSame(oldItem: DiskTitle, newItem: DiskTitle): Boolean {
             return oldItem == newItem
         }

@@ -4,14 +4,16 @@ import android.os.Bundle
 import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
-import androidx.core.view.MenuProvider
-import androidx.lifecycle.Lifecycle
-import com.haidoan.android.ceedee.R
+import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.haidoan.android.ceedee.databinding.FragmentDiskTabDisksBinding
-
+import com.haidoan.android.ceedee.ui.disk_screen.utils.Response
 import kotlinx.android.synthetic.main.activity_main.*
 
 class DisksTabFragment : Fragment() {
+
+    private lateinit var diskAdapter: DiskAdapter
+    private lateinit var diskViewModel: DiskViewModel
 
     private var _binding: FragmentDiskTabDisksBinding? = null
 
@@ -25,45 +27,51 @@ class DisksTabFragment : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         _binding = FragmentDiskTabDisksBinding.inflate(inflater, container, false)
-        //createMenu()
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.tvDisk.text = "DISK TAB FRAGMENT"
-
+        init()
     }
 
-    private fun createMenu() {
-        requireActivity().toolbar.addMenuProvider(object : MenuProvider {
-                override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-                    // Add menu items here
-                    menu.clear()
-                    menuInflater.inflate(R.menu.menu_disks,menu)
-                }
+    fun init() {
+        diskViewModel = ViewModelProvider(requireActivity())[DiskViewModel::class.java]
 
-                override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
-                    // Handle the menu selection
-                    return when (menuItem.itemId) {
-                        R.id.menu_disks_cart -> {
-                            Log.d("TAG_MENU", "DISK_CART")
-                            true
-                        }
-                        R.id.menu_disks_tab_filter -> {
-                            Log.d("TAG_MENU", "DISK_FILTER")
-                            true
-                        }
-                        R.id.menu_disks_search -> {
-                            Log.d("TAG_MENU", "DISK_SEARCH")
-                            true
-                        }
-                        else -> false
-                    }
+        diskAdapter = DiskAdapter(requireActivity(),diskViewModel,viewLifecycleOwner)
+
+        diskViewModel.getDisks().observe(viewLifecycleOwner) { response ->
+            when (response) {
+                is Response.Loading -> {
+                    //Load a ProgressBar
+                    binding.progressbarDisk.visibility = View.VISIBLE
+                    Log.d("TAG_LIST", "LOADING...")
                 }
-            }, viewLifecycleOwner, Lifecycle.State.RESUMED
-        )
+                is Response.Success -> {
+                    val list = response.data
+                    //Do what you need to do with your list
+                    diskAdapter.submitList(list.toMutableList())
+                    Log.d("TAG_LIST",list.toString())
+                    //Hide the ProgressBar
+                    binding.progressbarDisk.visibility = View.GONE
+                }
+                is Response.Failure -> {
+                    print(response.errorMessage)
+                    //Hide the ProgressBar
+                    binding.progressbarDisk.visibility = View.GONE
+                    Log.d("TAG_LIST", "FAILURE " + response.errorMessage)
+                }
+                else -> print(response.toString())
+            }
+        }
+
+        binding.apply {
+            rcvDisk.apply {
+                layoutManager = LinearLayoutManager(activity)
+                adapter = diskAdapter
+            }
+        }
     }
 
     override fun onDestroyView() {
