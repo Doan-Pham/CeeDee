@@ -80,6 +80,7 @@ class DiskStatusAdapter(
                                 View.GONE
                             rcvDiskTitle?.visibility = View.VISIBLE
                             diskAdapter.setFilterByDiskStatusList(list)
+                            diskAdapter.setAllDiskFilterByDiskStatus(list)
                         }
                         is Response.Failure -> {
                             println(response.errorMessage)
@@ -109,6 +110,7 @@ class DiskStatusAdapter(
                         rcvDisk?.visibility = View.VISIBLE
 
                         diskAdapter.setFilterByDiskStatusList(list)
+                        diskAdapter.setAllDiskFilterByDiskStatus(list)
                     }
                     is Response.Failure -> {
                         print(response.errorMessage)

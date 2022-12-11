@@ -27,16 +27,22 @@ class DiskAdapter(
     private val viewLifecycleOwner: LifecycleOwner,
     private val diskTabFragment: DisksTabFragment
 ) :
-    ListAdapter<Disk, DiskAdapter.DiskViewHolder>(DiskAdapter.DiskUtils()) {
+    ListAdapter<Disk, DiskAdapter.DiskViewHolder>(DiskAdapter.DiskUtils()), Filterable {
 
     private val displayedDisk = arrayListOf<Disk>()
     private val allDisk = arrayListOf<Disk>()
+    private val allDiskFilterByDiskStatus = arrayListOf<Disk>()
 
     override fun submitList(newList: MutableList<Disk>?) {
         super.submitList(newList!!.toList())
         allDisk.addAll(newList.toList())
         displayedDisk.clear()
         displayedDisk.addAll(newList.toList())
+    }
+
+    fun setAllDiskFilterByDiskStatus(newList: List<Disk>) {
+        allDiskFilterByDiskStatus.clear()
+        allDiskFilterByDiskStatus.addAll(newList.toList())
     }
 
     fun setFilterByDiskStatusList(newList: List<Disk>) {
@@ -90,10 +96,6 @@ class DiskAdapter(
                 bindImage(imgDisk, item.status)
 
                 tvDiskId.text = item.id
-                /*  val triggerTime: LocalDateTime = LocalDateTime.ofInstant(
-                      Instant.ofEpochMilli(item.importDate.seconds * 1000),
-                      TimeZone.getDefault().toZoneId()
-                  )*/
                 tvDiskStatus.text = item.status
             }
         }
@@ -225,6 +227,37 @@ class DiskAdapter(
 
         private fun refresh() {
             diskTabFragment.init()
+        }
+    }
+
+    override fun getFilter(): Filter {
+        return object : Filter() {
+            override fun performFiltering(constraint: CharSequence?): FilterResults {
+                val filteredList = arrayListOf<Disk>()
+                if (constraint == null || constraint.isEmpty()) {
+                    filteredList.addAll(allDiskFilterByDiskStatus)
+                } else {
+                    val filterPattern: String =
+                        constraint.toString().lowercase(Locale.getDefault()).trim()
+                    allDiskFilterByDiskStatus.forEach { item ->
+                        if (item.id.lowercase(Locale.getDefault()).trim()
+                                .contains(filterPattern)
+                        ) {
+                            filteredList.add(item)
+                        }
+                    }
+                }
+                val filterResults = FilterResults()
+                filterResults.values = filteredList
+                return filterResults
+            }
+
+            @Suppress("UNCHECKED_CAST")
+            override fun publishResults(constraint: CharSequence?, results: FilterResults?) {
+                displayedDisk.clear()
+                displayedDisk.addAll(results?.values as List<Disk>)
+                notifyDataSetChanged()
+            }
         }
     }
 }

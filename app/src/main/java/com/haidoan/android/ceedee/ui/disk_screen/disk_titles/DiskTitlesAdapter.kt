@@ -58,6 +58,12 @@ class DiskTitlesAdapter(private val context: Context) :
         allDiskTitleFilterByGenre.addAll(newList.toList())
     }
 
+    fun setFilterByGenreList(newList: List<DiskTitle>) {
+        displayedDiskTitles.clear()
+        displayedDiskTitles.addAll(newList)
+        notifyDataSetChanged()
+    }
+
     fun setDiskTitlesTabFragment(fragment: DiskTitlesTabFragment) {
         diskTitlesTabFragment = fragment;
     }
@@ -76,12 +82,6 @@ class DiskTitlesAdapter(private val context: Context) :
 
     fun getListData(): ArrayList<DiskTitle> {
         return allDiskTitles
-    }
-
-    fun setFilterByGenreList(newList: List<DiskTitle>) {
-        displayedDiskTitles.clear()
-        displayedDiskTitles.addAll(newList)
-        notifyDataSetChanged()
     }
 
     fun sortByCDAmount(type: TypeUtils.SORT_BY_AMOUNT) {
