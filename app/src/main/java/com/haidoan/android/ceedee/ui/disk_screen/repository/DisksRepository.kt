@@ -22,6 +22,24 @@ class DisksRepository(private val application: Application) {
 
     }
 
+    fun updateStatusToFireStore(
+        id: String,
+        status: String
+    ) = flow {
+        emit(Response.Loading())
+        emit(
+            Response.Success(
+                queryDisk.document(id).update(
+                    "status", status
+                ).await()
+            )
+        )
+    }.catch { error ->
+        error.message?.let { errorMessage ->
+            emit(Response.Failure(errorMessage))
+        }
+    }
+
     fun getDisksFromFireStore() = flow {
         emit(Response.Loading())
         emit(

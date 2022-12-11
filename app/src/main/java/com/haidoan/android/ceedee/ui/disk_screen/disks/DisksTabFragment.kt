@@ -39,7 +39,7 @@ class DisksTabFragment : Fragment() {
     fun init() {
         diskViewModel = ViewModelProvider(requireActivity())[DiskViewModel::class.java]
 
-        diskAdapter = DiskAdapter(requireActivity(),diskViewModel,viewLifecycleOwner)
+        diskAdapter = DiskAdapter(requireActivity(), diskViewModel, viewLifecycleOwner, this)
 
         diskViewModel.getDisks().observe(viewLifecycleOwner) { response ->
             when (response) {
@@ -52,7 +52,7 @@ class DisksTabFragment : Fragment() {
                     val list = response.data
                     //Do what you need to do with your list
                     diskAdapter.submitList(list.toMutableList())
-                    Log.d("TAG_LIST",list.toString())
+                    Log.d("TAG_LIST", list.toString())
                     //Hide the ProgressBar
                     binding.progressbarDisk.visibility = View.GONE
                 }

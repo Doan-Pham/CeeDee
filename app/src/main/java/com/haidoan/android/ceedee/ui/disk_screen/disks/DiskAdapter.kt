@@ -8,10 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
-import androidx.core.view.get
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -19,19 +16,15 @@ import coil.load
 import com.haidoan.android.ceedee.R
 import com.haidoan.android.ceedee.data.Disk
 import com.haidoan.android.ceedee.data.DiskStatus
-import com.haidoan.android.ceedee.data.Genre
 import com.haidoan.android.ceedee.databinding.DiskItemBinding
-import com.haidoan.android.ceedee.ui.disk_screen.disk_add_edit.DiskAddEditViewModel
 import com.haidoan.android.ceedee.ui.disk_screen.utils.Response
-import java.time.Instant
-import java.time.LocalDateTime
 import java.util.*
-import kotlin.collections.ArrayList
 
 class DiskAdapter(
     private val context: Context,
     private val diskViewModel: DiskViewModel,
-    private val viewLifecycleOwner: LifecycleOwner
+    private val viewLifecycleOwner: LifecycleOwner,
+    private val diskTabFragment: DisksTabFragment
 ) :
     ListAdapter<Disk, DiskAdapter.DiskViewHolder>(DiskAdapter.DiskUtils()) {
 
@@ -68,7 +61,7 @@ class DiskAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DiskViewHolder {
         val binding =
             DiskItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return DiskViewHolder(binding, diskViewModel, viewLifecycleOwner)
+        return DiskViewHolder(binding, diskViewModel, viewLifecycleOwner, diskTabFragment)
     }
 
     override fun onBindViewHolder(holder: DiskViewHolder, position: Int) {
@@ -79,17 +72,17 @@ class DiskAdapter(
     inner class DiskViewHolder(
         private val binding: DiskItemBinding,
         private val diskViewModel: DiskViewModel,
-        private val viewLifecycleOwner: LifecycleOwner
+        private val viewLifecycleOwner: LifecycleOwner,
+        private val diskTabFragment: DisksTabFragment
     ) : RecyclerView.ViewHolder(binding.root) {
 
         private lateinit var adapterForSpinnerStatus: ArrayAdapter<DiskStatus>
 
         fun setData(item: Disk) {
             binding.apply {
-                bindImage(imgDisk)
+                bindImage(imgDisk, item.status)
 
                 tvDiskId.text = item.id
-
                 /*  val triggerTime: LocalDateTime = LocalDateTime.ofInstant(
                       Instant.ofEpochMilli(item.importDate.seconds * 1000),
                       TimeZone.getDefault().toZoneId()
@@ -98,11 +91,28 @@ class DiskAdapter(
             }
         }
 
-        private fun bindImage(imgView: ImageView) {
-            imgView.load(R.drawable.ic_in_store) {
-                placeholder(R.drawable.ic_launcher)
-                error(R.drawable.ic_app_logo)
+        private fun bindImage(imgView: ImageView, status: String) {
+            when (status) {
+                "In Store" -> {
+                    imgView.load(R.drawable.ic_in_store) {
+                        placeholder(R.drawable.ic_launcher)
+                        error(R.drawable.ic_app_logo)
+                    }
+                }
+                "Rented" -> {
+                    imgView.load(R.drawable.ic_rented) {
+                        placeholder(R.drawable.ic_launcher)
+                        error(R.drawable.ic_app_logo)
+                    }
+                }
+                else -> {
+                    imgView.load(R.drawable.ic_damaged) {
+                        placeholder(R.drawable.ic_launcher)
+                        error(R.drawable.ic_app_logo)
+                    }
+                }
             }
+
         }
 
         init {
@@ -126,6 +136,10 @@ class DiskAdapter(
 
         private fun setStatus() {
             withSetStatus(itemView, LayoutInflater.from(context))
+        }
+
+        private fun makeToast(text: String) {
+            Toast.makeText(context, text, Toast.LENGTH_SHORT).show()
         }
 
         /**
@@ -164,10 +178,11 @@ class DiskAdapter(
                         builder.setPositiveButton("ADD") { dialogInterface, i ->
 
                             if (statusSpinner.selectedItem.toString() == "") {
-                                //makeToast("Please fill all information!")
+                                makeToast("Please fill all information!")
                             } else {
-                                Log.d("TAG_SPINNER", statusSpinner.selectedItem.toString())
                                 //change update status to firestore
+                                val status = statusSpinner.selectedItem
+                                updateDiskStatusToFireStore(status.toString())
                             }
                         }
                         builder.setNegativeButton("CANCEL") { dialogLayout, i -> }
@@ -181,6 +196,28 @@ class DiskAdapter(
             }
 
         }
-    }
 
+        private fun updateDiskStatusToFireStore(status: String) {
+            val disk = displayedDisk[bindingAdapterPosition]
+            diskViewModel.updateDiskStatus(disk.id, status)
+                .observe(viewLifecycleOwner) { response ->
+                    when (response) {
+                        is Response.Loading -> {
+                        }
+                        is Response.Success -> {
+                            refresh()
+                        }
+                        is Response.Failure -> {
+                            print(response.errorMessage)
+                        }
+                        else -> print(response.toString())
+                    }
+
+                }
+        }
+
+        private fun refresh() {
+            diskTabFragment.init()
+        }
+    }
 }

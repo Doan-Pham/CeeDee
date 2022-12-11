@@ -1,6 +1,5 @@
 package com.haidoan.android.ceedee.data
 
-import com.google.firebase.Timestamp
 import com.google.firebase.firestore.DocumentId
 import java.io.Serializable
 
