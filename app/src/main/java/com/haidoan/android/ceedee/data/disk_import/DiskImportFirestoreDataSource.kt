@@ -10,7 +10,7 @@ class DiskImportFirestoreDataSource {
 
     suspend fun addImport(newImport: Import): DocumentReference? {
         val newImportAsMap = hashMapOf(
-            "supplierName" to newImport.supplierName,
+            "requisitionId" to newImport.requisitionId,
             "date" to Timestamp.now(),
             "totalPayment" to newImport.totalPayment
         )

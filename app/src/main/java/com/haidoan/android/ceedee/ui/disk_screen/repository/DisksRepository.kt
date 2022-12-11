@@ -2,7 +2,6 @@ package com.haidoan.android.ceedee.ui.disk_screen.repository
 
 import android.app.Application
 import android.util.Log
-import com.google.firebase.Timestamp
 import com.google.firebase.firestore.AggregateSource
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FirebaseFirestore
@@ -38,15 +37,14 @@ class DisksRepository(private val application: Application) {
      * Currently, Firestore limits the batch size to 500 for the free version, so the total number of
      * disks shouldn't exceed that limit
      */
-    suspend fun addMultipleDisks(diskTitlesToImportAndAmount: Map<String, Long>) = flow {
+    suspend fun importDisks(diskTitlesToImportAndAmount: Map<String, Long>) = flow {
         emit(Response.Loading())
         emit(Response.Success(db.runBatch { batch ->
             for (diskTitleId in diskTitlesToImportAndAmount.keys) {
                 val newDiskInfoAsMap = hashMapOf(
                     "diskTitleId" to diskTitleId,
                     "status" to "In Store",
-                    "totalRentalCount" to 0,
-                    "importDate" to Timestamp.now()
+                    "currentRentalId" to ""
                 )
                 val diskAmountToImport: Long = diskTitlesToImportAndAmount[diskTitleId] ?: 0
 
@@ -77,7 +75,8 @@ class DisksRepository(private val application: Application) {
             }
             .addOnFailureListener { exception ->
                 Log.w(TAG, "Error getting documents: ", exception)
-            }.await())
+            }.await()
+        )
         )
     }.catch { emit(Response.Failure(it.message.toString())) }
 

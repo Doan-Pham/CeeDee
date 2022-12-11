@@ -99,7 +99,7 @@ class DiskImportFragment : Fragment() {
     private fun importDisks() {
         viewModel.addNewImport(
             Import(
-                supplierName = binding.textviewSupplierName.text.toString(),
+                requisitionId = currentRequisitionId,
                 totalPayment = binding.edittextTotalPayment.text.toString().toLong()
             ),
             diskTitlesToImportAndAmount,

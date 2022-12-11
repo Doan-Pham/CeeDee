@@ -75,7 +75,7 @@ class DiskReturnViewModel(
                     disksRepository.returnDisksRented(
                         savedStateHandle.get<String>(SAVED_STATE_KEY_RENTAL_ID) ?: ""
                     )
-                },
+                }
             )
 
             val taskResponses = tasks.awaitAll()
@@ -83,7 +83,7 @@ class DiskReturnViewModel(
             for (response in taskResponses) {
                 response.collect { result ->
                     Log.d(
-                        "DiskImportViewModel",
+                        TAG,
                         "taskResponses.indexOf(result)" + taskResponses.indexOf(response)
                     )
                     taskResults.add(taskResponses.indexOf(response), result)
@@ -92,7 +92,7 @@ class DiskReturnViewModel(
                     // a workaround for replacing old value
                     if (taskResults.size > taskResponses.indexOf(response) + 1)
                         taskResults.removeAt(taskResponses.indexOf(response) + 1)
-                    Log.d("DiskImportViewModel", "taskResults $taskResults")
+                    Log.d(TAG, "taskResults $taskResults")
 
                     if (taskResults.size < taskResponses.size) return@collect
 
@@ -136,7 +136,7 @@ data class DiskReturnUiState(
     val customerPhone: String? = "",
     val customerAddress: String? = "",
     /**
-     * Pair<DiskTitle, Long> = diskTitle & its amount. Final "Long" = total fee for that disk title
+     * Triple<DiskTitle, Long, Long> = <Disk title, amount, fee>
      */
     val diskTitlesToReturn: List<Triple<DiskTitle, Long, Long>> = listOf(),
     val dueDate: LocalDate? = LocalDate.now(),

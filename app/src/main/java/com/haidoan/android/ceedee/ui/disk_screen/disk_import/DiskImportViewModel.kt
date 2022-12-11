@@ -65,8 +65,13 @@ class DiskImportViewModel(
         coroutineScope {
             val tasks = listOf(
                 async { diskImportRepository.addImport(newImport) },
-                async { disksRepository.addMultipleDisks(diskTitlesToImportAndAmount) },
-                async { diskRequisitionsRepository.completeRequisition(requisitionId) }
+                async { disksRepository.importDisks(diskTitlesToImportAndAmount) },
+                async { diskRequisitionsRepository.completeRequisition(requisitionId) },
+                async {
+                    diskTitlesRepository.updateDiskAmount(
+                        disksToImport.value?.mapKeys { it.key.id } ?: mapOf()
+                    )
+                }
             )
             val taskResponses = tasks.awaitAll()
             val taskResults = mutableListOf<Response<Any?>>()
