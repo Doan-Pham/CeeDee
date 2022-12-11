@@ -3,7 +3,6 @@ package com.haidoan.android.ceedee.ui.disk_screen.disks
 import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Context
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,10 +15,12 @@ import coil.load
 import com.haidoan.android.ceedee.R
 import com.haidoan.android.ceedee.data.Disk
 import com.haidoan.android.ceedee.data.DiskStatus
+import com.haidoan.android.ceedee.data.DiskTitle
 import com.haidoan.android.ceedee.databinding.DiskItemBinding
 import com.haidoan.android.ceedee.ui.disk_screen.utils.Response
 import java.util.*
 
+@SuppressLint("NotifyDataSetChanged")
 class DiskAdapter(
     private val context: Context,
     private val diskViewModel: DiskViewModel,
@@ -36,6 +37,12 @@ class DiskAdapter(
         allDisk.addAll(newList.toList())
         displayedDisk.clear()
         displayedDisk.addAll(newList.toList())
+    }
+
+    fun setFilterByDiskStatusList(newList: List<Disk>) {
+        displayedDisk.clear()
+        displayedDisk.addAll(newList)
+        notifyDataSetChanged()
     }
 
     fun getListData(): ArrayList<Disk> {

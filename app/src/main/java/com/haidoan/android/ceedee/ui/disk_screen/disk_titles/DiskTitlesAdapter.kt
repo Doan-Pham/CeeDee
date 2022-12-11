@@ -7,13 +7,11 @@ import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.core.net.toUri
 import androidx.core.os.bundleOf
 import androidx.lifecycle.LifecycleOwner
-import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -22,9 +20,7 @@ import coil.load
 import com.haidoan.android.ceedee.R
 import com.haidoan.android.ceedee.data.DiskTitle
 import com.haidoan.android.ceedee.databinding.DiskTitlesItemBinding
-import com.haidoan.android.ceedee.databinding.FragmentDiskTabDiskTitlesBinding
 import com.haidoan.android.ceedee.ui.disk_screen.utils.Response
-
 import com.haidoan.android.ceedee.ui.disk_screen.utils.TypeUtils
 import java.io.Serializable
 import java.util.*
@@ -47,6 +43,7 @@ class DiskTitlesAdapter(private val context: Context) :
     private val mapDiskTitleAmount = hashMapOf<DiskTitle, Long>()
 
     init {
+
     }
 
     override fun submitList(newList: MutableList<DiskTitle>?) {

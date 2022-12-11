@@ -19,6 +19,10 @@ class DiskStatusRepository(private val application: Application) {
 
     }
 
+    companion object {
+        const val defaultDiskStatus = "default_disk_status"
+    }
+
     fun getDiskStatusListFromFireStore() = flow {
         emit(Response.Loading())
         emit(

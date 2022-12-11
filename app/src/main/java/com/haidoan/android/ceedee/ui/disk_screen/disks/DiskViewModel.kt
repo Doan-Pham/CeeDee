@@ -15,6 +15,13 @@ class DiskViewModel(application: Application) : AndroidViewModel(application) {
         diskStatusRepository = DiskStatusRepository(application)
     }
 
+    fun getDiskByDiskStatus(status: String) = liveData(Dispatchers.IO) {
+        disksRepository.getDisksByStatusFromFireStore(status).collect { response ->
+            emit(response)
+        }
+    }
+
+
     fun updateDiskStatus(id: String, status:String)= liveData(Dispatchers.IO) {
         disksRepository.updateStatusToFireStore(id,status).collect { response ->
             emit(response)
