@@ -15,7 +15,6 @@ import coil.load
 import com.haidoan.android.ceedee.R
 import com.haidoan.android.ceedee.data.Disk
 import com.haidoan.android.ceedee.data.DiskStatus
-import com.haidoan.android.ceedee.data.DiskTitle
 import com.haidoan.android.ceedee.databinding.DiskItemBinding
 import com.haidoan.android.ceedee.ui.disk_screen.utils.Response
 import java.util.*

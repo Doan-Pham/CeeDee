@@ -40,8 +40,6 @@ class DiskTitlesAdapter(private val context: Context) :
 
     private lateinit var genreAdapter: GenreAdapter
 
-    private val mapDiskTitleAmount = hashMapOf<DiskTitle, Long>()
-
     init {
 
     }
@@ -80,36 +78,15 @@ class DiskTitlesAdapter(private val context: Context) :
         diskTitlesViewModel = viewModel
     }
 
-    fun getListData(): ArrayList<DiskTitle> {
-        return allDiskTitles
-    }
-
     fun sortByCDAmount(type: TypeUtils.SORT_BY_AMOUNT) {
-        val sortByAmountList = arrayListOf<DiskTitle>()
         when (type) {
             TypeUtils.SORT_BY_AMOUNT.Ascending -> {
-                val list = mapDiskTitleAmount.toList().sortedBy { it.second }
-                list.forEach { map ->
-                    displayedDiskTitles.forEach { item ->
-                        if (map.first.id == item.id) {
-                            sortByAmountList.add(item)
-                        }
-                    }
-                }
+                displayedDiskTitles.sortBy { it.diskAmount }
             }
             TypeUtils.SORT_BY_AMOUNT.Descending -> {
-                val list = mapDiskTitleAmount.toList().sortedByDescending { it.second }
-                list.forEach { map ->
-                    displayedDiskTitles.forEach { item ->
-                        if (map.first.id == item.id) {
-                            sortByAmountList.add(item)
-                        }
-                    }
-                }
+                displayedDiskTitles.sortByDescending { it.diskAmount }
             }
         }
-        displayedDiskTitles.clear()
-        displayedDiskTitles.addAll(sortByAmountList)
         notifyDataSetChanged()
     }
 
@@ -167,27 +144,7 @@ class DiskTitlesAdapter(private val context: Context) :
 
                 tvDiskTitlesAuthor.text = item.author
                 tvDiskTitlesName.text = item.name
-
-                Log.d("TAG_AMOUNT", item.id)
-                diskTitlesViewModel.getDiskAmountInDiskTitles(item.id)
-                    .observe(viewLifecycleOwner) { response ->
-                        when (response) {
-                            is Response.Loading -> {
-                                tvDiskTitlesAmount.text = "Loading..."
-                            }
-                            is Response.Success -> {
-                                val it = response.data.count
-                                mapDiskTitleAmount[item] = it
-                                Log.d("TAG_AMOUNT", "it $it")
-                                tvDiskTitlesAmount.text = "Amount: $it CD"
-                            }
-                            is Response.Failure -> {
-                                tvDiskTitlesAmount.text = "Fail to get amount..."
-                                print(response.errorMessage)
-                            }
-                        }
-
-                    }
+                tvDiskTitlesAmount.text = "Amount: ${item.diskAmount} CD"
             }
         }
 
@@ -233,10 +190,9 @@ class DiskTitlesAdapter(private val context: Context) :
 
         private fun deleteDiskTitle() {
             val bundle = getBundleDiskTitle()
-            val amount = bundle.getLong("amount_disk_title")
             val diskTitle = bundle.customGetSerializable<DiskTitle>("disk_title")
 
-            if (amount > 0) {
+            if (diskTitle!!.diskAmount > 0) {
                 Toast.makeText(
                     context,
                     "Can't be delete disk title because it contain disks",
@@ -302,7 +258,6 @@ class DiskTitlesAdapter(private val context: Context) :
 
             return bundleOf(
                 "disk_title" to diskTitle,
-                "amount_disk_title" to mapDiskTitleAmount[diskTitle],
                 "genre_name" to genre
             )
         }

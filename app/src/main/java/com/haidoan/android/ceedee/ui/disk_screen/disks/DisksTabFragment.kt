@@ -19,7 +19,6 @@ import com.haidoan.android.ceedee.databinding.FragmentDiskTabDisksBinding
 import com.haidoan.android.ceedee.ui.disk_screen.disk_titles.DiskTitlesViewModel
 import com.haidoan.android.ceedee.ui.disk_screen.repository.DiskStatusRepository
 import com.haidoan.android.ceedee.ui.disk_screen.utils.Response
-import kotlinx.android.synthetic.main.activity_main.*
 
 class DisksTabFragment : Fragment() {
 

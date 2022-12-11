@@ -72,22 +72,6 @@ class DisksRepository(private val application: Application) {
         }
     }
 
-    fun getDiskAmountInDiskTitlesFromFireStore(diskTitleId: String) = flow {
-        emit(Response.Loading())
-        emit(
-            Response.Success(
-                queryDisk.whereEqualTo("diskTitleId", diskTitleId)
-                    .count()
-                    .get(AggregateSource.SERVER)
-                    .await()
-            )
-        )
-    }.catch { error ->
-        error.message?.let { errorMessage ->
-            emit(Response.Failure(errorMessage))
-        }
-    }
-
     /**
      * Currently, Firestore limits the batch size to 500 for the free version, so the total number of
      * disks shouldn't exceed that limit

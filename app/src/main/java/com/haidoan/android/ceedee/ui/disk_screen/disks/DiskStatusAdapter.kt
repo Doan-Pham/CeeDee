@@ -1,7 +1,6 @@
 package com.haidoan.android.ceedee.ui.disk_screen.disks
 
 import android.content.Context
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,11 +11,9 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.haidoan.android.ceedee.R
 import com.haidoan.android.ceedee.data.DiskStatus
-import com.haidoan.android.ceedee.data.Genre
 import com.haidoan.android.ceedee.databinding.DiskStatusItemBinding
 import com.haidoan.android.ceedee.databinding.FragmentDiskTabDisksBinding
 import com.haidoan.android.ceedee.ui.disk_screen.repository.DiskStatusRepository
-import com.haidoan.android.ceedee.ui.disk_screen.repository.GenreRepository
 import com.haidoan.android.ceedee.ui.disk_screen.utils.Response
 
 class DiskStatusAdapter(

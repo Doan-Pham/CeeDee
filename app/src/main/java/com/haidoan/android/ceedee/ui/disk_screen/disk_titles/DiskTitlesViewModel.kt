@@ -23,12 +23,6 @@ class DiskTitlesViewModel(application: Application) : AndroidViewModel(applicati
         supplierRepository = SupplierRepository(application)
     }
 
-    fun getDiskAmountInDiskTitles(diskTitleId : String) = liveData(Dispatchers.IO) {
-        disksRepository.getDiskAmountInDiskTitlesFromFireStore(diskTitleId).collect { response ->
-            emit(response)
-        }
-    }
-
     fun deleteDiskTitle(diskTitleId : String) = liveData(Dispatchers.IO) {
         diskTitlesRepository.deleteDiskTitleFromFireStore(diskTitleId).collect { response ->
             emit(response)
@@ -37,18 +31,6 @@ class DiskTitlesViewModel(application: Application) : AndroidViewModel(applicati
 
     fun getDiskTitleFilterByGenreId(id: String) = liveData(Dispatchers.IO) {
         diskTitlesRepository.getDiskTitleFilterByGenreIdFromFireStore(id).collect { response ->
-            emit(response)
-        }
-    }
-
-    fun getDiskTitlesSortByName(type: TypeUtils.SORT_BY_NAME) = liveData(Dispatchers.IO) {
-        diskTitlesRepository.getDiskTitlesSortByNameFromFireStore(type).collect { response ->
-            emit(response)
-        }
-    }
-
-    fun getGenreNameById(id: String) = liveData(Dispatchers.IO) {
-        genreRepository.getGenreByIdFireStore(id).collect { response ->
             emit(response)
         }
     }
