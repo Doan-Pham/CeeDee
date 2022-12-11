@@ -60,8 +60,9 @@ class DisksRepository(private val application: Application) {
     }
         .catch { emit(Response.Failure(it.message.toString())) }
 
-    suspend fun returnDisksRented(rentalId: String) {
-        queryDisk.whereEqualTo("currentRentalId", rentalId).get()
+    suspend fun returnDisksRented(rentalId: String) = flow {
+        emit(Response.Loading())
+        emit(Response.Success(queryDisk.whereEqualTo("currentRentalId", rentalId).get()
             .addOnSuccessListener { documents ->
                 db.runBatch { batch ->
                     for (document in documents) {
@@ -76,10 +77,14 @@ class DisksRepository(private val application: Application) {
             }
             .addOnFailureListener { exception ->
                 Log.w(TAG, "Error getting documents: ", exception)
-            }
-    }
+            }.await())
+        )
+    }.catch { emit(Response.Failure(it.message.toString())) }
 
-    suspend fun rentDisksOfDiskTitleIds(rentalId: String, diskTitleIdsAndAmount: Map<String, Long>) {
+    suspend fun rentDisksOfDiskTitleIds(
+        rentalId: String,
+        diskTitleIdsAndAmount: Map<String, Long>
+    ) {
 
         // This tracker makes sure the amount of disks marked as "Rented" does not exceed the
         // amount to rent for each disk title

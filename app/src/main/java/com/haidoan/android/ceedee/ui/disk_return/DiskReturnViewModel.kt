@@ -9,10 +9,12 @@ import com.haidoan.android.ceedee.data.DiskTitle
 import com.haidoan.android.ceedee.data.disk_rental.DiskRentalRepository
 import com.haidoan.android.ceedee.ui.disk_screen.repository.DiskTitlesRepository
 import com.haidoan.android.ceedee.ui.disk_screen.repository.DisksRepository
+import com.haidoan.android.ceedee.ui.disk_screen.utils.Response
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.temporal.ChronoUnit
@@ -60,17 +62,47 @@ class DiskReturnViewModel(
         Log.d(TAG, "Called setRentalId - new id: $rentalId")
     }
 
-    fun completeRental() {
-        viewModelScope.launch {
-            diskRentalRepository.completeRental(
-                savedStateHandle.get<String>(SAVED_STATE_KEY_RENTAL_ID) ?: "",
-                uiState.value?.totalPayment ?: 0L
-            ).collect()
-        }
-        viewModelScope.launch {
-            disksRepository.returnDisksRented(
-                savedStateHandle.get<String>(SAVED_STATE_KEY_RENTAL_ID) ?: ""
+    fun completeRental() = liveData(context = viewModelScope.coroutineContext + Dispatchers.IO) {
+        coroutineScope {
+            val tasks = listOf(
+                async {
+                    diskRentalRepository.completeRental(
+                        savedStateHandle.get<String>(SAVED_STATE_KEY_RENTAL_ID) ?: "",
+                        uiState.value?.totalPayment ?: 0L
+                    )
+                },
+                async {
+                    disksRepository.returnDisksRented(
+                        savedStateHandle.get<String>(SAVED_STATE_KEY_RENTAL_ID) ?: ""
+                    )
+                },
             )
+
+            val taskResponses = tasks.awaitAll()
+            val taskResults = mutableListOf<Response<Any?>>()
+            for (response in taskResponses) {
+                response.collect { result ->
+                    Log.d(
+                        "DiskImportViewModel",
+                        "taskResponses.indexOf(result)" + taskResponses.indexOf(response)
+                    )
+                    taskResults.add(taskResponses.indexOf(response), result)
+
+                    // For some reason, using the set() method and [] cause app crash, so this is
+                    // a workaround for replacing old value
+                    if (taskResults.size > taskResponses.indexOf(response) + 1)
+                        taskResults.removeAt(taskResponses.indexOf(response) + 1)
+                    Log.d("DiskImportViewModel", "taskResults $taskResults")
+
+                    if (taskResults.size < taskResponses.size) return@collect
+
+                    if (taskResults.all { it is Response.Success }) emit(Response.Success(1))
+                    else if (taskResults.any { it is Response.Loading }) emit(Response.Loading<Int>())
+                    else if (taskResults.any { it is Response.Failure }) emit(Response.Failure("An error has occurred importing new disks"))
+                }
+            }
+
+
         }
     }
 

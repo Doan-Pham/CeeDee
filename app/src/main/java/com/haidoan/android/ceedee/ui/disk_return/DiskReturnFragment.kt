@@ -5,8 +5,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.haidoan.android.ceedee.data.disk_rental.DiskRentalFiresoreDataSource
@@ -14,6 +16,7 @@ import com.haidoan.android.ceedee.data.disk_rental.DiskRentalRepository
 import com.haidoan.android.ceedee.databinding.FragmentDiskReturnBinding
 import com.haidoan.android.ceedee.ui.disk_screen.repository.DiskTitlesRepository
 import com.haidoan.android.ceedee.ui.disk_screen.repository.DisksRepository
+import com.haidoan.android.ceedee.ui.disk_screen.utils.Response
 import com.haidoan.android.ceedee.ui.rental.adapters.DisksToReturnAdapter
 import com.haidoan.android.ceedee.ui.report.util.toFormattedCurrencyString
 import com.haidoan.android.ceedee.ui.report.util.toFormattedString
@@ -93,7 +96,23 @@ class DiskReturnFragment : Fragment() {
 
     private fun setUpButtonProceed() {
         binding.buttonProceed.setOnClickListener {
-            viewModel.completeRental()
+            viewModel.completeRental().observe(viewLifecycleOwner) { response ->
+                when (response) {
+                    is Response.Loading -> {
+                        binding.linearlayoutContentWrapper.visibility = View.GONE
+                        binding.progressbarImport.visibility = View.VISIBLE
+                    }
+                    is Response.Failure -> {}
+                    is Response.Success -> {
+                        findNavController().popBackStack()
+                        Toast.makeText(
+                            requireActivity(),
+                            "New rental added!",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+                }
+            }
         }
     }
 }
