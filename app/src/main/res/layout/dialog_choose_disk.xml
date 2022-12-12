@@ -1,43 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:paddingHorizontal="20dp">
 
-    <androidx.appcompat.widget.LinearLayoutCompat
+    <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_marginTop="30dp"
+        android:layout_marginBottom="20dp"
+        android:gravity="center"
+        android:text="Choose Disk"
+        android:textColor="@color/black"
+        android:textSize="18sp"
+        android:textStyle="bold" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="100dp"
-            android:layout_marginTop="0dp"
-            android:text="Choose Disks"
-            android:textColor="@color/black"
-            android:textSize="20dp"
-            android:textStyle="bold"></TextView>
+    <androidx.appcompat.widget.SearchView
+        android:id="@+id/search"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="10dp"
+        android:layout_marginBottom="30dp"
+        android:background="@drawable/background_textview_round_outline"
+        app:iconifiedByDefault="false"
+        app:queryHint="Search" />
 
-        <androidx.appcompat.widget.SearchView
-            android:id="@+id/search"
-            style="@style/edt_login_style"
-            android:layout_width="250dp"
-            android:layout_height="50dp"
-            android:layout_marginLeft="40dp"
-            android:layout_marginTop="20dp"
-            app:iconifiedByDefault="false"
-            app:queryBackground="@android:color/transparent"
-            app:queryHint="Search"></androidx.appcompat.widget.SearchView>
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/chooseDiskRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/chooseDiskRecyclerView"
-            android:layout_width="match_parent"
-            android:layout_marginLeft="40dp"
-            android:layout_marginRight="90dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="30dp"></androidx.recyclerview.widget.RecyclerView>
-    </androidx.appcompat.widget.LinearLayoutCompat>
-</androidx.cardview.widget.CardView>
+</LinearLayout>

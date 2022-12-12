@@ -8,8 +8,8 @@ import com.haidoan.android.ceedee.data.Rental
 class RentalRepository {
 
     private val dbf: FirebaseFirestore = FirebaseFirestore.getInstance()
-    private val tempList: ArrayList<Rental> = arrayListOf<Rental>()
-    private val _rentalList: ArrayList<Rental> = arrayListOf<Rental>()
+    private val tempList: ArrayList<Rental> = arrayListOf()
+    private val _rentalList: ArrayList<Rental> = arrayListOf()
     @Volatile
     private var inst: RentalRepository? = null
 

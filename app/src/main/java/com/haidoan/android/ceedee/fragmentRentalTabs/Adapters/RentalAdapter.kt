@@ -67,10 +67,11 @@ class RentalAdapter(var rentalList: ArrayList<Rental>) :
         val dueDate: TextView = itemView.findViewById(R.id.tvDueDate)
     }
 
-    fun convertToLocalDate(time: Timestamp?): String?{
+    @SuppressLint("WeekBasedYear")
+    fun convertToLocalDate(time: Timestamp?): String? {
         val zoneId = ZoneId.of("Asia/Ho_Chi_Minh")
-        val dtf:DateTimeFormatter=DateTimeFormatter.ofPattern("dd/MMMM/YYYY")
-       val local:LocalDate?=time?.toDate()?.toInstant()?.atZone(zoneId)?.toLocalDate()
+        val dtf: DateTimeFormatter = DateTimeFormatter.ofPattern("dd/MMMM/YYYY")
+        val local: LocalDate? = time?.toDate()?.toInstant()?.atZone(zoneId)?.toLocalDate()
         return local?.format(dtf)
     }
 

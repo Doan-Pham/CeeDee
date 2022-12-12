@@ -14,32 +14,38 @@
         android:textColor="@color/black"
         android:textStyle="bold"
         android:layout_marginTop="30dp"
-        android:layout_marginLeft="60dp">
+        android:layout_gravity="center">
     </TextView>
-    <EditText
-        android:layout_width="330dp"
-        android:id="@+id/tv_phone"
-        android:layout_marginTop="35dp"
-        android:hint="Client_Phone"
-        android:layout_height="60dp"
-        android:layout_marginLeft="30dp"
-        style="@style/edt_login_style"></EditText>
-    <EditText
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/tv_phone"
+            style="@style/edt_login_style"
+            android:layout_width="330dp"
+            android:layout_height="60dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="35dp"
+            android:inputType="text|textNoSuggestions"
+            android:hint="Client_Phone"></com.google.android.material.textfield.TextInputEditText>
+ 
+
+    <com.google.android.material.textfield.TextInputEditText
         android:layout_width="330dp"
         android:id="@+id/tv_name"
         android:layout_marginTop="30dp"
         android:hint="Client_Name"
         android:layout_height="60dp"
-        android:layout_marginLeft="30dp"
-        style="@style/edt_login_style"></EditText>
-    <EditText
+        android:inputType="text|textNoSuggestions"
+        android:layout_gravity="center"
+        style="@style/edt_login_style"></com.google.android.material.textfield.TextInputEditText>
+    <com.google.android.material.textfield.TextInputEditText
         android:layout_width="330dp"
         android:id="@+id/tv_address"
         android:layout_marginTop="30dp"
         android:hint="Client_Address"
         android:layout_height="60dp"
-        android:layout_marginLeft="30dp"
-        style="@style/edt_login_style"></EditText>
+        android:layout_gravity="center"
+        android:inputType="text|textNoSuggestions"
+        style="@style/edt_login_style"></com.google.android.material.textfield.TextInputEditText>
     <androidx.appcompat.widget.LinearLayoutCompat
         android:layout_width="match_parent"
         android:layout_marginTop="30dp"
@@ -72,7 +78,7 @@
     android:layout_width="300dp"
     android:id="@+id/btn_proceed"
     android:layout_marginTop="10dp"
-    android:layout_marginLeft="55dp"
+    android:layout_gravity="center"
     android:text="Proceed"
     android:layout_height="wrap_content"></Button>
 </androidx.appcompat.widget.LinearLayoutCompat>

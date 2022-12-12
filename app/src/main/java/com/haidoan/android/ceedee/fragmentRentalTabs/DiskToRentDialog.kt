@@ -8,14 +8,10 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.haidoan.android.ceedee.databinding.DialogAddDiskToImportBinding
 import com.haidoan.android.ceedee.databinding.DialogChooseDiskBinding
 import com.haidoan.android.ceedee.fragmentRentalTabs.Adapters.DiskToRentAdapter
 import com.haidoan.android.ceedee.fragmentRentalTabs.ViewModels.DiskToRentViewModel
 import com.haidoan.android.ceedee.fragmentRentalTabs.ViewModels.NewRentalViewModel
-import com.haidoan.android.ceedee.ui.disk_screen.disk_requisition.DisksToImportAdapter
-import com.haidoan.android.ceedee.ui.disk_screen.disk_requisition.DisksToImportViewModel
-import com.haidoan.android.ceedee.ui.disk_screen.disk_requisition.NewRequisitionViewModel
 import com.haidoan.android.ceedee.ui.disk_screen.repository.DiskTitlesRepository
 
 

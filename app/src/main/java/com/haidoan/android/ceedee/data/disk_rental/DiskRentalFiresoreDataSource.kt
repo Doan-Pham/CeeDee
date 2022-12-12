@@ -5,17 +5,13 @@ import com.google.firebase.Timestamp
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.snapshots
-import com.google.type.Date
 import com.haidoan.android.ceedee.data.DiskTitle
 import com.haidoan.android.ceedee.data.Rental
-import com.haidoan.android.ceedee.data.Requisition
-import com.haidoan.android.ceedee.data.supplier.Supplier
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.tasks.await
 import java.time.LocalDate
-import java.time.ZoneId
 
 class DiskRentalFiresoreDataSource {
     private val firestoreDb: FirebaseFirestore = FirebaseFirestore.getInstance()
@@ -68,7 +64,7 @@ class DiskRentalFiresoreDataSource {
 
         //val diskTitleIdToAmountMap = diskTitlesToAdd
         val newRentalAsMap = hashMapOf(
-            "customerName" to (customerName?: "") ,
+            "customerName" to (customerName ?: ""),
             "customerAddress" to (customerAddress ?: ""),
             "customerPhone" to (customerPhone ?: ""),
             "rentDate" to Timestamp.now(),

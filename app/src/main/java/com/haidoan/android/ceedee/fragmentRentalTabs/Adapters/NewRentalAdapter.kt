@@ -1,16 +1,10 @@
 package com.haidoan.android.ceedee.fragmentRentalTabs.Adapters
 
 import android.annotation.SuppressLint
-import android.util.Log
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
-import androidx.core.net.toUri
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
-import com.haidoan.android.ceedee.R
 import com.haidoan.android.ceedee.data.DiskTitle
 import com.haidoan.android.ceedee.databinding.ItemNewrequisitionDiskToImportBinding
 

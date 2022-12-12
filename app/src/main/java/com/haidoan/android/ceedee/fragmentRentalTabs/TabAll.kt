@@ -39,6 +39,7 @@ class TabAll : Fragment() {
         createMenu()
         return inflater.inflate(R.layout.fragment_tab_all, container, false)
     }
+
     private fun createMenu() {
         val menuHost: MenuHost = requireActivity()
         menuHost.addMenuProvider(object : MenuProvider {
@@ -56,7 +57,9 @@ class TabAll : Fragment() {
                         val searchText = newText!!.lowercase(Locale.getDefault())
                         if (searchText.isNotEmpty()) {
                             tempRentalList.forEach {
-                                if (it.customerName!!.lowercase(Locale.getDefault()).contains(searchText)) {
+                                if (it.customerName!!.lowercase(Locale.getDefault())
+                                        .contains(searchText)
+                                ) {
                                     rentalList.add(it)
                                 }
                             }
@@ -79,6 +82,7 @@ class TabAll : Fragment() {
             }
         }, viewLifecycleOwner, Lifecycle.State.RESUMED)
     }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -93,7 +97,7 @@ class TabAll : Fragment() {
         }
     }
 
-    fun getUserData(temp: kotlin.collections.ArrayList<Rental>) {
+    fun getUserData(temp: ArrayList<Rental>) {
         val dbf: FirebaseFirestore = FirebaseFirestore.getInstance()
         val _rentalList: ArrayList<Rental> = arrayListOf<Rental>()
         dbf.collection("Rental").addSnapshotListener(object : EventListener<QuerySnapshot> {
@@ -107,8 +111,8 @@ class TabAll : Fragment() {
                         _rentalList.add(dc.document.toObject(Rental::class.java))
                     }
                 }
-                    temp.addAll(_rentalList)
-                    return
+                temp.addAll(_rentalList)
+                return
             }
 
         })

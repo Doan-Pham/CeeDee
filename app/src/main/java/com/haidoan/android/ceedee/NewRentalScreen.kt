@@ -1,38 +1,24 @@
 package com.haidoan.android.ceedee
 
 
-import android.R
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.firebase.firestore.*
 import com.haidoan.android.ceedee.data.disk_rental.DiskRentalFiresoreDataSource
 import com.haidoan.android.ceedee.data.disk_rental.DiskRentalRepository
-import com.haidoan.android.ceedee.data.disk_requisition.DiskRequisitionsFirestoreDataSource
-import com.haidoan.android.ceedee.data.disk_requisition.DiskRequisitionsRepository
-import com.haidoan.android.ceedee.data.supplier.Supplier
-import com.haidoan.android.ceedee.data.supplier.SupplierFirestoreDataSource
-import com.haidoan.android.ceedee.data.supplier.SupplierRepository
 import com.haidoan.android.ceedee.databinding.FragmentNewRentalScreenBinding
 import com.haidoan.android.ceedee.fragmentRentalTabs.Adapters.NewRentalAdapter
 import com.haidoan.android.ceedee.fragmentRentalTabs.DiskToRentDialog
 import com.haidoan.android.ceedee.fragmentRentalTabs.ViewModels.NewRentalViewModel
-import com.haidoan.android.ceedee.ui.disk_screen.disk_requisition.DisksToImportDialog
-import com.haidoan.android.ceedee.ui.disk_screen.disk_requisition.NewRequisitionDiskAdapter
-import com.haidoan.android.ceedee.ui.disk_screen.disk_requisition.NewRequisitionViewModel
 import com.haidoan.android.ceedee.ui.disk_screen.repository.DiskTitlesRepository
 import com.haidoan.android.ceedee.ui.disk_screen.utils.Response
-import kotlinx.android.synthetic.main.dialog_choose_disk.*
-import java.util.*
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -76,12 +62,12 @@ class NewRentalScreen : Fragment() {
             //viewModel.addDiskTitleToImport(DiskTitle(name = "What"))
         }
         binding.btnProceed.setOnClickListener {
-            if (disksToRentAdapter.itemCount == 0 || binding.tvAddress.text.isEmpty() || binding.tvName.text.isEmpty() || binding.tvPhone.text.isEmpty()) Toast.makeText(
+            if (disksToRentAdapter.itemCount == 0) Toast.makeText(
                 requireActivity(),
-                "You need to enter at least 1 disk title and fill all customer's information",
+                "You need to enter at least 1 disk title ",
                 Toast.LENGTH_LONG
             ).show()
-            else {
+            else if (validate()) {
                 viewModel.setCustomerInformation(
                     binding.tvName.text.toString(),
                     binding.tvAddress.text.toString(),
@@ -112,5 +98,29 @@ class NewRentalScreen : Fragment() {
             disksToRentAdapter.setDisksToRent(it)
             //Log.d(TAG, "disksToImport: $it")
         }
+    }
+
+    private fun validate(): Boolean {
+        var addressTV = true
+        var phoneTV = true
+        var nameTV = true
+        var phoneTVIsValid = true
+        if (binding.tvAddress.text!!.isEmpty()) {
+            binding.tvAddress.error = "Address should not be blank"
+            addressTV = false
+        }
+        if (binding.tvName.text!!.isEmpty()) {
+            binding.tvName.error = "Name should not be blank"
+            nameTV = false
+        }
+        if (binding.tvPhone.text!!.isEmpty()) {
+            binding.tvPhone.error = "Phone number should not be blank"
+            phoneTV = false
+        }
+        if (!binding.tvPhone.text!!.matches("-?\\d+(\\.\\d+)?".toRegex())) {
+            binding.tvPhone.error = "Phone number should be digits"
+            phoneTVIsValid = false
+        }
+        return addressTV && nameTV && phoneTV  && phoneTVIsValid
     }
 }

@@ -1,7 +1,6 @@
 package com.haidoan.android.ceedee.data
 
 import com.google.firebase.Timestamp
-import com.haidoan.android.ceedee.data.DiskTitle
 
 data class Rental(
     var id : String? = null,

@@ -40,6 +40,7 @@ class TabComplete : Fragment() {
         createMenu()
         return inflater.inflate(R.layout.fragment_tab_complete, container, false)
     }
+
     private fun createMenu() {
         val menuHost: MenuHost = requireActivity()
         menuHost.addMenuProvider(object : MenuProvider {
@@ -58,7 +59,9 @@ class TabComplete : Fragment() {
                         val searchText = newText!!.lowercase(Locale.getDefault())
                         if (searchText.isNotEmpty()) {
                             tempRentalList.forEach {
-                                if (it.customerName!!.lowercase(Locale.getDefault()).contains(searchText)) {
+                                if (it.customerName!!.lowercase(Locale.getDefault())
+                                        .contains(searchText)
+                                ) {
                                     rentalList.add(it)
                                 }
                             }
@@ -81,6 +84,7 @@ class TabComplete : Fragment() {
             }
         }, viewLifecycleOwner, Lifecycle.State.RESUMED)
     }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -109,9 +113,8 @@ class TabComplete : Fragment() {
                         _rentalList.add(dc.document.toObject(Rental::class.java))
                     }
                 }
-                for(i in _rentalList)
-                {
-                    if(i.rentalStatus=="Complete")
+                for (i in _rentalList) {
+                    if (i.rentalStatus == "Complete")
                         temp.add(i)
                 }
                 return
