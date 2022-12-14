@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <item
+        android:id="@+id/menu_disk_search"
+        android:icon="@drawable/ic_round_search_24"
+        android:orderInCategory="100"
+        android:title="@string/search"
+        app:actionViewClass="android.widget.SearchView"
+        app:iconTint="@color/white"
+        app:showAsAction="always"
+        tools:ignore="AlwaysShowAction"
+        tools:targetApi="o">
+
+    </item>
+
+    <item
+        android:id="@+id/menu_disk_add"
+        android:icon="@drawable/ic_round_add_24"
+        android:orderInCategory="102"
+        android:title="@string/sort_by"
+        android:visible="true"
+        app:showAsAction="always"
+        tools:targetApi="o">
+        <menu>
+            <item
+                android:id="@+id/menu_disk_add_genre"
+                android:title="Add new genre" />
+            <item
+                android:id="@+id/menu_disk_add_supplier"
+                android:title="Add new supplier" />
+            <item
+                android:id="@+id/menu_disk_add_disk_title"
+                android:title="Add new disk title" />
+        </menu>
+    </item>
+    <item
+        android:id="@+id/menu_item_disk_tab_new_requisition"
+        app:actionLayout="@layout/menu_item_badge"
+        android:orderInCategory="1000"
+        android:title="@string/new_requisition"
+        app:showAsAction="always"
+        tools:ignore="AlwaysShowAction" />
+
+
+</menu>

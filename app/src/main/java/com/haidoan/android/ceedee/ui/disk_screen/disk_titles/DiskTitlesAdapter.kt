@@ -7,13 +7,11 @@ import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.core.net.toUri
 import androidx.core.os.bundleOf
 import androidx.lifecycle.LifecycleOwner
-import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -22,9 +20,7 @@ import coil.load
 import com.haidoan.android.ceedee.R
 import com.haidoan.android.ceedee.data.DiskTitle
 import com.haidoan.android.ceedee.databinding.DiskTitlesItemBinding
-import com.haidoan.android.ceedee.databinding.FragmentDiskTabDiskTitlesBinding
 import com.haidoan.android.ceedee.ui.disk_screen.utils.Response
-
 import com.haidoan.android.ceedee.ui.disk_screen.utils.TypeUtils
 import java.io.Serializable
 import java.util.*
@@ -44,9 +40,8 @@ class DiskTitlesAdapter(private val context: Context) :
 
     private lateinit var genreAdapter: GenreAdapter
 
-    private val mapDiskTitleAmount = hashMapOf<DiskTitle, Long>()
-
     init {
+
     }
 
     override fun submitList(newList: MutableList<DiskTitle>?) {
@@ -59,6 +54,12 @@ class DiskTitlesAdapter(private val context: Context) :
     fun setAllDiskTitleFilterByGenre(newList: List<DiskTitle>) {
         allDiskTitleFilterByGenre.clear()
         allDiskTitleFilterByGenre.addAll(newList.toList())
+    }
+
+    fun setFilterByGenreList(newList: List<DiskTitle>) {
+        displayedDiskTitles.clear()
+        displayedDiskTitles.addAll(newList)
+        notifyDataSetChanged()
     }
 
     fun setDiskTitlesTabFragment(fragment: DiskTitlesTabFragment) {
@@ -77,42 +78,15 @@ class DiskTitlesAdapter(private val context: Context) :
         diskTitlesViewModel = viewModel
     }
 
-    fun getListData(): ArrayList<DiskTitle> {
-        return allDiskTitles
-    }
-
-    fun setFilterByGenreList(newList: List<DiskTitle>) {
-        displayedDiskTitles.clear()
-        displayedDiskTitles.addAll(newList)
-        notifyDataSetChanged()
-    }
-
     fun sortByCDAmount(type: TypeUtils.SORT_BY_AMOUNT) {
-        val sortByAmountList = arrayListOf<DiskTitle>()
         when (type) {
             TypeUtils.SORT_BY_AMOUNT.Ascending -> {
-                val list = mapDiskTitleAmount.toList().sortedBy { it.second }
-                list.forEach { map ->
-                    displayedDiskTitles.forEach { item ->
-                        if (map.first.id == item.id) {
-                            sortByAmountList.add(item)
-                        }
-                    }
-                }
+                displayedDiskTitles.sortBy { it.diskAmount }
             }
             TypeUtils.SORT_BY_AMOUNT.Descending -> {
-                val list = mapDiskTitleAmount.toList().sortedByDescending { it.second }
-                list.forEach { map ->
-                    displayedDiskTitles.forEach { item ->
-                        if (map.first.id == item.id) {
-                            sortByAmountList.add(item)
-                        }
-                    }
-                }
+                displayedDiskTitles.sortByDescending { it.diskAmount }
             }
         }
-        displayedDiskTitles.clear()
-        displayedDiskTitles.addAll(sortByAmountList)
         notifyDataSetChanged()
     }
 
@@ -149,7 +123,7 @@ class DiskTitlesAdapter(private val context: Context) :
         holder.setIsRecyclable(true)
     }
 
-    private class DiskTitleUtils : DiffUtil.ItemCallback<DiskTitle>() {
+    class DiskTitleUtils : DiffUtil.ItemCallback<DiskTitle>() {
         override fun areItemsTheSame(oldItem: DiskTitle, newItem: DiskTitle): Boolean {
             return oldItem == newItem
         }
@@ -170,27 +144,7 @@ class DiskTitlesAdapter(private val context: Context) :
 
                 tvDiskTitlesAuthor.text = item.author
                 tvDiskTitlesName.text = item.name
-
-                Log.d("TAG_AMOUNT", item.id)
-                diskTitlesViewModel.getDiskAmountInDiskTitles(item.id)
-                    .observe(viewLifecycleOwner) { response ->
-                        when (response) {
-                            is Response.Loading -> {
-                                tvDiskTitlesAmount.text = "Loading..."
-                            }
-                            is Response.Success -> {
-                                val it = response.data.count
-                                mapDiskTitleAmount[item] = it
-                                Log.d("TAG_AMOUNT", "it $it")
-                                tvDiskTitlesAmount.text = "Amount: $it CD"
-                            }
-                            is Response.Failure -> {
-                                tvDiskTitlesAmount.text = "Fail to get amount..."
-                                print(response.errorMessage)
-                            }
-                        }
-
-                    }
+                tvDiskTitlesAmount.text = "Amount: ${item.diskAmount} CD"
             }
         }
 
@@ -236,10 +190,9 @@ class DiskTitlesAdapter(private val context: Context) :
 
         private fun deleteDiskTitle() {
             val bundle = getBundleDiskTitle()
-            val amount = bundle.getLong("amount_disk_title")
             val diskTitle = bundle.customGetSerializable<DiskTitle>("disk_title")
 
-            if (amount > 0) {
+            if (diskTitle!!.diskAmount > 0) {
                 Toast.makeText(
                     context,
                     "Can't be delete disk title because it contain disks",
@@ -305,7 +258,6 @@ class DiskTitlesAdapter(private val context: Context) :
 
             return bundleOf(
                 "disk_title" to diskTitle,
-                "amount_disk_title" to mapDiskTitleAmount[diskTitle],
                 "genre_name" to genre
             )
         }

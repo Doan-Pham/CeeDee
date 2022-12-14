@@ -81,4 +81,5 @@
     <string name="send_an_email">Send an email</string>
     <string name="complete_sending_requisition">Complete sending requisition</string>
     <string name="import_icon">Import icon</string>
+    <string name="set_status">Set status</string>
 </resources>

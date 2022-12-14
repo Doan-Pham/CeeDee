@@ -1,76 +1,69 @@
-package com.haidoan.android.ceedee.ui.disk_screen.disk_titles
+package com.haidoan.android.ceedee.ui.disk_screen.disks
 
 import android.content.Context
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ProgressBar
-
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.haidoan.android.ceedee.R
-import com.haidoan.android.ceedee.data.Genre
-import com.haidoan.android.ceedee.databinding.FragmentDiskTabDiskTitlesBinding
-
-import com.haidoan.android.ceedee.databinding.GenreItemBinding
-import com.haidoan.android.ceedee.ui.disk_screen.repository.GenreRepository
+import com.haidoan.android.ceedee.data.DiskStatus
+import com.haidoan.android.ceedee.databinding.DiskStatusItemBinding
+import com.haidoan.android.ceedee.databinding.FragmentDiskTabDisksBinding
+import com.haidoan.android.ceedee.ui.disk_screen.repository.DiskStatusRepository
 import com.haidoan.android.ceedee.ui.disk_screen.utils.Response
 
-class GenreAdapter(
+class DiskStatusAdapter(
     private val context: Context,
-    private val diskTitlesViewModel: DiskTitlesViewModel,
+    private val diskViewModel: DiskViewModel,
     private val viewLifecycleOwner: LifecycleOwner,
-    private val diskTitlesAdapter: DiskTitlesAdapter?,
-    private val fragmentDiskTitlesBinding: FragmentDiskTabDiskTitlesBinding?
+    private val diskAdapter: DiskAdapter,
+    private val fragmentDisksTabBinding: FragmentDiskTabDisksBinding?
 ) :
-    ListAdapter<Genre, GenreAdapter.GenreViewHolder>(GenreUtils())
-    {
+    ListAdapter<DiskStatus, DiskStatusAdapter.DiskStatusViewHolder>(DiskStatusUtils())
+{
 
-    private val displayedGenres = arrayListOf<Genre>()
+    private val displayedDiskStatus = arrayListOf<DiskStatus>()
 
     private var selectedItemPos = 0
     private var lastItemSelectedPos = 0
 
-    override fun submitList(newList: MutableList<Genre>?) {
+    override fun submitList(newList: MutableList<DiskStatus>?) {
         super.submitList(newList!!.toList())
-        displayedGenres.clear()
-        displayedGenres.addAll(newList.toList())
+        displayedDiskStatus.clear()
+        displayedDiskStatus.addAll(newList.toList())
     }
 
-    fun getItemAt(position: Int): Genre {
-        return displayedGenres[position]
+    fun getItemAt(position: Int): DiskStatus {
+        return displayedDiskStatus[position]
     }
 
-    fun getAllGenres() : ArrayList<Genre> {
-        return displayedGenres
+    fun getAllGenres() : ArrayList<DiskStatus> {
+        return displayedDiskStatus
     }
 
-    inner class GenreViewHolder(
-        val binding: GenreItemBinding
+    inner class DiskStatusViewHolder(
+        val binding: DiskStatusItemBinding
     ) : RecyclerView.ViewHolder(binding.root) {
-
         init {
             binding.root.setOnClickListener {
                 setPosItemClick()
-                Log.d("TAG", getItemAt(position = bindingAdapterPosition).name.toString())
 
-                if (getItemAt(bindingAdapterPosition).id == GenreRepository.defaultGenre) {
-                    getAllDiskTitle()
+                if (getItemAt(bindingAdapterPosition).id == DiskStatusRepository.defaultDiskStatus) {
+                    getAllDisks()
                 } else {
-                    getDiskTitleFilterByGenreId(displayedGenres[bindingAdapterPosition].id)
+                    getDiskFilterByStatus(displayedDiskStatus[bindingAdapterPosition].name)
                 }
-
             }
         }
 
-        private fun getDiskTitleFilterByGenreId(id: String) {
-            val progressBar = fragmentDiskTitlesBinding?.progressbarDiskTitle
-            val rcvDiskTitle = fragmentDiskTitlesBinding?.rcvDiskTitles
-            diskTitlesViewModel.getDiskTitleFilterByGenreId(id)
+        private fun getDiskFilterByStatus(status: String) {
+            val progressBar = fragmentDisksTabBinding?.progressbarDisk
+            val rcvDiskTitle = fragmentDisksTabBinding?.rcvDisk
+            diskViewModel.getDiskByDiskStatus(status)
                 .observe(viewLifecycleOwner) { response ->
                     when (response) {
                         is Response.Loading -> {
@@ -83,8 +76,8 @@ class GenreAdapter(
                             progressBar?.visibility =
                                 View.GONE
                             rcvDiskTitle?.visibility = View.VISIBLE
-                            diskTitlesAdapter?.setFilterByGenreList(list)
-                            diskTitlesAdapter?.setAllDiskTitleFilterByGenre(list)
+                            diskAdapter.setFilterByDiskStatusList(list)
+                            diskAdapter.setAllDiskFilterByDiskStatus(list)
                         }
                         is Response.Failure -> {
                             println(response.errorMessage)
@@ -97,10 +90,10 @@ class GenreAdapter(
                 }
         }
 
-        private fun getAllDiskTitle() {
-            val progressBar = fragmentDiskTitlesBinding?.progressbarDiskTitle
-            val rcvDiskTitle = fragmentDiskTitlesBinding?.rcvDiskTitles
-            diskTitlesViewModel.getDiskTitles().observe(viewLifecycleOwner) { response ->
+        private fun getAllDisks() {
+            val progressBar = fragmentDisksTabBinding?.progressbarDisk
+            val rcvDisk = fragmentDisksTabBinding?.rcvDisk
+            diskViewModel.getDisks().observe(viewLifecycleOwner) { response ->
                 when (response) {
                     is Response.Loading -> {
                         progressBar?.visibility =
@@ -111,15 +104,16 @@ class GenreAdapter(
                         val list = response.data
                         progressBar?.visibility =
                             View.GONE
-                        rcvDiskTitle?.visibility = View.VISIBLE
-                        diskTitlesAdapter?.setFilterByGenreList(list)
-                        diskTitlesAdapter?.setAllDiskTitleFilterByGenre(list)
+                        rcvDisk?.visibility = View.VISIBLE
+
+                        diskAdapter.setFilterByDiskStatusList(list)
+                        diskAdapter.setAllDiskFilterByDiskStatus(list)
                     }
                     is Response.Failure -> {
                         print(response.errorMessage)
                         progressBar?.visibility =
                             View.GONE
-                        rcvDiskTitle?.visibility = View.VISIBLE
+                        rcvDisk?.visibility = View.VISIBLE
                     }
                     else -> print(response.toString())
                 }
@@ -137,62 +131,61 @@ class GenreAdapter(
             notifyItemChanged(selectedItemPos)
         }
 
-        fun setData(item: Genre) {
+        fun setData(item: DiskStatus) {
             binding.apply {
-                tvGenre.text = item.name
+                tvStatus.text = item.name
             }
         }
 
         fun setDefaultBackGround() {
-            binding.cardGenre.setCardBackgroundColor(
+            binding.cardStatus.setCardBackgroundColor(
                 ContextCompat.getColor(
                     context,
                     R.color.light_grey
                 )
             )
-            binding.tvGenre.setTextColor(ContextCompat.getColor(context, R.color.dark_grey))
+            binding.tvStatus.setTextColor(ContextCompat.getColor(context, R.color.dark_grey))
         }
 
         fun setSelectedBackGround() {
-            binding.cardGenre.setCardBackgroundColor(
+            binding.cardStatus.setCardBackgroundColor(
                 ContextCompat.getColor(
                     context,
                     R.color.primary
                 )
             )
-            binding.tvGenre.setTextColor(ContextCompat.getColor(context, R.color.white))
+            binding.tvStatus.setTextColor(ContextCompat.getColor(context, R.color.white))
         }
 
     }
 
     override fun getItemCount(): Int {
-        return displayedGenres.size
+        return displayedDiskStatus.size
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GenreViewHolder {
+    private class DiskStatusUtils : DiffUtil.ItemCallback<DiskStatus>() {
+        override fun areItemsTheSame(oldItem: DiskStatus, newItem: DiskStatus): Boolean {
+            return oldItem == newItem
+        }
+
+        override fun areContentsTheSame(oldItem: DiskStatus, newItem: DiskStatus): Boolean {
+            return oldItem.id == newItem.id
+        }
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DiskStatusViewHolder {
         val binding =
-            GenreItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return GenreViewHolder(binding)
+            DiskStatusItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return DiskStatusViewHolder(binding)
     }
 
-    override fun onBindViewHolder(holder: GenreViewHolder, position: Int) {
-        holder.setData(getItemAt(position))
+    override fun onBindViewHolder(holder: DiskStatusViewHolder, position: Int) {
+        holder.setData(displayedDiskStatus[position])
         holder.setIsRecyclable(true)
 
         if (position == selectedItemPos)
             holder.setSelectedBackGround()
         else
             holder.setDefaultBackGround()
-
-    }
-
-    private class GenreUtils : DiffUtil.ItemCallback<Genre>() {
-        override fun areItemsTheSame(oldItem: Genre, newItem: Genre): Boolean {
-            return oldItem == newItem
-        }
-
-        override fun areContentsTheSame(oldItem: Genre, newItem: Genre): Boolean {
-            return oldItem.id == newItem.id
-        }
     }
 }
