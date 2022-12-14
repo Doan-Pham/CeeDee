@@ -48,21 +48,4 @@ class GenreRepository(private val application: Application) {
             emit(Response.Failure(errorMessage))
         }
     }
-
-    fun getGenreByIdFireStore(id: String) = flow {
-        emit(Response.Loading())
-        emit(
-            Response.Success(
-                queryGenre.document(id)
-                    .get()
-                    .await()
-                    .toObject(Genre::class.java)
-            )
-        )
-    }.catch { error ->
-        error.message?.let { errorMessage ->
-            emit(Response.Failure(errorMessage))
-        }
-    }
-
 }

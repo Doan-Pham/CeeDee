@@ -81,6 +81,7 @@
     <string name="send_an_email">Send an email</string>
     <string name="complete_sending_requisition">Complete sending requisition</string>
     <string name="import_icon">Import icon</string>
+    <string name="set_status">Set status</string>
     <string name="return_disks">Return disks</string>
     <string name="customer">Customer</string>
     <string name="customer_name">Customer name</string>

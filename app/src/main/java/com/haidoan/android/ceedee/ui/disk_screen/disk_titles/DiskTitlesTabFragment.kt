@@ -266,6 +266,7 @@ class DiskTitlesTabFragment : Fragment() {
                 is Response.Failure -> {
                     makeToast("Add genre fail!")
                 }
+                else -> {}
             }
         }
     }
@@ -308,8 +309,8 @@ class DiskTitlesTabFragment : Fragment() {
                 is Response.Failure -> {
                     makeToast("Add supplier fail!")
                 }
+                else -> {}
             }
-
         }
     }
 

@@ -3,11 +3,13 @@ package com.haidoan.android.ceedee.ui.disk_screen.repository
 import android.app.Application
 import android.net.Uri
 import android.util.Log
-import com.google.firebase.firestore.*
+import com.google.firebase.firestore.CollectionReference
+import com.google.firebase.firestore.FieldPath
+import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import com.haidoan.android.ceedee.data.DiskTitle
 import com.haidoan.android.ceedee.ui.disk_screen.utils.Response
-import com.haidoan.android.ceedee.ui.disk_screen.utils.TypeUtils
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.tasks.await
@@ -42,34 +44,6 @@ class DiskTitlesRepository(private val application: Application) {
         emit(
             Response.Success(queryDiskTitle
                 .whereEqualTo("genreId", id)
-                .get()
-                .await()
-                .documents
-                .mapNotNull { doc ->
-                    Log.d("TAG", "GET POST SUCCESS")
-                    doc.toObject(DiskTitle::class.java)
-                })
-        )
-    }.catch { error ->
-        error.message?.let { errorMessage ->
-            emit(Response.Failure(errorMessage))
-        }
-    }
-
-    fun getDiskTitlesSortByNameFromFireStore(type: TypeUtils.SORT_BY_NAME) = flow {
-        emit(Response.Loading())
-        emit(
-            Response.Success(queryDiskTitle
-                .orderBy(
-                    "name", when (type) {
-                        TypeUtils.SORT_BY_NAME.Ascending -> {
-                            Query.Direction.ASCENDING
-                        }
-                        TypeUtils.SORT_BY_NAME.Descending -> {
-                            Query.Direction.DESCENDING
-                        }
-                    }
-                )
                 .get()
                 .await()
                 .documents
