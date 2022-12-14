@@ -21,7 +21,7 @@ class DiskRentalFiresoreDataSource {
     private val firestoreDb: FirebaseFirestore = FirebaseFirestore.getInstance()
     private val zoneId = ZoneId.of("Asia/Ho_Chi_Minh")
 
-    fun getRentalStream(): Flow<List<Rental>> =
+    fun getRentalsStream(): Flow<List<Rental>> =
         firestoreDb.collection("Rental").snapshots().map { querySnapshot ->
             querySnapshot.documents.map {
                 Rental(
@@ -32,9 +32,10 @@ class DiskRentalFiresoreDataSource {
                     it.get("diskTitlesToAdd") as Map<String, Long>,
                     it.get("dueDate") as Timestamp,
                     it.get("rentDate") as Timestamp,
-                    it.get("totalPayment") as Timestamp,
+                    it.get("returnDate") as Timestamp,
+                    it.get("rentalStatus") as String,
                     // Naming a Firestore field as "status" somehow causes the app to crash
-                    it.get("rentalStatus") as String
+
                 )
             }
         }

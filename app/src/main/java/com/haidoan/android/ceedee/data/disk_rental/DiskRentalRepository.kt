@@ -8,8 +8,8 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 
 class DiskRentalRepository(private val firestoreDataSource: DiskRentalFiresoreDataSource) {
-    fun getRentalStream(): Flow<List<Rental>> =
-        firestoreDataSource.getRentalStream()
+    fun getRentalsStream(): Flow<List<Rental>> =
+        firestoreDataSource.getRentalsStream()
 
     fun getRentalStreamById(rentalId: String) =
         firestoreDataSource.getRentalStreamById(rentalId)
