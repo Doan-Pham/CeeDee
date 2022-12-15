@@ -18,8 +18,8 @@ import com.haidoan.android.ceedee.ui.disk_screen.repository.DiskTitlesRepository
 import com.haidoan.android.ceedee.ui.disk_screen.repository.DisksRepository
 import com.haidoan.android.ceedee.ui.disk_screen.utils.Response
 import com.haidoan.android.ceedee.ui.rental.adapters.DisksToReturnAdapter
-import com.haidoan.android.ceedee.ui.report.util.toFormattedCurrencyString
-import com.haidoan.android.ceedee.ui.report.util.toFormattedString
+import com.haidoan.android.ceedee.ui.utils.toFormattedCurrencyString
+import com.haidoan.android.ceedee.ui.utils.toFormattedString
 import java.time.LocalDate
 
 private const val TAG = "DiskReturnFragment"

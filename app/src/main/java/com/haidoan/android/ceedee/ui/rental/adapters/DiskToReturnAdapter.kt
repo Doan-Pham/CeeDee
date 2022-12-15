@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import com.haidoan.android.ceedee.data.DiskTitle
 import com.haidoan.android.ceedee.databinding.ItemDiskToReturnBinding
-import com.haidoan.android.ceedee.ui.report.util.toFormattedCurrencyString
+import com.haidoan.android.ceedee.ui.utils.toFormattedCurrencyString
 
 class DisksToReturnAdapter :
     ListAdapter<Triple<DiskTitle, Long, Long>, DisksToReturnAdapter.DisksToReturnViewHolder>(

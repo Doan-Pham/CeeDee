@@ -17,7 +17,7 @@ import java.time.format.DateTimeFormatter
 
 
 class RentalSection(
-    private val currentMonth: Timestamp?,
+    private val currentMonth: String?,
     private val currentMonthRentals: List<Rental>,
     private val onButtonReturnClick: (Rental) -> Unit
 ) : Section(
@@ -62,9 +62,9 @@ class RentalSection(
 
     class RentalMonthViewHolder(private val binding: SectionHeaderRentalBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(currentMonth: Timestamp?) {
+        fun bind(currentMonth: String?) {
             binding.apply {
-                textviewCurrentMonth.text = convertToLocalDate(currentMonth)
+                textviewCurrentMonth.text = currentMonth
             }
         }
     }

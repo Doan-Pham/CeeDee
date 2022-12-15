@@ -11,6 +11,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.firebase.Timestamp
 import com.haidoan.android.ceedee.R
 import com.haidoan.android.ceedee.data.disk_rental.DiskRentalFiresoreDataSource
 import com.haidoan.android.ceedee.data.disk_rental.DiskRentalRepository
@@ -18,7 +19,11 @@ import com.haidoan.android.ceedee.databinding.FragmentRentalBinding
 import com.haidoan.android.ceedee.ui.rental.adapters.RentalSection
 import com.haidoan.android.ceedee.ui.rental.viewmodel.RentalFilterCategory
 import com.haidoan.android.ceedee.ui.rental.viewmodel.RentalsViewModel
+import com.haidoan.android.ceedee.ui.utils.toFormattedMonthYearString
 import io.github.luizgrp.sectionedrecyclerviewadapter.SectionedRecyclerViewAdapter
+import java.time.LocalDate
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
 private const val TAG = "RentalFragment"
 
@@ -90,8 +95,11 @@ class RentalFragment : Fragment() {
 
         viewModel.rentals.observe(viewLifecycleOwner) { rentals ->
             val rentalsGroupedByMonth =
-                rentals.sortedByDescending { it.rentDate }.groupBy { it.rentDate }
+                rentals.sortedByDescending { it.rentDate }
+                    .groupBy { it.rentDate?.toFormattedMonthYearString() }
+
             rentalAdapter.removeAllSections()
+
             for (currentMonthRentals in rentalsGroupedByMonth) {
                 Log.d(TAG, "currentMonthRentals: $currentMonthRentals")
                 val currentSection = RentalSection(
@@ -154,4 +162,11 @@ class RentalFragment : Fragment() {
             RentalFragmentDirections.actionRentalFragmentToNewRentalScreen2()
         findNavController().navigate(action)
     }
+}
+
+private fun convertToLocalDate(time: Timestamp?): String? {
+    val zoneId = ZoneId.of("Asia/Ho_Chi_Minh")
+    val dtf: DateTimeFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy")
+    val localDate: LocalDate? = time?.toDate()?.toInstant()?.atZone(zoneId)?.toLocalDate()
+    return dtf.format(localDate)
 }
