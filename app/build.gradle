@@ -91,4 +91,7 @@ dependencies {
     // SavedState Module
     implementation("androidx.savedstate:savedstate-ktx:1.2.0")
     implementation 'androidx.lifecycle:lifecycle-viewmodel-savedstate:2.6.0-alpha03'
+
+    // Sectioned RecyclerView Adapter
+    implementation 'com.github.luizgrp:SectionedRecyclerViewAdapter:v3.2.0'
 }

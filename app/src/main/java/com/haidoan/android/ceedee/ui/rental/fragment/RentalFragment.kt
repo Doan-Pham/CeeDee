@@ -15,11 +15,12 @@ import com.haidoan.android.ceedee.R
 import com.haidoan.android.ceedee.data.disk_rental.DiskRentalFiresoreDataSource
 import com.haidoan.android.ceedee.data.disk_rental.DiskRentalRepository
 import com.haidoan.android.ceedee.databinding.FragmentRentalBinding
-import com.haidoan.android.ceedee.ui.disk_screen.disk_requisition.RentalAdapter
+import com.haidoan.android.ceedee.ui.rental.adapters.RentalSection
 import com.haidoan.android.ceedee.ui.rental.viewmodel.RentalFilterCategory
 import com.haidoan.android.ceedee.ui.rental.viewmodel.RentalsViewModel
+import io.github.luizgrp.sectionedrecyclerviewadapter.SectionedRecyclerViewAdapter
 
-private const val TAG = "RentalsFrag"
+private const val TAG = "RentalFragment"
 
 class RentalFragment : Fragment() {
 
@@ -36,7 +37,7 @@ class RentalFragment : Fragment() {
             )
         )[RentalsViewModel::class.java]
     }
-    private lateinit var rentalAdapter: RentalAdapter
+    private lateinit var rentalAdapter: SectionedRecyclerViewAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -52,14 +53,15 @@ class RentalFragment : Fragment() {
         setUpOptionMenu()
 
 
-        rentalAdapter =
-            RentalAdapter(onButtonReturnClick = { rental ->
-                val action =
-                    RentalFragmentDirections.actionRentalFragmentToDiskReturnFragment(
-                        rental.id
-                    )
-                findNavController().navigate(action)
-            })
+//        rentalAdapter =
+//            RentalAdapter(onButtonReturnClick = { rental ->
+//                val action =
+//                    RentalFragmentDirections.actionRentalFragmentToDiskReturnFragment(
+//                        rental.id
+//                    )
+//                findNavController().navigate(action)
+//            })
+        rentalAdapter = SectionedRecyclerViewAdapter()
 
         binding.apply {
             fab.setOnClickListener { navigateToNewRentalFragment() }
@@ -87,9 +89,29 @@ class RentalFragment : Fragment() {
         }
 
         viewModel.rentals.observe(viewLifecycleOwner) { rentals ->
-            rentalAdapter.submitList(
-                rentals
-            )
+            val rentalsGroupedByMonth =
+                rentals.sortedByDescending { it.rentDate }.groupBy { it.rentDate }
+            rentalAdapter.removeAllSections()
+            for (currentMonthRentals in rentalsGroupedByMonth) {
+                Log.d(TAG, "currentMonthRentals: $currentMonthRentals")
+                val currentSection = RentalSection(
+                    currentMonthRentals.key,
+                    currentMonthRentals.value,
+                    onButtonReturnClick = { rental ->
+                        val action =
+                            RentalFragmentDirections.actionRentalFragmentToDiskReturnFragment(
+                                rental.id
+                            )
+                        findNavController().navigate(action)
+                    })
+                rentalAdapter.addSection(currentSection)
+            }
+
+            binding.recyclerviewRentals.adapter = rentalAdapter
+
+//            rentalAdapter.submitList(
+//                rentals
+//            )
         }
     }
 
