@@ -5,8 +5,6 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.haidoan.android.ceedee.data.USER_ROLE_EMPLOYEE
-import com.haidoan.android.ceedee.data.USER_ROLE_MANAGER
 import com.haidoan.android.ceedee.data.User
 import com.haidoan.android.ceedee.databinding.ItemUserBinding
 
@@ -21,11 +19,7 @@ class UserAdapter : ListAdapter<User, UserAdapter.UserViewHolder>(UserUtils()) {
             binding.apply {
                 textviewUsername.text = user.username
                 textviewPassword.text = user.password
-                textviewRole.text = when (user.role) {
-                    USER_ROLE_EMPLOYEE -> "Employee"
-                    USER_ROLE_MANAGER -> "Manager"
-                    else -> "UNKNOWN"
-                }
+                textviewRole.text = user.role
             }
         }
     }

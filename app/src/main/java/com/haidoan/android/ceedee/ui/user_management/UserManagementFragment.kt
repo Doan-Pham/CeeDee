@@ -11,6 +11,7 @@ import com.haidoan.android.ceedee.data.user_management.UserFirestoreDataSource
 import com.haidoan.android.ceedee.data.user_management.UserRepository
 import com.haidoan.android.ceedee.databinding.FragmentUserManagementBinding
 
+private const val TAG = "UserManagementFragment"
 
 class UserManagementFragment : Fragment() {
 
@@ -58,6 +59,12 @@ class UserManagementFragment : Fragment() {
             usersAdapter.submitList(
                 users
             )
+        }
+
+        viewModel.userRoles.observe(viewLifecycleOwner) {
+            Log.d(TAG, "userRoles: $it")
+            roleList.clear()
+            roleList.addAll(it)
         }
     }
 }

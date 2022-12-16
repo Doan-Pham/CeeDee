@@ -15,7 +15,7 @@
         android:focusable="true"
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/button_import"
+        app:layout_constraintEnd_toStartOf="@+id/button_delete"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:targetApi="m">
@@ -82,14 +82,14 @@
     </LinearLayout>
 
     <ImageButton
-        android:id="@+id/button_import"
+        android:id="@+id/button_delete"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:backgroundTint="@color/white"
         android:clickable="true"
-        android:contentDescription="@string/Import"
+        android:contentDescription="Delete"
         android:focusable="true"
-        android:src="@drawable/ic_import_black_24dp"
+        android:src="@drawable/ic_delete_black_24dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

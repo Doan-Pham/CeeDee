@@ -1,6 +1,7 @@
 package com.haidoan.android.ceedee.ui.login
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -10,6 +11,8 @@ import com.haidoan.android.ceedee.ui.disk_screen.utils.Response
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.tasks.await
+
+private const val TAG = "AuthenticationRepo"
 
 class AuthenticationRepository(private val application: Application) {
     private val firebaseUserMutableLiveData: MutableLiveData<FirebaseUser?> = MutableLiveData()
@@ -62,6 +65,18 @@ class AuthenticationRepository(private val application: Application) {
             }
             if (email!!.isEmpty() || pass!!.isEmpty()) {
                 requiredText.postValue("Email or Password cannot be empty")
+            }
+        }
+    }
+
+    fun signUpWithEmailPassword(email: String, password: String) {
+        auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                // Sign in success, update UI with the signed-in user's information
+                Log.d(TAG, "createUserWithEmail:success")
+            } else {
+                // If sign in fails, display a message to the user.
+                Log.w(TAG, "createUserWithEmail:failure", task.exception)
             }
         }
     }

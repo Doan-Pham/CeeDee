@@ -7,10 +7,10 @@ data class User(
     val id: String = "NOT_FOUND_UID",
     val username: String = "NOT_FOUND_USERNAME",
     val password: String = "NOT_FOUND_PASSWORD",
-    val role: Long = -1L,
+    val role: String = "NOT_FOUND_ROLE",
 )
 
 const val USER_ROLE_CUSTOMER = 1L
-const val USER_ROLE_EMPLOYEE = 2L
-const val USER_ROLE_MANAGER = 3L
+const val USER_ROLE_EMPLOYEE = "Employee"
+const val USER_ROLE_MANAGER = "Manager"
 
