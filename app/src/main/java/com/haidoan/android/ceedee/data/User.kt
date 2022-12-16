@@ -10,7 +10,7 @@ data class User(
     val role: Long = -1L,
 )
 
-const val USER_ROLE_USER = 1L
+const val USER_ROLE_CUSTOMER = 1L
 const val USER_ROLE_EMPLOYEE = 2L
 const val USER_ROLE_MANAGER = 3L
 

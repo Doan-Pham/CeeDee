@@ -78,7 +78,7 @@
     </fragment>
     <fragment
         android:id="@+id/userManagementFragment"
-        android:name="com.haidoan.android.ceedee.data.UserManagementFragment"
+        android:name="com.haidoan.android.ceedee.ui.user_management.UserManagementFragment"
         android:label="User Management"
         tools:layout="@layout/fragment_user_management" />
 </navigation>
