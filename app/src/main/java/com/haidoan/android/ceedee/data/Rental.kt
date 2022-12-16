@@ -5,14 +5,14 @@ import com.google.firebase.firestore.DocumentId
 
 data class Rental(
     @DocumentId
-    var id: String? = null,
-    var customerName: String? = null,
-    var customerPhone: String? = null,
-    var customerAddress: String? = null,
+    var id: String = "NOT_FOUND_ID",
+    var customerName: String = "NOT_FOUND_CUSTOMER_NAME",
+    var customerPhone: String = "NOT_FOUND_CUSTOMER_PHONE",
+    var customerAddress: String = "NOT_FOUND_CUSTOMER_ADDRESS",
     var diskTitlesRentedAndAmount: Map<String, Long> = mapOf(),
     var dueDate: Timestamp? = null,
     var rentDate: Timestamp? = null,
     var returnDate: Timestamp? = null,
     var rentalStatus: String? = null,
-    var totalPayment: Float? = null,
+    var totalPayment: Long? = null,
 )

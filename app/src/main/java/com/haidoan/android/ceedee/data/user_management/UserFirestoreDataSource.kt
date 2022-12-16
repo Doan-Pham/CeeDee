@@ -34,7 +34,7 @@ class UserFirestoreDataSource {
     ): DocumentReference? {
 
         Log.d(TAG, "Called addUser")
-        return firestoreDb.collection("Rental").add(
+        return firestoreDb.collection("User").add(
             mapOf(
                 "username" to user.username,
                 "password" to user.password,

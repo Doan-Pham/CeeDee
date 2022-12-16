@@ -9,7 +9,7 @@ import com.haidoan.android.ceedee.data.DiskTitle
 import com.haidoan.android.ceedee.data.Rental
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.tasks.await
 import java.time.LocalDate
 import java.time.ZoneId
@@ -22,21 +22,9 @@ class DiskRentalFirestoreDataSource {
     private val zoneId = ZoneId.of("Asia/Ho_Chi_Minh")
 
     fun getRentalsStream(): Flow<List<Rental>> =
-        firestoreDb.collection("Rental").snapshots().map { querySnapshot ->
-            querySnapshot.documents.map {
-                Rental(
-                    it.id,
-                    it.get("customerName") as String,
-                    it.get("customerAddress") as String,
-                    it.get("customerPhone") as String,
-                    it.get("diskTitlesToAdd") as Map<String, Long>,
-                    it.get("dueDate") as Timestamp,
-                    it.get("rentDate") as Timestamp,
-                    it.get("returnDate") as Timestamp,
-                    it.get("rentalStatus") as String,
-                    // Naming a Firestore field as "status" somehow causes the app to crash
-
-                )
+        firestoreDb.collection("Rental").snapshots().mapNotNull { querySnapshot ->
+            querySnapshot.documents.mapNotNull {
+                it.toObject(Rental::class.java)
             }
         }
 
@@ -53,7 +41,8 @@ class DiskRentalFirestoreDataSource {
                 result.get("rentDate") as Timestamp,
                 result.get("returnDate") as Timestamp,
                 // Naming a Firestore field as "status" somehow causes the app to crash
-                result.get("rentalStatus") as String
+                result.get("rentalStatus") as String,
+                result.get("totalPayment") as Long
             )
         )
     }
