@@ -11,7 +11,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.haidoan.android.ceedee.data.disk_rental.DiskRentalFiresoreDataSource
+import com.haidoan.android.ceedee.data.disk_rental.DiskRentalFirestoreDataSource
 import com.haidoan.android.ceedee.data.disk_rental.DiskRentalRepository
 import com.haidoan.android.ceedee.databinding.FragmentDiskReturnBinding
 import com.haidoan.android.ceedee.ui.disk_screen.repository.DiskTitlesRepository
@@ -33,7 +33,7 @@ class DiskReturnFragment : Fragment() {
 
     private val viewModel: DiskReturnViewModel by viewModels {
         DiskReturnViewModel.Factory(
-            DiskRentalRepository(DiskRentalFiresoreDataSource()),
+            DiskRentalRepository(DiskRentalFirestoreDataSource()),
             DiskTitlesRepository(requireActivity().application),
             DisksRepository(requireActivity().application),
             this

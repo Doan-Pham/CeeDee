@@ -11,7 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.haidoan.android.ceedee.data.disk_rental.DiskRentalFiresoreDataSource
+import com.haidoan.android.ceedee.data.disk_rental.DiskRentalFirestoreDataSource
 import com.haidoan.android.ceedee.data.disk_rental.DiskRentalRepository
 import com.haidoan.android.ceedee.databinding.FragmentNewRentalScreenBinding
 import com.haidoan.android.ceedee.ui.disk_screen.repository.DisksRepository
@@ -33,7 +33,7 @@ class NewRentalScreen : Fragment() {
     private val viewModel: NewRentalViewModel by viewModels(
         factoryProducer = {
             NewRentalViewModel.Factory(
-                DiskRentalRepository(DiskRentalFiresoreDataSource()),
+                DiskRentalRepository(DiskRentalFirestoreDataSource()),
                 DisksRepository(requireActivity().application),
             )
         })

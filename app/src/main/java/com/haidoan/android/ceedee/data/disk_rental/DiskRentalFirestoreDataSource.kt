@@ -17,7 +17,7 @@ import java.time.ZoneId
 @Suppress("UNCHECKED_CAST")
 
 
-class DiskRentalFiresoreDataSource {
+class DiskRentalFirestoreDataSource {
     private val firestoreDb: FirebaseFirestore = FirebaseFirestore.getInstance()
     private val zoneId = ZoneId.of("Asia/Ho_Chi_Minh")
 

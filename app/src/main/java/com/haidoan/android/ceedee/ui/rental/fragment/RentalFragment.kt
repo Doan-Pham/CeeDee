@@ -13,7 +13,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.Timestamp
 import com.haidoan.android.ceedee.R
-import com.haidoan.android.ceedee.data.disk_rental.DiskRentalFiresoreDataSource
+import com.haidoan.android.ceedee.data.disk_rental.DiskRentalFirestoreDataSource
 import com.haidoan.android.ceedee.data.disk_rental.DiskRentalRepository
 import com.haidoan.android.ceedee.databinding.FragmentRentalBinding
 import com.haidoan.android.ceedee.ui.rental.adapters.RentalSection
@@ -38,7 +38,7 @@ class RentalFragment : Fragment() {
     private val viewModel: RentalsViewModel by lazy {
         ViewModelProvider(
             this, RentalsViewModel.Factory(
-                DiskRentalRepository(DiskRentalFiresoreDataSource())
+                DiskRentalRepository(DiskRentalFirestoreDataSource())
             )
         )[RentalsViewModel::class.java]
     }
