@@ -1,51 +1,87 @@
 package com.haidoan.android.ceedee
 
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.NavigationUI.setupWithNavController
 import androidx.navigation.ui.setupWithNavController
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.haidoan.android.ceedee.data.USER_ROLE_EMPLOYEE
+import com.haidoan.android.ceedee.data.USER_ROLE_MANAGER
+import com.haidoan.android.ceedee.data.User
 import com.haidoan.android.ceedee.databinding.ActivityMainBinding
+import com.haidoan.android.ceedee.ui.login.AuthenticationRepository
+
+private const val TAG = "MainActivity"
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var navController: NavController
+    private val appBarConfiguration = AppBarConfiguration(
+        setOf(
+            R.id.rentalFragment,
+            R.id.diskFragment,
+            R.id.reportFragment,
+            R.id.userManagementFragment
+        )
+    )
+    private val viewModel: MainActivityViewModel by viewModels {
+        MainActivityViewModel.Factory(AuthenticationRepository(application))
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Set up nav
+        // Set up navController
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.mainContainer) as NavHostFragment
         navController = navHostFragment.navController
 
         //set up appbar
         setSupportActionBar(binding.toolbar)
-        val appBarConfiguration = AppBarConfiguration(
-            setOf(
-                R.id.rentalFragment, R.id.diskFragment, R.id.reportFragment
-            )
-        )
         binding.toolbar.setupWithNavController(navController, appBarConfiguration)
 
-        // Set up bottomnav
-        val bottomNavigationView = binding.bottomNavigationView
-        setupWithNavController(bottomNavigationView, navController)
+        viewModel.currentUser.observe(this) {
+            setupBottomNav(it)
+        }
+    }
 
+    override fun onResume() {
+        super.onResume()
+
+        Log.d(TAG, "onResume Called")
+        viewModel.resetUser()
+    }
+
+    private fun setupBottomNav(currentUser: User) {
+
+        binding.bottomNavigationViewEmployee.visibility = View.GONE
+        binding.bottomNavigationViewManager.visibility = View.GONE
+
+        var bottomNavigationView: BottomNavigationView = binding.bottomNavigationViewEmployee
+        // Set up bottomNav
+        when (currentUser.role) {
+            USER_ROLE_EMPLOYEE -> bottomNavigationView = binding.bottomNavigationViewEmployee
+            USER_ROLE_MANAGER -> bottomNavigationView = binding.bottomNavigationViewManager
+        }
+        Log.d(TAG, "currentUser: ${viewModel.currentUser}")
+
+        setupWithNavController(bottomNavigationView, navController)
         navController.addOnDestinationChangedListener { _, destination, _ ->
             bottomNavigationView.visibility =
                 if (appBarConfiguration.topLevelDestinations.contains(destination.id)) View.VISIBLE
                 else View.GONE
         }
-
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
