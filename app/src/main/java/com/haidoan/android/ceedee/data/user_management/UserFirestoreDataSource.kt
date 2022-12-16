@@ -1,7 +1,6 @@
 package com.haidoan.android.ceedee.data.user_management
 
 import android.util.Log
-import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.snapshots
 import com.haidoan.android.ceedee.data.User
@@ -31,15 +30,17 @@ class UserFirestoreDataSource {
 
     suspend fun addUser(
         user: User
-    ): DocumentReference? {
-
+    ): Void? {
         Log.d(TAG, "Called addUser")
-        return firestoreDb.collection("User").add(
-            mapOf(
+        return firestoreDb.collection("User").document(user.id).set(
+            hashMapOf(
                 "username" to user.username,
                 "password" to user.password,
                 "role" to user.role
             )
         ).await()
     }
+
+    suspend fun deleteUser(user: User): Void =
+        firestoreDb.collection("User").document(user.id).delete().await()
 }

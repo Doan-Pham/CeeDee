@@ -46,7 +46,7 @@ class UserManagementFragment : Fragment() {
     }
 
     private fun setupRecyclerview() {
-        usersAdapter = UserAdapter()
+        usersAdapter = UserAdapter { viewModel.deleteUser(it) }
 
         binding.apply {
             recyclerviewUsers.adapter = usersAdapter

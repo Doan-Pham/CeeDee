@@ -8,6 +8,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.haidoan.android.ceedee.data.User
 import com.haidoan.android.ceedee.ui.disk_screen.utils.Response
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.tasks.await
@@ -66,7 +68,7 @@ class AuthenticationRepository(private val application: Application) {
         }
     }
 
-    fun signUpWithEmailPassword(email: String, password: String) {
+    fun signUpWithEmailPassword(email: String, password: String) = callbackFlow {
         authSecond = try {
             val app = FirebaseApp.initializeApp(
                 defaultFirebaseApp.applicationContext,
@@ -77,17 +79,20 @@ class AuthenticationRepository(private val application: Application) {
         } catch (e: IllegalStateException) {
             FirebaseAuth.getInstance(FirebaseApp.getInstance("SecondAppInstance"))
         }
-        authSecond.createUserWithEmailAndPassword(email, password)
+        val subscription = authSecond.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     // Sign in success, update UI with the signed-in user's information
                     Log.d(TAG, "createUserWithEmail:success")
                     authSecond.signOut()
+                    trySend(task.result.user?.uid)
                 } else {
                     // If sign in fails, display a message to the user.
                     Log.w(TAG, "createUserWithEmail:failure", task.exception)
                 }
             }
+
+        awaitClose{subscription.result}
     }
 
     fun signOut() {

@@ -28,14 +28,23 @@ class UserManagementViewModel(
 
     fun addUser(user: User) {
         viewModelScope.launch {
-            userRepository.addUser(user).collect {
-                when (it) {
-                    is Response.Success -> Log.d(TAG, "Called addUser: ${it.data}")
-                    is Response.Failure -> {}
-                    is Response.Loading -> {}
-                }
-            }
             authenticationRepository.signUpWithEmailPassword(user.username, user.password)
+                .collect { newUserUid ->
+                    userRepository.addUser(user.copy(id = newUserUid ?: "")).collect {
+                        when (it) {
+                            is Response.Success -> Log.d(TAG, "Called addUser: ${it.data}")
+                            is Response.Failure -> {}
+                            is Response.Loading -> {}
+                        }
+                    }
+                }
+        }
+    }
+
+    fun deleteUser(user: User) {
+        Log.d(TAG, "Called deleteUser - user: $user")
+        viewModelScope.launch {
+            userRepository.deleteUser(user).collect{}
         }
     }
 

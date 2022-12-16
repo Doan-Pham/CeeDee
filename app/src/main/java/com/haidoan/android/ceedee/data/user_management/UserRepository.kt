@@ -19,4 +19,10 @@ class UserRepository(private val firestoreDataSource: UserFirestoreDataSource) {
     }
         .catch { emit(Response.Failure(it.message.toString())) }
 
+    suspend fun deleteUser(user: User) = flow {
+        emit(Response.Loading())
+        emit(Response.Success(firestoreDataSource.deleteUser(user)))
+    }
+        .catch { emit(Response.Failure(it.message.toString())) }
+
 }

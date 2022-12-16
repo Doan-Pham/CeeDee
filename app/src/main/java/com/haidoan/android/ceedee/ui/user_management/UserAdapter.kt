@@ -9,10 +9,12 @@ import com.haidoan.android.ceedee.data.User
 import com.haidoan.android.ceedee.databinding.ItemUserBinding
 
 
-class UserAdapter : ListAdapter<User, UserAdapter.UserViewHolder>(UserUtils()) {
+class UserAdapter(private val onButtonDeleteClick: (user: User) -> Unit) :
+    ListAdapter<User, UserAdapter.UserViewHolder>(UserUtils()) {
 
     class UserViewHolder(
-        private val binding: ItemUserBinding
+        private val binding: ItemUserBinding,
+        private val onButtonDeleteClick: (user: User) -> Unit
     ) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(user: User) {
@@ -20,6 +22,7 @@ class UserAdapter : ListAdapter<User, UserAdapter.UserViewHolder>(UserUtils()) {
                 textviewUsername.text = user.username
                 textviewPassword.text = user.password
                 textviewRole.text = user.role
+                buttonDelete.setOnClickListener { onButtonDeleteClick(user) }
             }
         }
     }
@@ -34,7 +37,7 @@ class UserAdapter : ListAdapter<User, UserAdapter.UserViewHolder>(UserUtils()) {
                 parent,
                 false
             )
-        return UserViewHolder(binding)
+        return UserViewHolder(binding, onButtonDeleteClick)
     }
 
     override fun onBindViewHolder(holder: UserViewHolder, position: Int) {
