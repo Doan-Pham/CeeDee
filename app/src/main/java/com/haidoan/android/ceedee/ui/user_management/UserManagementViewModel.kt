@@ -44,7 +44,8 @@ class UserManagementViewModel(
     fun deleteUser(user: User) {
         Log.d(TAG, "Called deleteUser - user: $user")
         viewModelScope.launch {
-            userRepository.deleteUser(user).collect{}
+            userRepository.deleteUser(user).collect {}
+            authenticationRepository.deleteUser(user)
         }
     }
 

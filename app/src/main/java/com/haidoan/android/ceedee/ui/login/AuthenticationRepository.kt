@@ -4,6 +4,7 @@ import android.app.Application
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.google.firebase.FirebaseApp
+import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.haidoan.android.ceedee.data.User
@@ -21,6 +22,7 @@ class AuthenticationRepository(private val application: Application) {
     private val isUserSignedIn: MutableLiveData<Boolean> = MutableLiveData()
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
     private var authSecond: FirebaseAuth = FirebaseAuth.getInstance()
+    private var authDeleteUser: FirebaseAuth = FirebaseAuth.getInstance()
     private val firestoreDb: FirebaseFirestore = FirebaseFirestore.getInstance()
     private val defaultFirebaseApp = FirebaseApp.getInstance()
 
@@ -49,9 +51,9 @@ class AuthenticationRepository(private val application: Application) {
         firestoreDb.collection("User").document(auth.currentUser?.uid ?: "").get().await()
             .toObject(User::class.java)
 
-    fun loginFromFireStore(email: String?, pass: String?) = flow {
+    fun loginFromFireStore(inputAuth: FirebaseAuth = auth, email: String?, pass: String?) = flow {
         emit(Response.Loading())
-        emit(Response.Success(auth.signInWithEmailAndPassword(email!!, pass!!).await()))
+        emit(Response.Success(inputAuth.signInWithEmailAndPassword(email!!, pass!!).await()))
     }.catch { error ->
         error.message?.let { errorMessage ->
             emit(Response.Failure(errorMessage))
@@ -92,7 +94,38 @@ class AuthenticationRepository(private val application: Application) {
                 }
             }
 
-        awaitClose{subscription.result}
+        awaitClose { subscription.result }
+    }
+
+    suspend fun deleteUser(user: User) {
+        authDeleteUser = try {
+            val app = FirebaseApp.initializeApp(
+                defaultFirebaseApp.applicationContext,
+                defaultFirebaseApp.options,
+                "DeleteUserAppInstance"
+            )
+            FirebaseAuth.getInstance(app)
+        } catch (e: IllegalStateException) {
+            FirebaseAuth.getInstance(FirebaseApp.getInstance("DeleteUserAppInstance"))
+        }
+        loginFromFireStore(authDeleteUser, user.username, user.password).collect {
+
+            if (it is Response.Success){
+                val userToDelete = authDeleteUser.currentUser
+                val credential = EmailAuthProvider
+                    .getCredential(user.username, user.password)
+
+                userToDelete!!.reauthenticate(credential)
+                    .addOnCompleteListener {
+                        userToDelete.delete()
+                            .addOnCompleteListener { task ->
+                                if (task.isSuccessful) {
+                                    Log.d(TAG, "User account deleted - uid: ${userToDelete.uid}")
+                                }
+                            }
+                    }
+            }
+        }
     }
 
     fun signOut() {

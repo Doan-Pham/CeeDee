@@ -24,7 +24,7 @@ class AuthenticationViewModel(application: Application) : AndroidViewModel(appli
     fun isUserSignedIn() = isUserSignedIn
 
     fun signIn(email: String?, pass: String?) = liveData(Dispatchers.IO) {
-        repository.loginFromFireStore(email, pass).collect { response ->
+        repository.loginFromFireStore(email = email, pass = pass).collect { response ->
             emit(response)
         }
     }
