@@ -21,6 +21,9 @@ class UserManagementViewModel(
         userRepository.getUsersStream().collect { emit(it) }
     }
     val users: LiveData<List<User>> = _users
+    val currentSignedInUser = liveData(Dispatchers.IO) {
+        emit(authenticationRepository.getCurrentUserInfo())
+    }
 
     val userRoles: LiveData<List<UserRole>> = liveData(Dispatchers.IO) {
         userRepository.getUserRolesStream().collect { emit(it) }

@@ -30,7 +30,7 @@ class AuthenticationRepository(private val application: Application) {
 
     init {
         auth.addAuthStateListener {
-            Log.d(TAG, "currentUser: ${it.currentUser?.email}")
+            Log.d(TAG, "Init - currentUser: ${it.currentUser?.email}")
             if (it.currentUser != null) {
                 isUserSignedIn.postValue(true)
             } else {
@@ -109,8 +109,7 @@ class AuthenticationRepository(private val application: Application) {
             FirebaseAuth.getInstance(FirebaseApp.getInstance("DeleteUserAppInstance"))
         }
         loginFromFireStore(authDeleteUser, user.username, user.password).collect {
-
-            if (it is Response.Success){
+            if (it is Response.Success) {
                 val userToDelete = authDeleteUser.currentUser
                 val credential = EmailAuthProvider
                     .getCredential(user.username, user.password)
@@ -120,12 +119,17 @@ class AuthenticationRepository(private val application: Application) {
                         userToDelete.delete()
                             .addOnCompleteListener { task ->
                                 if (task.isSuccessful) {
-                                    Log.d(TAG, "User account deleted - uid: ${userToDelete.uid}")
+                                    Log.d(
+                                        TAG,
+                                        "User account deleted - uid: ${userToDelete.uid}"
+                                    )
                                 }
                             }
                     }
             }
         }
+
+
     }
 
     fun signOut() {

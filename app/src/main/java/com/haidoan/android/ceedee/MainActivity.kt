@@ -53,8 +53,11 @@ class MainActivity : AppCompatActivity() {
         binding.toolbar.setupWithNavController(navController, appBarConfiguration)
 
         viewModel.currentUser.observe(this) {
-            Log.d(TAG, "currentUser: $it")
-            setupBottomNav(it)
+            if (it != null) {
+                Log.d(TAG, "viewModel.currentUser.observe() - currentUser: $it")
+                setupBottomNav(it)
+            }
+
         }
     }
 
@@ -76,7 +79,7 @@ class MainActivity : AppCompatActivity() {
             USER_ROLE_EMPLOYEE -> bottomNavigationView = binding.bottomNavigationViewEmployee
             USER_ROLE_MANAGER -> bottomNavigationView = binding.bottomNavigationViewManager
         }
-        //Log.d(TAG, "currentUser: ${viewModel.currentUser}")
+        Log.d(TAG, "setupBottomNav() - currentUser: ${viewModel.currentUser}")
 
         setupWithNavController(bottomNavigationView, navController)
         navController.addOnDestinationChangedListener { _, destination, _ ->
