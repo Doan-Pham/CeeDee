@@ -29,6 +29,12 @@ class MainActivityViewModel(private val authenticationRepository: Authentication
         }
     }
 
+    fun signOut() {
+        viewModelScope.launch {
+            authenticationRepository.signOut()
+        }
+    }
+
     class Factory(
         private val authenticationRepository: AuthenticationRepository
     ) :

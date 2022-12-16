@@ -1,5 +1,6 @@
 package com.haidoan.android.ceedee
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
@@ -96,6 +97,12 @@ class MainActivity : AppCompatActivity() {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         return when (item.itemId) {
+            R.id.menu_item_main_sign_out -> {
+                viewModel.signOut()
+                startActivity(Intent(this, LoginActivity::class.java))
+                finish()
+                true
+            }
             else -> super.onOptionsItemSelected(item)
         }
     }

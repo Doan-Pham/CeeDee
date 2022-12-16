@@ -130,7 +130,7 @@ class AuthenticationRepository(private val application: Application) {
 
     fun signOut() {
         auth.signOut()
-        isUserSignedIn.postValue(true)
+        isUserSignedIn.postValue(false)
     }
 
 }
