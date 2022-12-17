@@ -6,79 +6,75 @@
     android:orientation="vertical"
     tools:context=".NewRentalScreen">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="New Rental"
-        android:textSize="25dp"
-        android:textColor="@color/black"
-        android:textStyle="bold"
-        android:layout_marginTop="30dp"
-        android:layout_gravity="center">
-    </TextView>
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/tv_phone"
-            style="@style/edt_login_style"
-            android:layout_width="330dp"
-            android:layout_height="60dp"
-            android:layout_gravity="center"
-            android:layout_marginTop="35dp"
-            android:inputType="text|textNoSuggestions"
-            android:hint="Client_Phone"></com.google.android.material.textfield.TextInputEditText>
- 
+    <com.google.android.material.textfield.TextInputEditText
+        android:id="@+id/tv_phone"
+        style="@style/edt_login_style"
+        android:layout_width="330dp"
+        android:layout_height="60dp"
+        android:layout_gravity="center"
+        android:layout_marginTop="35dp"
+        android:inputType="text|textNoSuggestions"
+        android:hint="@string/client_phone" />
+
 
     <com.google.android.material.textfield.TextInputEditText
         android:layout_width="330dp"
         android:id="@+id/tv_name"
         android:layout_marginTop="30dp"
-        android:hint="Client_Name"
+        android:hint="@string/client_name"
         android:layout_height="60dp"
         android:inputType="text|textNoSuggestions"
         android:layout_gravity="center"
-        style="@style/edt_login_style"></com.google.android.material.textfield.TextInputEditText>
+        style="@style/edt_login_style" />
+
     <com.google.android.material.textfield.TextInputEditText
         android:layout_width="330dp"
         android:id="@+id/tv_address"
         android:layout_marginTop="30dp"
-        android:hint="Client_Address"
+        android:hint="@string/client_address"
         android:layout_height="60dp"
         android:layout_gravity="center"
         android:inputType="text|textNoSuggestions"
-        style="@style/edt_login_style"></com.google.android.material.textfield.TextInputEditText>
+        style="@style/edt_login_style" />
     <androidx.appcompat.widget.LinearLayoutCompat
         android:layout_width="match_parent"
         android:layout_marginTop="30dp"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Disks to Rent"
-            android:layout_marginLeft="30dp"
+            android:text="@string/disks_to_rent"
+            android:layout_marginStart="30dp"
             android:textStyle="bold"
             android:textColor="@color/black"
-            android:textSize="23dp"></TextView>
+            android:textSize="23sp" />
+
         <ImageButton
             android:id="@+id/open_dialog"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_round_add_24"
             android:background="@color/white"
-            android:layout_marginLeft="170dp"></ImageButton>
+            android:layout_marginStart="170dp"
+            android:contentDescription="@string/addNewRental" />
     </androidx.appcompat.widget.LinearLayoutCompat>
+
     <androidx.recyclerview.widget.RecyclerView
         android:layout_width="match_parent"
         android:id="@+id/new_rental_rcl"
         android:layout_marginTop="20dp"
         android:layout_marginRight="40dp"
         android:layout_marginLeft="40dp"
-        android:layout_height="wrap_content"></androidx.recyclerview.widget.RecyclerView>
-<Button
-    android:layout_width="300dp"
-    android:id="@+id/btn_proceed"
-    android:layout_marginTop="10dp"
-    android:layout_gravity="center"
-    android:text="Proceed"
-    android:layout_height="wrap_content"></Button>
+        android:layout_height="280dp" />
+
+    <Button
+        android:layout_width="300dp"
+        android:id="@+id/btn_proceed"
+        android:layout_marginTop="0dp"
+        android:layout_gravity="center"
+        android:text="@string/proceed_New_Rental"
+        android:layout_height="wrap_content" />
 </androidx.appcompat.widget.LinearLayoutCompat>

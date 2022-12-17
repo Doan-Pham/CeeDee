@@ -61,6 +61,6 @@
     <fragment
         android:id="@+id/newRentalScreen"
         android:name="com.haidoan.android.ceedee.NewRentalScreen"
-        android:label="Rental Screen"
+        android:label="New Rental"
         tools:layout="@layout/fragment_new_rental_screen" />
 </navigation>
