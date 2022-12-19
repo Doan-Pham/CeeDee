@@ -1,17 +1,18 @@
 package com.haidoan.android.ceedee.data
 
 import com.google.firebase.Timestamp
-import com.haidoan.android.ceedee.data.DiskTitle
+import com.google.firebase.firestore.DocumentId
 
 data class Rental(
-    var id : String? = null,
-    var customerName: String? = null,
-    var customerPhone: String? = null,
-    var customerAddress: String? = null,
-    var map: Map<String,Long> = mapOf(),
+    @DocumentId
+    var id: String = "NOT_FOUND_ID",
+    var customerName: String = "NOT_FOUND_CUSTOMER_NAME",
+    var customerPhone: String = "NOT_FOUND_CUSTOMER_PHONE",
+    var customerAddress: String = "NOT_FOUND_CUSTOMER_ADDRESS",
+    var diskTitlesRentedAndAmount: Map<String, Long> = mapOf(),
     var dueDate: Timestamp? = null,
     var rentDate: Timestamp? = null,
     var returnDate: Timestamp? = null,
     var rentalStatus: String? = null,
-    var totalPayment: Float? = null,
+    var totalPayment: Long? = null,
 )

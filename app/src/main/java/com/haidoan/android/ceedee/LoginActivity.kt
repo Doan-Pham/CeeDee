@@ -1,25 +1,21 @@
 package com.haidoan.android.ceedee
 
 import android.content.Intent
-
 import android.os.Bundle
-
+import android.util.Log
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-
-import android.view.View
-
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
-
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.haidoan.android.ceedee.databinding.ActivityLoginBinding
 import com.haidoan.android.ceedee.ui.disk_screen.utils.Response
 import com.haidoan.android.ceedee.ui.login.AuthenticationViewModel
+
+private const val TAG = "LoginActivity"
 
 class LoginActivity : AppCompatActivity() {
     private lateinit var binding: ActivityLoginBinding
@@ -32,17 +28,22 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         auth = Firebase.auth
         authViewModel = ViewModelProvider(this)[AuthenticationViewModel::class.java]
-        authViewModel.getUserData().observe(this, Observer<FirebaseUser?> { _ ->
-            val i = Intent(this, MainActivity::class.java)
-            //i.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            startActivity(i)
-            finish()
-        })
-        authViewModel.getRequiredTextMessage().observe(this, Observer<String> { s ->
-            run {
-                setTextRequired(s)
+        authViewModel.isUserSignedIn().observe(this) {
+            Log.d(TAG, "isUserSignedIn: $it")
+            if (it == true) {
+                val i = Intent(this, MainActivity::class.java)
+                //i.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                startActivity(i)
+                finish()
             }
-        })
+        }
+        authViewModel.getRequiredTextMessage().observe(
+            this,
+            Observer<String> { s ->
+                run {
+                    setTextRequired(s)
+                }
+            })
 
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -63,8 +64,6 @@ class LoginActivity : AppCompatActivity() {
                     }
                     is Response.Success -> {
                         binding.progressbarLogin.visibility = View.INVISIBLE
-                        val i = Intent(this, MainActivity::class.java)
-                        startActivity(i)
                     }
                     is Response.Failure -> {
                         binding.progressbarLogin.visibility = View.INVISIBLE

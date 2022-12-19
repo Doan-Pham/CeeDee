@@ -5,6 +5,7 @@ import android.net.Uri
 import android.util.Log
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FieldPath
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import com.haidoan.android.ceedee.data.DiskTitle
@@ -12,6 +13,8 @@ import com.haidoan.android.ceedee.ui.disk_screen.utils.Response
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.tasks.await
+
+private const val TAG = "DiskTitlesRepository"
 
 class DiskTitlesRepository(private val application: Application) {
     private val db: FirebaseFirestore = FirebaseFirestore.getInstance()
@@ -171,5 +174,26 @@ class DiskTitlesRepository(private val application: Application) {
             emit(Response.Failure(errorMessage))
         }
     }
+
+    fun updateDiskAmount(diskTitleIdsAndAmount: Map<String, Long>) = flow {
+        emit(Response.Loading())
+        getDiskTitlesByListOfId(diskTitleIdsAndAmount.keys.toList()).collect { diskTitles ->
+            emit(
+                Response.Success(
+                    db.runBatch { batch ->
+                        for (diskTitle in diskTitles) {
+                            Log.d(TAG, "${diskTitle.id} => $diskTitle")
+                            batch.update(
+                                queryDiskTitle.document(diskTitle.id),
+                                "diskAmount",
+                                FieldValue.increment(diskTitleIdsAndAmount[diskTitle.id] ?: 0L)
+                            )
+                        }
+                    }.await()
+                )
+            )
+        }
+
+    }.catch { emit(Response.Failure(it.message.toString())) }
 
 }

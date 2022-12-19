@@ -3,7 +3,6 @@ package com.haidoan.android.ceedee.ui.disk_screen.repository
 import android.app.Application
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FirebaseFirestore
-import com.haidoan.android.ceedee.data.Disk
 import com.haidoan.android.ceedee.data.DiskStatus
 import com.haidoan.android.ceedee.ui.disk_screen.utils.Response
 import kotlinx.coroutines.flow.catch

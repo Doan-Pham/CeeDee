@@ -5,8 +5,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ProgressBar
-
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.DiffUtil
@@ -15,7 +13,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.haidoan.android.ceedee.R
 import com.haidoan.android.ceedee.data.Genre
 import com.haidoan.android.ceedee.databinding.FragmentDiskTabDiskTitlesBinding
-
 import com.haidoan.android.ceedee.databinding.GenreItemBinding
 import com.haidoan.android.ceedee.ui.disk_screen.repository.GenreRepository
 import com.haidoan.android.ceedee.ui.disk_screen.utils.Response

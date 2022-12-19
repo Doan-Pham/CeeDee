@@ -3,12 +3,10 @@ package com.haidoan.android.ceedee.ui.disk_screen.disk_titles
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.liveData
-import com.haidoan.android.ceedee.data.Genre
-import com.haidoan.android.ceedee.ui.disk_screen.repository.DisksRepository
 import com.haidoan.android.ceedee.ui.disk_screen.repository.DiskTitlesRepository
+import com.haidoan.android.ceedee.ui.disk_screen.repository.DisksRepository
 import com.haidoan.android.ceedee.ui.disk_screen.repository.GenreRepository
 import com.haidoan.android.ceedee.ui.disk_screen.repository.SupplierRepository
-import com.haidoan.android.ceedee.ui.disk_screen.utils.TypeUtils
 import kotlinx.coroutines.Dispatchers
 
 class DiskTitlesViewModel(application: Application) : AndroidViewModel(application) {
