@@ -26,5 +26,8 @@ class ChooseRoleFragment : Fragment() {
             findNavController().navigate(ChooseRoleFragmentDirections.actionChooseRoleFragmentToLoginPersonnelFragment())
         }
 
+        binding.cardviewCustomer.setOnClickListener {
+            findNavController().navigate(ChooseRoleFragmentDirections.actionChooseRoleFragmentToLoginCustomerFragment())
+        }
     }
 }

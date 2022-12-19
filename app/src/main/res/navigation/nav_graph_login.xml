@@ -18,5 +18,22 @@
         <action
             android:id="@+id/action_chooseRoleFragment_to_loginPersonnelFragment"
             app:destination="@id/loginPersonnelFragment" />
+        <action
+            android:id="@+id/action_chooseRoleFragment_to_loginCustomerFragment"
+            app:destination="@id/loginCustomerFragment" />
     </fragment>
+    <fragment
+        android:id="@+id/loginCustomerFragment"
+        android:name="com.haidoan.android.ceedee.ui.login.LoginCustomerFragment"
+        android:label="fragment_login_customer"
+        tools:layout="@layout/fragment_login_customer" >
+        <action
+            android:id="@+id/action_loginCustomerFragment_to_phoneOtpFragment"
+            app:destination="@id/phoneOtpFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/phoneOtpFragment"
+        android:name="com.haidoan.android.ceedee.ui.login.PhoneOtpFragment"
+        android:label="fragment_phone_otp"
+        tools:layout="@layout/fragment_phone_otp" />
 </navigation>
