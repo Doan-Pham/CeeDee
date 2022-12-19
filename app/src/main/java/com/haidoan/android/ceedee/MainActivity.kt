@@ -18,6 +18,7 @@ import com.haidoan.android.ceedee.data.USER_ROLE_EMPLOYEE
 import com.haidoan.android.ceedee.data.USER_ROLE_MANAGER
 import com.haidoan.android.ceedee.data.User
 import com.haidoan.android.ceedee.databinding.ActivityMainBinding
+import com.haidoan.android.ceedee.ui.login.AuthenticationActivity
 import com.haidoan.android.ceedee.ui.login.AuthenticationRepository
 
 private const val TAG = "MainActivity"
@@ -102,7 +103,7 @@ class MainActivity : AppCompatActivity() {
         return when (item.itemId) {
             R.id.menu_item_main_sign_out -> {
                 viewModel.signOut()
-                startActivity(Intent(this, LoginActivity::class.java))
+                startActivity(Intent(this, AuthenticationActivity::class.java))
                 finish()
                 true
             }

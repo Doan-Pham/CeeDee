@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:gravity="center"
+    android:orientation="vertical"
+    tools:context=".ui.login.LoginPersonnelFragment"
+    android:paddingStart="48dp"
+    android:paddingEnd="48dp">
+
+    <ImageView
+        android:layout_width="144dp"
+        android:layout_height="144dp"
+        android:layout_marginTop="40dp"
+
+        android:contentDescription="@string/login_logo"
+        android:src="@drawable/ic_app_logo" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:letterSpacing="0.01"
+
+        android:padding="18dp"
+        android:text="@string/login"
+        android:textColor="@color/primary"
+        android:textSize="36sp"
+        android:textStyle="bold" />
+
+    <EditText
+        android:id="@+id/edt_username_login"
+        style="@style/edt_login_style"
+
+        android:layout_marginTop="52dp"
+
+        android:autofillHints=""
+        android:drawableStart="@drawable/ic_round_person_24"
+        android:hint="@string/email"
+        android:inputType="textEmailAddress" />
+
+    <EditText
+        android:id="@+id/edt_password_login"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        style="@style/edt_login_style"
+
+        android:layout_marginTop="24dp"
+
+        android:autofillHints=""
+        android:drawableStart="@drawable/ic_round_lock_24"
+        android:hint="@string/password"
+        android:inputType="textPassword" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:layout_marginTop="8dp">
+        <TextView
+            android:id="@+id/tv_message_required"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="top|left"
+            android:visibility="invisible"
+
+            android:letterSpacing="0.01"
+
+            android:padding="4dp"
+            android:text=""
+            android:textColor="@color/secondary"
+            android:textSize="14sp"
+            android:textStyle="normal"
+
+            android:drawablePadding="4dp"
+            android:drawableTint="@color/secondary"
+            android:drawableStart="@drawable/ic_round_info_24"
+            tools:ignore="RtlHardcoded,UseCompatTextViewDrawableXml"
+            tools:targetApi="m" />
+    </LinearLayout>
+
+    <ProgressBar
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/progressbar_login"
+        android:visibility="invisible"/>
+
+    <Button
+        android:id="@+id/btn_login"
+        style="@style/btn_style"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+        android:layout_marginTop="4dp"
+
+        android:text="@string/login"
+        />
+</LinearLayout>
