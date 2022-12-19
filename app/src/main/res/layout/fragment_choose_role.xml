@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="20dp"
+    tools:context=".ui.login.ChooseRoleFragment">
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="180dp"
+
+        android:layout_height="180dp"
+        android:layout_marginVertical="40dp"
+        android:contentDescription="@string/login_logo"
+        android:src="@drawable/ic_app_logo"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="40dp"
+        android:gravity="center"
+        android:text="Welcome to CeeDee, continue as "
+        android:textColor="@color/black"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imageView"
+        app:layout_constraintVertical_weight="0.2" />
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cardview_personnel"
+        android:layout_width="0dp"
+        android:layout_height="120dp"
+        android:layout_marginHorizontal="10dp"
+        android:layout_marginVertical="40dp"
+        android:foreground="?android:attr/selectableItemBackground"
+        android:padding="10dp"
+        app:cardBackgroundColor="@color/primary"
+        app:cardCornerRadius="20dp"
+        app:cardElevation="0dp"
+        app:layout_constraintEnd_toStartOf="@id/cardview_customer"
+        app:layout_constraintHorizontal_chainStyle="spread_inside"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView">
+
+
+        <com.google.android.material.textview.MaterialTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:drawableTop="@drawable/ic_import_black_24dp"
+            android:drawablePadding="10dp"
+            android:gravity="center"
+            android:text="Shop Personnel"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:drawableTint="@color/white" />
+    </com.google.android.material.card.MaterialCardView>
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cardview_customer"
+        android:layout_width="0dp"
+        android:layout_height="120dp"
+        android:layout_marginHorizontal="10dp"
+        android:layout_marginVertical="40dp"
+        android:foreground="?android:attr/selectableItemBackground"
+        app:cardBackgroundColor="@color/secondary"
+        app:cardCornerRadius="20dp"
+        app:cardElevation="0dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/cardview_personnel"
+        app:layout_constraintTop_toBottomOf="@+id/textView">
+
+        <com.google.android.material.textview.MaterialTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:drawableTop="@drawable/ic_import_black_24dp"
+            android:drawablePadding="10dp"
+            android:gravity="center"
+            android:text="Customer"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:drawableTint="@color/white" />
+    </com.google.android.material.card.MaterialCardView>
+</androidx.constraintlayout.widget.ConstraintLayout>
