@@ -56,49 +56,53 @@
         android:layout_height="48dp"
         android:layout_marginStart="24dp"
         android:layout_marginTop="40dp"
-        android:ems="10"
+        android:layout_marginEnd="5dp"
         android:gravity="center"
+        android:importantForAutofill="no"
         android:inputType="number"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textview_sub_header"
-        android:importantForAutofill="no"
+app:layout_constraintEnd_toStartOf="@id/otpEditText2"
         tools:ignore="LabelFor" />
 
     <EditText
         android:id="@+id/otpEditText2"
         android:layout_width="48dp"
         android:layout_height="48dp"
+        android:layout_marginEnd="5dp"
+        android:autofillHints=""
         android:ems="10"
         android:gravity="center"
-        android:inputType="number"
 
+        android:inputType="number"
         app:layout_constraintBaseline_toBaselineOf="@+id/otpEditText1"
         app:layout_constraintEnd_toStartOf="@+id/otpEditText3"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/otpEditText1"
-        android:autofillHints=""
         tools:ignore="LabelFor" />
 
     <EditText
         android:id="@+id/otpEditText3"
         android:layout_width="48dp"
         android:layout_height="48dp"
-
+        android:layout_marginEnd="5dp"
+        android:autofillHints=""
         android:ems="10"
         android:gravity="center"
-        android:inputType="number"
 
+        android:inputType="number"
         app:layout_constraintBaseline_toBaselineOf="@+id/otpEditText1"
         app:layout_constraintEnd_toStartOf="@+id/otpEditText4"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/otpEditText2"
-        android:autofillHints=""
         tools:ignore="LabelFor" />
 
     <EditText
         android:id="@+id/otpEditText4"
         android:layout_width="48dp"
         android:layout_height="48dp"
+        android:layout_marginEnd="5dp"
+        android:autofillHints=""
         android:ems="10"
         android:gravity="center"
         android:inputType="number"
@@ -106,7 +110,6 @@
         app:layout_constraintEnd_toStartOf="@+id/otpEditText5"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/otpEditText3"
-        android:autofillHints=""
         tools:ignore="LabelFor" />
 
 
@@ -114,14 +117,16 @@
         android:id="@+id/otpEditText5"
         android:layout_width="48dp"
         android:layout_height="48dp"
+        android:layout_marginEnd="5dp"
+        android:autofillHints=""
         android:ems="10"
-        android:gravity="center" android:inputType="number"
+        android:gravity="center"
+        android:inputType="number"
         android:maxLength="1"
         app:layout_constraintBaseline_toBaselineOf="@+id/otpEditText1"
         app:layout_constraintEnd_toStartOf="@+id/otpEditText6"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/otpEditText4"
-        android:autofillHints=""
         tools:ignore="LabelFor" />
 
 
@@ -130,13 +135,13 @@
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:layout_marginEnd="24dp"
+        android:autofillHints=""
         android:ems="10"
         android:gravity="center"
         android:inputType="number"
         app:layout_constraintBaseline_toBaselineOf="@+id/otpEditText1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/otpEditText5"
-        android:autofillHints=""
         tools:ignore="LabelFor" />
 
     <TextView

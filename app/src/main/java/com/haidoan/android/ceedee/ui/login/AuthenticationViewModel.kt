@@ -1,9 +1,12 @@
 package com.haidoan.android.ceedee.ui.login
 
+import android.app.Activity
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.liveData
+import com.google.firebase.auth.PhoneAuthCredential
+import com.google.firebase.auth.PhoneAuthProvider
 import kotlinx.coroutines.Dispatchers
 
 class AuthenticationViewModel(application: Application) : AndroidViewModel(application) {
@@ -28,6 +31,19 @@ class AuthenticationViewModel(application: Application) : AndroidViewModel(appli
             emit(response)
         }
     }
+
+    fun authenticatePhoneNumber(
+        phoneNumber: String,
+        activity: Activity,
+        callbacks: PhoneAuthProvider.OnVerificationStateChangedCallbacks
+    ) {
+        repository.authenticatePhoneNumber(phoneNumber, activity, callbacks)
+    }
+
+    fun signInWithPhoneAuthCredential(activity: Activity, credential: PhoneAuthCredential) =
+        liveData {
+            emit(repository.signInWithPhoneAuthCredential(activity, credential))
+        }
 
     fun signOut() {
         repository.signOut()

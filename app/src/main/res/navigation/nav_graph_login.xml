@@ -35,5 +35,12 @@
         android:id="@+id/phoneOtpFragment"
         android:name="com.haidoan.android.ceedee.ui.login.PhoneOtpFragment"
         android:label="fragment_phone_otp"
-        tools:layout="@layout/fragment_phone_otp" />
+        tools:layout="@layout/fragment_phone_otp" >
+        <argument
+            android:name="verificationId"
+            app:argType="string" />
+        <argument
+            android:name="phoneNumber"
+            app:argType="string" />
+    </fragment>
 </navigation>

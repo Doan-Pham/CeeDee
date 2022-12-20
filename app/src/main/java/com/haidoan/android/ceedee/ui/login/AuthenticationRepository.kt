@@ -1,11 +1,11 @@
 package com.haidoan.android.ceedee.ui.login
 
+import android.app.Activity
 import android.app.Application
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.google.firebase.FirebaseApp
-import com.google.firebase.auth.EmailAuthProvider
-import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.*
 import com.google.firebase.firestore.FirebaseFirestore
 import com.haidoan.android.ceedee.data.User
 import com.haidoan.android.ceedee.ui.disk_screen.utils.Response
@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.tasks.await
+import java.util.concurrent.TimeUnit
 
 
 private const val TAG = "AuthenticationRepo"
@@ -30,7 +31,7 @@ class AuthenticationRepository(private val application: Application) {
 
     init {
         auth.addAuthStateListener {
-            Log.d(TAG, "Init - currentUser: ${it.currentUser?.email}")
+            Log.d(TAG, "Init - currentUser: ${it.currentUser}")
             if (it.currentUser != null) {
                 isUserSignedIn.postValue(true)
             } else {
@@ -136,5 +137,23 @@ class AuthenticationRepository(private val application: Application) {
         auth.signOut()
         isUserSignedIn.postValue(false)
     }
+
+    fun authenticatePhoneNumber(
+        phoneNumber: String,
+        activity: Activity,
+        callbacks: PhoneAuthProvider.OnVerificationStateChangedCallbacks
+    ) {
+        val options = PhoneAuthOptions.newBuilder(auth)
+            .setPhoneNumber(phoneNumber)       // Phone number to verify
+            .setTimeout(60L, TimeUnit.SECONDS) // Timeout and unit
+            .setActivity(activity)                 // Activity (for callback binding)
+            .setCallbacks(callbacks)          // OnVerificationStateChangedCallbacks
+            .build()
+        PhoneAuthProvider.verifyPhoneNumber(options)
+    }
+
+    suspend fun signInWithPhoneAuthCredential(activity: Activity,credential: PhoneAuthCredential) =
+        auth.signInWithCredential(credential)
+
 
 }
