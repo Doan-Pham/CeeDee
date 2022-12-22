@@ -72,6 +72,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
             android:layout_marginTop="50dp"
+            android:autofillHints="phone"
             android:hint="@string/type_your_phone_number"
             app:endIconMode="clear_text"
             app:errorEnabled="true"
@@ -84,7 +85,8 @@
                 android:id="@+id/editTextPhoneNumber"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="number"
+                android:autofillHints="phone"
+                android:inputType="phone"
                 android:textSize="16sp" />
         </com.google.android.material.textfield.TextInputLayout>
 

@@ -8,18 +8,22 @@ import android.view.MenuItem
 import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.FragmentTransaction
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.NavigationUI.setupWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.haidoan.android.ceedee.data.USER_ROLE_CUSTOMER
 import com.haidoan.android.ceedee.data.USER_ROLE_EMPLOYEE
 import com.haidoan.android.ceedee.data.USER_ROLE_MANAGER
 import com.haidoan.android.ceedee.data.User
 import com.haidoan.android.ceedee.databinding.ActivityMainBinding
 import com.haidoan.android.ceedee.ui.login.AuthenticationActivity
 import com.haidoan.android.ceedee.ui.login.AuthenticationRepository
+import com.haidoan.android.ceedee.ui.rental.fragment.NewRentalScreen
+
 
 private const val TAG = "MainActivity"
 
@@ -77,6 +81,14 @@ class MainActivity : AppCompatActivity() {
         var bottomNavigationView: BottomNavigationView = binding.bottomNavigationViewEmployee
         // Set up bottomNav
         when (currentUser.role) {
+            USER_ROLE_CUSTOMER -> {
+
+                supportFragmentManager.popBackStackImmediate()
+                val transaction: FragmentTransaction = supportFragmentManager.beginTransaction()
+                transaction.replace(R.id.mainContainer, NewRentalScreen())
+                transaction.commit()
+                return
+            }
             USER_ROLE_EMPLOYEE -> bottomNavigationView = binding.bottomNavigationViewEmployee
             USER_ROLE_MANAGER -> bottomNavigationView = binding.bottomNavigationViewManager
         }

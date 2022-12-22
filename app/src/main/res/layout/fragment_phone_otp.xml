@@ -49,100 +49,32 @@
         app:layout_constraintTop_toBottomOf="@+id/textView"
         app:layout_constraintVertical_weight="0.2" />
 
-
-    <EditText
-        android:id="@+id/otpEditText1"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="40dp"
-        android:layout_marginEnd="5dp"
-        android:gravity="center"
-        android:importantForAutofill="no"
-        android:inputType="number"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textview_sub_header"
-app:layout_constraintEnd_toStartOf="@id/otpEditText2"
-        tools:ignore="LabelFor" />
-
-    <EditText
-        android:id="@+id/otpEditText2"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:layout_marginEnd="5dp"
-        android:autofillHints=""
-        android:ems="10"
-        android:gravity="center"
-
-        android:inputType="number"
-        app:layout_constraintBaseline_toBaselineOf="@+id/otpEditText1"
-        app:layout_constraintEnd_toStartOf="@+id/otpEditText3"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/otpEditText1"
-        tools:ignore="LabelFor" />
-
-    <EditText
-        android:id="@+id/otpEditText3"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:layout_marginEnd="5dp"
-        android:autofillHints=""
-        android:ems="10"
-        android:gravity="center"
-
-        android:inputType="number"
-        app:layout_constraintBaseline_toBaselineOf="@+id/otpEditText1"
-        app:layout_constraintEnd_toStartOf="@+id/otpEditText4"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/otpEditText2"
-        tools:ignore="LabelFor" />
-
-    <EditText
-        android:id="@+id/otpEditText4"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:layout_marginEnd="5dp"
-        android:autofillHints=""
-        android:ems="10"
-        android:gravity="center"
-        android:inputType="number"
-        app:layout_constraintBaseline_toBaselineOf="@+id/otpEditText1"
-        app:layout_constraintEnd_toStartOf="@+id/otpEditText5"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/otpEditText3"
-        tools:ignore="LabelFor" />
-
-
-    <EditText
-        android:id="@+id/otpEditText5"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:layout_marginEnd="5dp"
-        android:autofillHints=""
-        android:ems="10"
-        android:gravity="center"
-        android:inputType="number"
-        android:maxLength="1"
-        app:layout_constraintBaseline_toBaselineOf="@+id/otpEditText1"
-        app:layout_constraintEnd_toStartOf="@+id/otpEditText6"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/otpEditText4"
-        tools:ignore="LabelFor" />
-
-
-    <EditText
-        android:id="@+id/otpEditText6"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:layout_marginEnd="24dp"
-        android:autofillHints=""
-        android:ems="10"
-        android:gravity="center"
-        android:inputType="number"
-        app:layout_constraintBaseline_toBaselineOf="@+id/otpEditText1"
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/textInputLayout"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="50dp"
+        android:hint="Type the OTP you have received"
+        app:counterEnabled="true"
+        app:counterMaxLength="6"
+        app:endIconMode="clear_text"
+        app:errorEnabled="true"
+        app:errorIconDrawable="@null"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/otpEditText5"
-        tools:ignore="LabelFor" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/textview_sub_header">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/editTextOtp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="number"
+            android:maxLength="6"
+            android:textSize="16sp" />
+    </com.google.android.material.textfield.TextInputLayout>
+
 
     <TextView
         android:id="@+id/textViewResend"
@@ -155,7 +87,7 @@ app:layout_constraintEnd_toStartOf="@id/otpEditText2"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/otpEditText1" />
+        app:layout_constraintTop_toBottomOf="@+id/textInputLayout" />
 
     <Button
         android:id="@+id/buttonVerify"

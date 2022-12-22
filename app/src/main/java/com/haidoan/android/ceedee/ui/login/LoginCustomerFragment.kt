@@ -39,7 +39,7 @@ class LoginCustomerFragment : Fragment() {
     private fun setUpButtonSendOtp() {
         binding.apply {
             buttonSendOtp.setOnClickListener {
-                val phoneNumberText = editTextPhoneNumber.text?.trim().toString()
+                val phoneNumberText = editTextPhoneNumber.text?.toString()?.trim() ?: ""
                 if (phoneNumberText.isEmpty() || phoneNumberText.length != 9) {
                     editTextPhoneNumber.error =
                         "Please type valid phone number! (No need to type the first 0)"

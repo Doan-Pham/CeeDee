@@ -31,7 +31,7 @@ class AuthenticationRepository(private val application: Application) {
 
     init {
         auth.addAuthStateListener {
-            Log.d(TAG, "Init - currentUser: ${it.currentUser}")
+            Log.d(TAG, "Init - currentUser: ${it.currentUser?.uid}")
             if (it.currentUser != null) {
                 isUserSignedIn.postValue(true)
             } else {
@@ -154,6 +154,5 @@ class AuthenticationRepository(private val application: Application) {
 
     suspend fun signInWithPhoneAuthCredential(activity: Activity,credential: PhoneAuthCredential) =
         auth.signInWithCredential(credential)
-
 
 }
