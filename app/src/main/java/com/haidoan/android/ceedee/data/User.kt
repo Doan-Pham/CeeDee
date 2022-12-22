@@ -10,7 +10,7 @@ data class User(
     val role: String = "NOT_FOUND_ROLE",
 )
 
-const val USER_ROLE_CUSTOMER = 1L
+const val USER_ROLE_CUSTOMER = "Customer"
 const val USER_ROLE_EMPLOYEE = "Employee"
 const val USER_ROLE_MANAGER = "Manager"
 

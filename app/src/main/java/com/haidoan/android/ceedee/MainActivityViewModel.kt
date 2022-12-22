@@ -17,14 +17,16 @@ class MainActivityViewModel(private val authenticationRepository: Authentication
 
     init {
         viewModelScope.launch {
-            currentUser.value = authenticationRepository.getCurrentUserInfo() ?: User()
+            currentUser.value =
+                authenticationRepository.getCurrentUserInfo() ?: User(role = "Customer")
             Log.d(TAG, "init- currentUser: ${currentUser.value}")
         }
     }
 
     fun resetUser() {
         viewModelScope.launch {
-            currentUser.value = authenticationRepository.getCurrentUserInfo()!!
+            currentUser.value =
+                authenticationRepository.getCurrentUserInfo() ?: User (role = "Customer")
             Log.d(TAG, "resetUser() - currentUser: ${currentUser.value}")
         }
     }

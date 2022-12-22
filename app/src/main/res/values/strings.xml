@@ -93,4 +93,12 @@
     <string name="rent_date_colon">Rent date:</string>
     <string name="due_date_colon">Due date:</string>
     <string name="overdue_colon">Overdue:</string>
+    <string name="phone_verification">Phone Verification</string>
+    <string name="we_will_send_you_an_otp_to_this_phone_number">We will send you an OTP to this phone number</string>
+    <string name="type_your_phone_number">Type your phone number</string>
+    <string name="send_otp">Send OTP</string>
+    <string name="verify">Verify</string>
+    <string name="resend_otp">Resend OTP</string>
+    <string name="enter_the_verification_code_sent_to_your_phone">Enter the verification code sent to your phone</string>
+    <string name="otp_verification">OTP Verification</string>
 </resources>

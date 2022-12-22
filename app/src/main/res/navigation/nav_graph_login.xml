@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph_login"
+    app:startDestination="@id/chooseRoleFragment">
+
+    <fragment
+        android:id="@+id/loginPersonnelFragment"
+        android:name="com.haidoan.android.ceedee.ui.login.LoginPersonnelFragment"
+        android:label="fragment_login_personnel"
+        tools:layout="@layout/fragment_login_personnel" />
+    <fragment
+        android:id="@+id/chooseRoleFragment"
+        android:name="com.haidoan.android.ceedee.ui.login.ChooseRoleFragment"
+        android:label="fragment_choose_role"
+        tools:layout="@layout/fragment_choose_role" >
+        <action
+            android:id="@+id/action_chooseRoleFragment_to_loginPersonnelFragment"
+            app:destination="@id/loginPersonnelFragment" />
+        <action
+            android:id="@+id/action_chooseRoleFragment_to_loginCustomerFragment"
+            app:destination="@id/loginCustomerFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/loginCustomerFragment"
+        android:name="com.haidoan.android.ceedee.ui.login.LoginCustomerFragment"
+        android:label="fragment_login_customer"
+        tools:layout="@layout/fragment_login_customer" >
+        <action
+            android:id="@+id/action_loginCustomerFragment_to_phoneOtpFragment"
+            app:destination="@id/phoneOtpFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/phoneOtpFragment"
+        android:name="com.haidoan.android.ceedee.ui.login.PhoneOtpFragment"
+        android:label="fragment_phone_otp"
+        tools:layout="@layout/fragment_phone_otp" >
+        <argument
+            android:name="verificationId"
+            app:argType="string" />
+        <argument
+            android:name="phoneNumber"
+            app:argType="string" />
+    </fragment>
+</navigation>
