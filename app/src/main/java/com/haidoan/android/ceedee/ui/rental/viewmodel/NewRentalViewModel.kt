@@ -2,7 +2,10 @@ package com.haidoan.android.ceedee.ui.rental.viewmodel
 
 import androidx.lifecycle.*
 import com.haidoan.android.ceedee.data.DiskTitle
+import com.haidoan.android.ceedee.data.customer.Customer
+import com.haidoan.android.ceedee.data.customer.CustomerRepository
 import com.haidoan.android.ceedee.data.disk_rental.DiskRentalRepository
+import com.haidoan.android.ceedee.data.supplier.Supplier
 import com.haidoan.android.ceedee.ui.disk_screen.repository.DisksRepository
 import com.haidoan.android.ceedee.ui.disk_screen.utils.Response
 import kotlinx.coroutines.Dispatchers
@@ -10,7 +13,8 @@ import okhttp3.internal.toImmutableMap
 
 class NewRentalViewModel(
     private val diskRentalRepository: DiskRentalRepository,
-    private val disksRepository: DisksRepository
+    private val disksRepository: DisksRepository,
+    private val customerRepository: CustomerRepository
 ) : ViewModel() {
 
     val disksToRent: LiveData<MutableMap<DiskTitle, Long>>
@@ -78,6 +82,16 @@ class NewRentalViewModel(
 
         }
 
+    val allCustomers: LiveData<List<Customer>>
+        get() = _allCustomers
+
+    private val _allCustomers =
+        liveData(context = viewModelScope.coroutineContext + Dispatchers.IO) {
+            customerRepository.getCustomersStream().collect {
+                emit(it)
+            }
+        }
+
     private val _customerName = MutableLiveData<String>()
     private val _customerPhone = MutableLiveData<String>()
     private val _customerAddress = MutableLiveData<String>()
@@ -91,16 +105,18 @@ class NewRentalViewModel(
         _customerPhone.value = customerPhone
     }
 
+
     class Factory(
         private val diskRentalRepository: DiskRentalRepository,
         private val disksRepository: DisksRepository,
+        private val customerRepository: CustomerRepository,
     ) :
         ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             if (modelClass.isAssignableFrom(NewRentalViewModel::class.java)) {
                 @Suppress("UNCHECKED_CAST")
                 return NewRentalViewModel(
-                    diskRentalRepository, disksRepository
+                    diskRentalRepository, disksRepository, customerRepository
                 ) as T
             }
             throw IllegalArgumentException("Unable to construct viewmodel")
