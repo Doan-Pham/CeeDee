@@ -9,3 +9,8 @@ data class Customer(
     val fullName: String = "",
     val phone: String = ""
 )
+{
+    override fun toString(): String {
+        return phone
+    }
+}
