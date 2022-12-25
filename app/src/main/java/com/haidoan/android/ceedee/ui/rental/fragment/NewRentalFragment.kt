@@ -48,6 +48,7 @@ class NewRentalScreen : Fragment() {
     private lateinit var disksToRentAdapter: NewRentalAdapter
 
     private val customers = mutableListOf<Customer>()
+    private var selectedCustomerId: String = ""
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -82,10 +83,23 @@ class NewRentalScreen : Fragment() {
             ).show()
             else {
                 viewModel.setCustomerInformation(
+                    selectedCustomerId,
                     binding.tvName.text.toString(),
                     binding.tvAddress.text.toString(),
                     binding.spinnerPhone.text.toString()
                 )
+                viewModel.proceedCustomer().observe(viewLifecycleOwner){ result ->
+                    when (result) {
+                        is Response.Loading -> {
+                        }
+                        is Response.Success -> {
+
+                        }
+                        is Response.Failure -> {
+                            Log.d(TAG, "Error: ${result.errorMessage}")
+                        }
+                    }
+                }
                 viewModel.addRental().observe(viewLifecycleOwner) { result ->
                     when (result) {
                         is Response.Loading -> {
@@ -118,11 +132,14 @@ class NewRentalScreen : Fragment() {
         setAutoCompleteTextViewPhone()
     }
 
+
     private fun setAutoCompleteTextViewPhone() {
+
         binding.spinnerPhone.onItemClickListener =
             AdapterView.OnItemClickListener { parent, view, position, id ->
                 binding.tvName.setText(customers[position].fullName)
                 binding.tvAddress.setText(customers[position].address)
+                selectedCustomerId = customers[position].id
             }
     }
 

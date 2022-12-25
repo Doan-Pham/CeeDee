@@ -17,20 +17,24 @@ class CustomerFireStoreDataSource {
             }
         }
 
-    suspend fun addCustomer(customer: Customer): DocumentReference? {
+    suspend fun addCustomer(
+        customerName: String?,
+        customerAddress: String?,
+        customerPhone: String?
+    ): DocumentReference? {
         val newCustomer = hashMapOf(
-            "address" to customer.address,
-            "phone" to customer.phone,
-            "fullName" to customer.fullName
+            "address" to customerAddress,
+            "phone" to customerPhone,
+            "fullName" to customerName
         )
         return firestoreDb.collection("Customer").add(newCustomer).await()
     }
 
     suspend fun updateCustomer(
         id: String,
-        address: String,
-        phone: String,
-        fullName: String
+        address: String?,
+        phone: String?,
+        fullName: String?
     ): Void? {
         return firestoreDb.collection("Customer").document(id).update(
             "address", address,

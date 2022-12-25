@@ -11,14 +11,26 @@ class CustomerRepository(
     fun getCustomersStream(): Flow<List<Customer>> =
         firestoreDataSource.getCustomersStream()
 
-    suspend fun addCustomer(customer: Customer) =
+    suspend fun addCustomer(
+        customerName: String?,
+        customerAddress: String?,
+        customerPhone: String?
+    ) =
         flow {
             emit(Response.Loading())
-            emit(Response.Success(firestoreDataSource.addCustomer(customer)))
+            emit(
+                Response.Success(
+                    firestoreDataSource.addCustomer(
+                        customerName,
+                        customerAddress,
+                        customerPhone
+                    )
+                )
+            )
         }
             .catch { emit(Response.Failure(it.message.toString())) }
 
-    suspend fun updateCustomer(id: String, address: String, phone: String, fullName: String) =
+    suspend fun updateCustomer(id: String, address: String?, phone: String?, fullName: String?) =
         flow {
             emit(Response.Loading())
             emit(Response.Success(firestoreDataSource.updateCustomer(id, address, phone, fullName)))

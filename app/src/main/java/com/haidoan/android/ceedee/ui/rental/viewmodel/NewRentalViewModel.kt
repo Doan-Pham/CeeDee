@@ -9,6 +9,7 @@ import com.haidoan.android.ceedee.data.supplier.Supplier
 import com.haidoan.android.ceedee.ui.disk_screen.repository.DisksRepository
 import com.haidoan.android.ceedee.ui.disk_screen.utils.Response
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collect
 import okhttp3.internal.toImmutableMap
 
 class NewRentalViewModel(
@@ -79,8 +80,33 @@ class NewRentalViewModel(
                 }
                 emit(response)
             }
-
         }
+
+    fun proceedCustomer() = liveData(context = viewModelScope.coroutineContext + Dispatchers.IO) {
+        if (isExistsCustomer()) {
+            customerRepository.updateCustomer(
+                _customerId.value!!,
+                _customerAddress.value,
+                _customerPhone.value,
+                _customerName.value
+            ).collect { emit(it) }
+        } else {
+            customerRepository.addCustomer(
+                _customerName.value,
+                _customerAddress.value,
+                _customerPhone.value
+            ).collect { emit(it) }
+        }
+    }
+
+    private fun isExistsCustomer(): Boolean {
+        _allCustomers.value?.forEach {
+            if (_customerPhone.value.equals(it.phone)) {
+                return true
+            }
+        }
+        return false
+    }
 
     val allCustomers: LiveData<List<Customer>>
         get() = _allCustomers
@@ -91,20 +117,21 @@ class NewRentalViewModel(
                 emit(it)
             }
         }
-
     private val _customerName = MutableLiveData<String>()
     private val _customerPhone = MutableLiveData<String>()
     private val _customerAddress = MutableLiveData<String>()
+    private val _customerId = MutableLiveData<String>()
     fun setCustomerInformation(
+        idCustomer: String,
         customerName: String,
         customerAddress: String,
-        customerPhone: String
+        customerPhone: String,
     ) {
+        _customerId.value = idCustomer
         _customerName.value = customerName
         _customerAddress.value = customerAddress
         _customerPhone.value = customerPhone
     }
-
 
     class Factory(
         private val diskRentalRepository: DiskRentalRepository,
