@@ -17,14 +17,16 @@
         android:layout_marginLeft="60dp">
     </TextView>
 
-    <Spinner
+    <AutoCompleteTextView
         android:layout_width="330dp"
         android:id="@+id/spinner_phone"
         android:layout_marginTop="35dp"
         android:hint="Client_Phone"
         android:layout_height="60dp"
         android:layout_marginLeft="30dp"
-        style="@style/edt_login_style" />
+        android:completionThreshold="1"
+        style="@style/edt_login_style"
+        />
 
     <EditText
         android:layout_width="330dp"

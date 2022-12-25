@@ -1,19 +1,18 @@
 package com.haidoan.android.ceedee.ui.rental.fragment
 
-
-import android.R
+import com.haidoan.android.ceedee.ui.rental.adapters.AutoCompleteCustomerAdapter
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
-import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.haidoan.android.ceedee.R
 import com.haidoan.android.ceedee.data.customer.Customer
 import com.haidoan.android.ceedee.data.customer.CustomerFireStoreDataSource
 import com.haidoan.android.ceedee.data.customer.CustomerRepository
@@ -31,6 +30,8 @@ private const val TAG = "NewRentalFrag"
 
 class NewRentalScreen : Fragment() {
     private var _binding: FragmentNewRentalScreenBinding? = null
+
+    private lateinit var customerAdapter: AutoCompleteCustomerAdapter
 
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -59,6 +60,7 @@ class NewRentalScreen : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         disksToRentAdapter = NewRentalAdapter(
             onButtonMinusClick = { diskTitle -> viewModel.decrementDiskTitleAmount(diskTitle) },
             onButtonPlusClick = { diskTitle -> viewModel.incrementDiskTitleAmount(diskTitle) },
@@ -71,7 +73,7 @@ class NewRentalScreen : Fragment() {
             //viewModel.addDiskTitleToImport(DiskTitle(name = "What"))
         }
         binding.btnProceed.setOnClickListener {
-            if (disksToRentAdapter.itemCount == 0 || binding.tvAddress.text.isEmpty() || binding.tvName.text.isEmpty() || binding.spinnerPhone.selectedItem.toString()
+            if (disksToRentAdapter.itemCount == 0 || binding.tvAddress.text.isEmpty() || binding.tvName.text.isEmpty() || binding.spinnerPhone.text.toString()
                     .isEmpty()
             ) Toast.makeText(
                 requireActivity(),
@@ -82,7 +84,7 @@ class NewRentalScreen : Fragment() {
                 viewModel.setCustomerInformation(
                     binding.tvName.text.toString(),
                     binding.tvAddress.text.toString(),
-                    binding.spinnerPhone.selectedItem.toString()
+                    binding.spinnerPhone.text.toString()
                 )
                 viewModel.addRental().observe(viewLifecycleOwner) { result ->
                     when (result) {
@@ -110,34 +112,18 @@ class NewRentalScreen : Fragment() {
             //Log.d(TAG, "disksToImport: $it")
         }
 
-        setUpSpinnerPhone()
+
         observeViewModel()
+
+        setAutoCompleteTextViewPhone()
     }
 
-    private fun setUpSpinnerPhone() {
-        binding.spinnerPhone.onItemSelectedListener = object : AdapterView.OnItemClickListener,
-            AdapterView.OnItemSelectedListener {
-
-            override fun onItemSelected(
-                parent: AdapterView<*>?,
-                view: View?,
-                position: Int,
-                id: Long
-            ) {
+    private fun setAutoCompleteTextViewPhone() {
+        binding.spinnerPhone.onItemClickListener =
+            AdapterView.OnItemClickListener { parent, view, position, id ->
                 binding.tvName.setText(customers[position].fullName)
                 binding.tvAddress.setText(customers[position].address)
             }
-
-            override fun onNothingSelected(parent: AdapterView<*>?) {}
-
-            override fun onItemClick(
-                parent: AdapterView<*>?,
-                view: View?,
-                position: Int,
-                id: Long
-            ) {
-            }
-        }
     }
 
     private fun observeViewModel() {
@@ -145,11 +131,13 @@ class NewRentalScreen : Fragment() {
             customers.clear()
             customers.addAll(allCustomers)
 
-            binding.spinnerPhone.adapter = ArrayAdapter(
+            customerAdapter = AutoCompleteCustomerAdapter(
                 requireActivity().baseContext,
-                R.layout.simple_spinner_dropdown_item,
-                customers.map { it.phone }
+                R.layout.item_auto_textview_customer,
+                customers
             )
+            customerAdapter.setListCustomers(customers)
+            binding.spinnerPhone.setAdapter(customerAdapter)
         }
     }
 }
