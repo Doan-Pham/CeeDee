@@ -1,18 +1,17 @@
 package com.haidoan.android.ceedee.ui.rental.fragment
 
-import com.haidoan.android.ceedee.ui.rental.adapters.AutoCompleteCustomerAdapter
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.haidoan.android.ceedee.R
 import com.haidoan.android.ceedee.data.customer.Customer
 import com.haidoan.android.ceedee.data.customer.CustomerFireStoreDataSource
 import com.haidoan.android.ceedee.data.customer.CustomerRepository
@@ -31,7 +30,6 @@ private const val TAG = "NewRentalFrag"
 class NewRentalScreen : Fragment() {
     private var _binding: FragmentNewRentalScreenBinding? = null
 
-    private lateinit var customerAdapter: AutoCompleteCustomerAdapter
 
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -88,7 +86,7 @@ class NewRentalScreen : Fragment() {
                     binding.tvAddress.text.toString(),
                     binding.spinnerPhone.text.toString()
                 )
-                viewModel.proceedCustomer().observe(viewLifecycleOwner){ result ->
+                viewModel.proceedCustomer().observe(viewLifecycleOwner) { result ->
                     when (result) {
                         is Response.Loading -> {
                         }
@@ -148,13 +146,12 @@ class NewRentalScreen : Fragment() {
             customers.clear()
             customers.addAll(allCustomers)
 
-            customerAdapter = AutoCompleteCustomerAdapter(
-                requireActivity().baseContext,
-                R.layout.item_auto_textview_customer,
-                customers
+            binding.spinnerPhone.setAdapter(
+                ArrayAdapter(
+                    requireContext(),
+                    android.R.layout.simple_dropdown_item_1line,
+                    customers.map { it.phone })
             )
-            customerAdapter.setListCustomers(customers)
-            binding.spinnerPhone.setAdapter(customerAdapter)
         }
     }
 }
