@@ -81,9 +81,9 @@
     <string name="send_an_email">Send an email</string>
     <string name="complete_sending_requisition">Complete sending requisition</string>
     <string name="import_icon">Import icon</string>
-    <string name="client_name">Client_Name</string>
-    <string name="client_phone">Client_Phone</string>
-    <string name="client_address">Client_Address</string>
+    <string name="client_name">Client Name</string>
+    <string name="client_phone">Client Phone</string>
+    <string name="client_address">Client Address</string>
     <string name="disks_to_rent">Disks to Rent</string>
     <string name="addNewRental">AddNewRental</string>
     <string name="proceed_New_Rental">Proceed</string>
