@@ -21,7 +21,7 @@
         android:icon="@drawable/ic_round_add_24"
         android:orderInCategory="102"
         android:title="@string/sort_by"
-        android:visible="true"
+        android:visible="false"
         app:showAsAction="always"
         tools:targetApi="o">
         <menu>
@@ -36,13 +36,13 @@
                 android:title="Add new disk title" />
         </menu>
     </item>
-    <item
-        android:id="@+id/menu_item_disk_tab_new_requisition"
-        app:actionLayout="@layout/menu_item_badge"
-        android:orderInCategory="1000"
-        android:title="@string/new_requisition"
-        app:showAsAction="always"
-        tools:ignore="AlwaysShowAction" />
+<!--    <item-->
+<!--        android:id="@+id/menu_item_disk_tab_new_requisition"-->
+<!--        app:actionLayout="@layout/menu_item_badge"-->
+<!--        android:orderInCategory="1000"-->
+<!--        android:title="@string/new_requisition"-->
+<!--        app:showAsAction="always"-->
+<!--        tools:ignore="AlwaysShowAction" />-->
 
 
 </menu>
