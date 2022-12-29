@@ -82,4 +82,16 @@ class DiskRentalFirestoreDataSource {
         Log.d("RentalFirestore", "Called Addrental")
         return firestoreDb.collection("Rental").add(newRentalAsMap).await()
     }
+
+    suspend fun acceptRentalInRequest(rentalId: String) =
+        firestoreDb.collection("Rental").document(rentalId).update(
+            mapOf(
+                "rentalStatus" to "In progress",
+                "rentDate" to Timestamp.now(),
+                "dueDate" to Timestamp(
+                    (LocalDate.now().plusDays(30).atStartOfDay(zoneId).toEpochSecond()), 0
+                )
+            )
+        ).await()
+
 }

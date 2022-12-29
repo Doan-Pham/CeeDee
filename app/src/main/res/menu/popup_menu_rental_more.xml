@@ -4,17 +4,21 @@
     <item
         android:id="@+id/menu_item_rental_return_disk"
         android:title="Return disks"
-        app:showAsAction="never"/>
-<!--    <item-->
-<!--        android:id="@+id/menu_item_rental_return_disk"-->
-<!--        android:title="Return disks"-->
-<!--        app:showAsAction="never"/>-->
-<!--    <item-->
-<!--        android:id="@+id/menu_item_rental_return_disk"-->
-<!--        android:title="@string/edit"-->
-<!--        app:showAsAction="never"/>-->
-<!--    <item-->
-<!--        android:id="@+id/menu_item_rental_return_disk"-->
-<!--        android:title="@string/delete"-->
-<!--        app:showAsAction="never"/>-->
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/menu_item_rental_accept_request"
+        android:title="Accept request"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/menu_item_rental_view_disk_titles"
+        android:title="View rented disk titles"
+        app:showAsAction="never" />
+    <!--    <item-->
+    <!--        android:id="@+id/menu_item_rental_return_disk"-->
+    <!--        android:title="@string/edit"-->
+    <!--        app:showAsAction="never"/>-->
+    <!--    <item-->
+    <!--        android:id="@+id/menu_item_rental_return_disk"-->
+    <!--        android:title="@string/delete"-->
+    <!--        app:showAsAction="never"/>-->
 </menu>

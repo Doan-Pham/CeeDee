@@ -164,6 +164,14 @@ class RentalFragment : Fragment() {
                         findNavController().navigate(action)
                         true
                     }
+                    R.id.menu_item_rental_accept_request -> {
+                        viewModel.acceptRentalInRequest(rental.id)
+                        true
+                    }
+                    R.id.menu_item_rental_view_disk_titles -> {
+                        viewModel.acceptRentalInRequest(rental.id)
+                        true
+                    }
                     else -> false
                 }
             }

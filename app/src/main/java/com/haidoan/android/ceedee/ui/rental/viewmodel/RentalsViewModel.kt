@@ -4,8 +4,9 @@ import androidx.lifecycle.*
 import com.haidoan.android.ceedee.data.Rental
 import com.haidoan.android.ceedee.data.disk_rental.DiskRentalRepository
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
-
+private const val TAG = "RentalsViewModel"
 class RentalsViewModel(
     private val rentalsRepository: DiskRentalRepository
 ) : ViewModel() {
@@ -46,6 +47,13 @@ class RentalsViewModel(
     fun setFilteringCategory(inputFilteringCategory: RentalFilterCategory) {
         filteringCategory.value = inputFilteringCategory
     }
+
+    fun acceptRentalInRequest(rentalId: String) {
+        viewModelScope.launch {
+            rentalsRepository.acceptRentalInRequest(rentalId)
+        }
+    }
+
 
     private fun List<Rental>.searchByCustomerName(supplierName: String) =
         this.filter { individualRental ->
