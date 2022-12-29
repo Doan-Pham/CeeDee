@@ -52,7 +52,7 @@ class NewRentalScreen : Fragment() {
 
         isCurrentUserCustomer = arguments?.getBoolean(ARGUMENT_KEY_IS_USER_CUSTOMER) ?: false
         Log.d(TAG, "OnViewCreated() - isCurrentUserCustomer: $isCurrentUserCustomer")
-
+        viewModel.setIsCurrentUserCustomer(isCurrentUserCustomer)
 
         disksToRentAdapter = NewRentalAdapter(
             onButtonMinusClick = { diskTitle -> viewModel.decrementDiskTitleAmount(diskTitle) },
@@ -65,6 +65,14 @@ class NewRentalScreen : Fragment() {
             disksToRentDialog.show(childFragmentManager, "DISK_TO_ADD_DIALOG")
             //viewModel.addDiskTitleToImport(DiskTitle(name = "What"))
         }
+        setupButtonProceed()
+        viewModel.disksToRent.observe(viewLifecycleOwner) {
+            disksToRentAdapter.setDisksToRent(it)
+            //Log.d(TAG, "disksToImport: $it")
+        }
+    }
+
+    private fun setupButtonProceed() {
         binding.btnProceed.setOnClickListener {
             if (disksToRentAdapter.itemCount == 0 || binding.tvAddress.text.isEmpty() || binding.tvName.text.isEmpty() || binding.tvPhone.text.isEmpty()) Toast.makeText(
                 requireActivity(),
@@ -82,12 +90,16 @@ class NewRentalScreen : Fragment() {
                         is Response.Loading -> {
                         }
                         is Response.Success -> {
-                            findNavController().popBackStack()
                             Toast.makeText(
                                 requireActivity(),
                                 "Rental added!",
                                 Toast.LENGTH_LONG
                             ).show()
+                            viewModel.clearDiskTitleToRent()
+
+                            if (!isCurrentUserCustomer) {
+                                findNavController().popBackStack()
+                            }
                         }
                         is Response.Failure -> {
                             Log.d(TAG, "Error: ${result.errorMessage}")
@@ -98,13 +110,9 @@ class NewRentalScreen : Fragment() {
 
         }
 
-        viewModel.disksToRent.observe(viewLifecycleOwner) {
-            disksToRentAdapter.setDisksToRent(it)
-            //Log.d(TAG, "disksToImport: $it")
-        }
     }
 
-    companion object{
+    companion object {
         const val TAG = "NewRentalFrag"
         const val ARGUMENT_KEY_IS_USER_CUSTOMER = "ARGUMENT_KEY_IS_USER_CUSTOMER"
 

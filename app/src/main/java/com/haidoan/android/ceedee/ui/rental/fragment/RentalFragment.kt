@@ -115,6 +115,9 @@ class RentalFragment : Fragment() {
                 R.id.chip_filter_by_overdue -> viewModel.setFilteringCategory(
                     RentalFilterCategory.FILTER_BY_OVERDUE
                 )
+                R.id.chip_filter_by_in_request -> viewModel.setFilteringCategory(
+                    RentalFilterCategory.FILTER_BY_IN_REQUEST
+                )
                 R.id.chip_filter_by_all -> viewModel.setFilteringCategory(
                     RentalFilterCategory.FILTER_BY_ALL
                 )

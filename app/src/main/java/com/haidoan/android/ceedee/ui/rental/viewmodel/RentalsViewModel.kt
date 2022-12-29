@@ -61,6 +61,7 @@ class RentalsViewModel(
                 RentalFilterCategory.FILTER_BY_IN_PROGRESS -> individualRental.rentalStatus == "In progress"
                 RentalFilterCategory.FILTER_BY_COMPLETE -> individualRental.rentalStatus == "Complete"
                 RentalFilterCategory.FILTER_BY_OVERDUE -> individualRental.rentalStatus == "Overdue"
+                RentalFilterCategory.FILTER_BY_IN_REQUEST -> individualRental.rentalStatus == "In request"
                 RentalFilterCategory.FILTER_BY_ALL -> true
             }
         }
@@ -83,5 +84,6 @@ enum class RentalFilterCategory {
     FILTER_BY_COMPLETE,
     FILTER_BY_OVERDUE,
     FILTER_BY_IN_PROGRESS,
+    FILTER_BY_IN_REQUEST,
     FILTER_BY_ALL
 }

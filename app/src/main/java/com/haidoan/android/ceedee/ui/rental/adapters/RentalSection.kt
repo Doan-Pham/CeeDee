@@ -37,15 +37,19 @@ class RentalSection(
 
                 when (rental.rentalStatus) {
                     "Complete" -> {
-                        imageviewItem.setImageResource(R.drawable.check)
+                        imageviewItem.setImageResource(R.drawable.ic_in_store)
                         buttonReturnDisk.visibility = View.INVISIBLE
                     }
                     "Overdue" -> {
-                        imageviewItem.setImageResource(R.drawable.multiply)
+                        imageviewItem.setImageResource(R.drawable.ic_damaged)
                         buttonReturnDisk.visibility = View.INVISIBLE
                     }
                     "In progress" -> {
-                        imageviewItem.setImageResource(R.drawable.clock)
+                        imageviewItem.setImageResource(R.drawable.ic_rented)
+                        buttonReturnDisk.visibility = View.VISIBLE
+                    }
+                    "In request" -> {
+                        imageviewItem.setImageResource(R.drawable.ic_rented)
                         buttonReturnDisk.visibility = View.VISIBLE
                     }
                 }

@@ -12,17 +12,26 @@ class NewRentalViewModel(
     private val diskRentalRepository: DiskRentalRepository,
     private val disksRepository: DisksRepository
 ) : ViewModel() {
+    private var isCurrentUserCustomer = false
+
+    fun setIsCurrentUserCustomer(isCustomer: Boolean) {
+        isCurrentUserCustomer = isCustomer
+    }
 
     val disksToRent: LiveData<MutableMap<DiskTitle, Long>>
         get() = _diskTitlesToRent
-
     private val _diskTitlesToRent = MutableLiveData<MutableMap<DiskTitle, Long>>(mutableMapOf())
+
     fun addDiskTitleToRent(diskTitle: DiskTitle) {
         // Have to write all of this, or else livedata won't update
         val currentDiskTitlesMap = _diskTitlesToRent.value
         currentDiskTitlesMap?.put(diskTitle, 1)
         _diskTitlesToRent.value = currentDiskTitlesMap!!
         //Log.d(TAG, "addDiskTitleToImport : ${disksToImport.value}")
+    }
+
+    fun clearDiskTitleToRent() {
+        _diskTitlesToRent.value = mutableMapOf()
     }
 
     fun incrementDiskTitleAmount(diskTitle: DiskTitle) {
@@ -62,11 +71,16 @@ class NewRentalViewModel(
     fun addRental() =
         liveData(context = viewModelScope.coroutineContext + Dispatchers.IO) {
             emit(Response.Loading())
+            val rentalStatus =
+                if (isCurrentUserCustomer) "In request"
+                else "In progress"
+
             diskRentalRepository.addRental(
                 _customerName.value,
                 _customerAddress.value,
                 _customerPhone.value,
-                _diskTitlesToRent.value?.toImmutableMap()!!
+                _diskTitlesToRent.value?.toImmutableMap()!!,
+                rentalStatus
             ).collect { response ->
                 if (response is Response.Success) {
                     disksRepository.rentDisksOfDiskTitleIds(

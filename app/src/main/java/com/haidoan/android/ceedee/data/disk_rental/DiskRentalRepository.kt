@@ -24,7 +24,8 @@ class DiskRentalRepository(private val firestoreDataSource: DiskRentalFirestoreD
         customerName: String?,
         customerAddress: String?,
         customerPhone: String?,
-        diskTitlesToAdd: Map<DiskTitle, Long>
+        diskTitlesToAdd: Map<DiskTitle, Long>,
+        rentalStatus: String?
     ) =
         flow {
             emit(Response.Loading())
@@ -34,7 +35,8 @@ class DiskRentalRepository(private val firestoreDataSource: DiskRentalFirestoreD
                         customerName,
                         customerAddress,
                         customerPhone,
-                        diskTitlesToAdd
+                        diskTitlesToAdd,
+                        rentalStatus
                     )
                 )
             )
