@@ -48,6 +48,7 @@ class NewRentalScreen : Fragment() {
 
     private val customers = mutableListOf<Customer>()
     private var selectedCustomerId: String = ""
+    private var currentUserPhoneNumber = ""
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -65,6 +66,15 @@ class NewRentalScreen : Fragment() {
         Log.d(TAG, "OnViewCreated() - isCurrentUserCustomer: $isCurrentUserCustomer")
         viewModel.setIsCurrentUserCustomer(isCurrentUserCustomer)
 
+        currentUserPhoneNumber =
+            arguments?.getString(ARGUMENT_KEY_CUSTOMER_PHONE)?.replaceFirst("+84", "0") ?: ""
+        Log.d(
+            TAG,
+            "arguments?.getString(ARGUMENT_KEY_CUSTOMER_PHONE): ${
+                arguments?.getString(ARGUMENT_KEY_CUSTOMER_PHONE)
+            }"
+        )
+
         disksToRentAdapter = NewRentalAdapter(
             onButtonMinusClick = { diskTitle -> viewModel.decrementDiskTitleAmount(diskTitle) },
             onButtonPlusClick = { diskTitle -> viewModel.incrementDiskTitleAmount(diskTitle) },
@@ -77,10 +87,8 @@ class NewRentalScreen : Fragment() {
             //viewModel.addDiskTitleToImport(DiskTitle(name = "What"))
         }
         setupButtonProceed()
-        viewModel.disksToRent.observe(viewLifecycleOwner) {
-            disksToRentAdapter.setDisksToRent(it)
-            //Log.d(TAG, "disksToImport: $it")
-        }
+        observeViewModel()
+        setAutoCompleteTextViewPhone()
     }
 
     private fun setupButtonProceed() {
@@ -138,37 +146,39 @@ class NewRentalScreen : Fragment() {
 
     }
 
-    companion object {
-        const val TAG = "NewRentalFrag"
-        const val ARGUMENT_KEY_IS_USER_CUSTOMER = "ARGUMENT_KEY_IS_USER_CUSTOMER"
 
+    private fun setAutoCompleteTextViewPhone() {
+        binding.spinnerPhone.onItemClickListener =
+            AdapterView.OnItemClickListener { _, _, position, _ ->
+                binding.tvName.setText(customers[position].fullName)
+                binding.tvAddress.setText(customers[position].address)
+                selectedCustomerId = customers[position].id
+            }
+
+        if (isCurrentUserCustomer) {
+            binding.spinnerPhone.keyListener = null
+            binding.spinnerPhone.setText(currentUserPhoneNumber)
+        }
+    }
+
+    private fun observeViewModel() {
         viewModel.disksToRent.observe(viewLifecycleOwner) {
             disksToRentAdapter.setDisksToRent(it)
             //Log.d(TAG, "disksToImport: $it")
         }
 
-
-        observeViewModel()
-
-        setAutoCompleteTextViewPhone()
-    }
-
-
-    private fun setAutoCompleteTextViewPhone() {
-
-        binding.spinnerPhone.onItemClickListener =
-            AdapterView.OnItemClickListener { parent, view, position, id ->
-                binding.tvName.setText(customers[position].fullName)
-                binding.tvAddress.setText(customers[position].address)
-                selectedCustomerId = customers[position].id
-            }
-    }
-
-    private fun observeViewModel() {
         viewModel.allCustomers.observe(viewLifecycleOwner) { allCustomers ->
             customers.clear()
             customers.addAll(allCustomers)
-
+            if (isCurrentUserCustomer) {
+                binding.tvName.setText(
+                    customers.find { it.phone == currentUserPhoneNumber }?.fullName ?: ""
+                )
+                binding.tvAddress.setText(
+                    customers.find { it.phone == currentUserPhoneNumber }?.address ?: ""
+                )
+                selectedCustomerId = customers.find { it.phone == currentUserPhoneNumber }?.id ?: ""
+            }
             binding.spinnerPhone.setAdapter(
                 ArrayAdapter(
                     requireContext(),
@@ -177,4 +187,11 @@ class NewRentalScreen : Fragment() {
             )
         }
     }
+
+    companion object {
+        const val TAG = "NewRentalFrag"
+        const val ARGUMENT_KEY_IS_USER_CUSTOMER = "ARGUMENT_KEY_IS_USER_CUSTOMER"
+        const val ARGUMENT_KEY_CUSTOMER_PHONE = "ARGUMENT_KEY_CUSTOMER_PHONE"
+    }
+
 }

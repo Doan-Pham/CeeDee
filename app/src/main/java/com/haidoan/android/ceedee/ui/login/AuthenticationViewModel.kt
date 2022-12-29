@@ -16,7 +16,6 @@ class AuthenticationViewModel(application: Application) : AndroidViewModel(appli
     private val userRepository: UserRepository
     private val isUserSignedIn: MutableLiveData<Boolean>
     private val requiredText: MutableLiveData<String>
-
     init {
         repository = AuthenticationRepository(application)
         userRepository = UserRepository(UserFirestoreDataSource())
@@ -29,6 +28,7 @@ class AuthenticationViewModel(application: Application) : AndroidViewModel(appli
     }
 
     fun isUserSignedIn() = isUserSignedIn
+    fun getCurrentUser() = repository.currentUser
 
     fun signIn(email: String?, pass: String?) = liveData(Dispatchers.IO) {
         repository.loginFromFireStore(email = email, pass = pass).collect { response ->
@@ -43,6 +43,7 @@ class AuthenticationViewModel(application: Application) : AndroidViewModel(appli
     ) {
         repository.authenticatePhoneNumber(phoneNumber, activity, callbacks)
     }
+
 
     fun signInWithPhoneAuthCredential(activity: Activity, credential: PhoneAuthCredential) =
         liveData {

@@ -23,10 +23,12 @@ import com.haidoan.android.ceedee.databinding.ActivityMainBinding
 import com.haidoan.android.ceedee.ui.login.AuthenticationActivity
 import com.haidoan.android.ceedee.ui.login.AuthenticationRepository
 import com.haidoan.android.ceedee.ui.rental.fragment.NewRentalScreen
+import com.haidoan.android.ceedee.ui.rental.fragment.NewRentalScreen.Companion.ARGUMENT_KEY_CUSTOMER_PHONE
 import com.haidoan.android.ceedee.ui.rental.fragment.NewRentalScreen.Companion.ARGUMENT_KEY_IS_USER_CUSTOMER
 
 
 private const val TAG = "MainActivity"
+const val EXTRA_CURRENT_USER_PHONE_NUMBER = "EXTRA_CURRENT_USER_PHONE_NUMBER"
 
 class MainActivity : AppCompatActivity() {
 
@@ -87,6 +89,11 @@ class MainActivity : AppCompatActivity() {
                 val newRentalScreenArguments = Bundle()
 
                 newRentalScreenArguments.putBoolean(ARGUMENT_KEY_IS_USER_CUSTOMER, true)
+                newRentalScreenArguments.putString(
+                    ARGUMENT_KEY_CUSTOMER_PHONE, intent.getStringExtra(
+                        EXTRA_CURRENT_USER_PHONE_NUMBER
+                    )
+                )
                 newRentalScreen.arguments = newRentalScreenArguments
 
                 supportFragmentManager.popBackStackImmediate()
