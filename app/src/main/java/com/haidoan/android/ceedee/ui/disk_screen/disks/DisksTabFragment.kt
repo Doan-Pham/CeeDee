@@ -4,7 +4,9 @@ import android.app.AlertDialog
 import android.os.Bundle
 import android.util.Log
 import android.view.*
-import android.widget.*
+import android.widget.EditText
+import android.widget.SearchView
+import android.widget.Toast
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
@@ -37,7 +39,7 @@ class DisksTabFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         // Inflate the layout for this fragment
         _binding = FragmentDiskTabDisksBinding.inflate(inflater, container, false)
         return binding.root
@@ -128,17 +130,17 @@ class DisksTabFragment : Fragment() {
                 // Add menu items here
                 menuInflater.inflate(R.menu.menu_disk, menu)
 
-                val menuItemNewRequisition =
-                    menu.findItem(R.id.menu_item_disk_tab_new_requisition)
+//                val menuItemNewRequisition =
+//                    menu.findItem(R.id.menu_item_disk_tab_new_requisition)
 
-                val newRequisitionActionView = (menuItemNewRequisition.actionView as FrameLayout)
-                val textViewNewRequisitionBadge =
-                    newRequisitionActionView.findViewById(R.id.textview_requisition_badge) as TextView
-                textViewNewRequisitionBadge.text = "10"
-
-                newRequisitionActionView.setOnClickListener {
-                    onMenuItemSelected(menuItemNewRequisition)
-                }
+//                val newRequisitionActionView = (menuItemNewRequisition.actionView as FrameLayout)
+//                val textViewNewRequisitionBadge =
+//                    newRequisitionActionView.findViewById(R.id.textview_requisition_badge) as TextView
+//                textViewNewRequisitionBadge.text = "10"
+//
+//                newRequisitionActionView.setOnClickListener {
+//                    onMenuItemSelected(menuItemNewRequisition)
+//                }
 
                 val searchView: SearchView =
                     (menu.findItem(R.id.menu_disk_search).actionView as SearchView)
@@ -159,10 +161,10 @@ class DisksTabFragment : Fragment() {
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
                 // Handle the menu selection
                 return when (menuItem.itemId) {
-                    R.id.menu_item_disk_tab_new_requisition -> {
-                        Log.d("DiskTab", "Clicked Import")
-                        true
-                    }
+//                    R.id.menu_item_disk_tab_new_requisition -> {
+//                        Log.d("DiskTab", "Clicked Import")
+//                        true
+//                    }
                     R.id.menu_disk_add_genre -> {
                         addGenre()
                         true
@@ -187,7 +189,7 @@ class DisksTabFragment : Fragment() {
 
 
     private fun addSupplier() {
-        view?.let { withEditTextSupplier(it) }
+        view?.let { withEditTextSupplier() }
     }
 
     private fun addDiskTitle() {
@@ -195,13 +197,13 @@ class DisksTabFragment : Fragment() {
     }
 
     private fun addGenre() {
-        view?.let { withEditTextGenre(it) }
+        view?.let { withEditTextGenre() }
     }
 
     /**
      *  Create dialog for add genre
      * */
-    private fun withEditTextGenre(view: View) {
+    private fun withEditTextGenre() {
         val builder = AlertDialog.Builder(context)
         val inflater = layoutInflater
         builder.setTitle("Add new genre")
@@ -214,7 +216,7 @@ class DisksTabFragment : Fragment() {
             } else
                 addGenreToFireStore(editText.text.toString())
         }
-        builder.setNegativeButton("CANCEL") { dialogLayout, i -> }
+        builder.setNegativeButton("CANCEL") { _, _ -> }
         builder.show()
     }
 
@@ -238,7 +240,7 @@ class DisksTabFragment : Fragment() {
     /**
      *  Create dialog for add supplier
      * */
-    private fun withEditTextSupplier(view: View) {
+    private fun withEditTextSupplier() {
         val builder = AlertDialog.Builder(context)
         val inflater = layoutInflater
         builder.setTitle("Add new supplier")
@@ -253,7 +255,7 @@ class DisksTabFragment : Fragment() {
             } else
                 addSupplierToFireStore(name.text.toString(), email.text.toString())
         }
-        builder.setNegativeButton("CANCEL") { dialogLayout, i -> }
+        builder.setNegativeButton("CANCEL") { _, _ -> }
         builder.show()
     }
 

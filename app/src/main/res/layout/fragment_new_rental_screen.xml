@@ -16,14 +16,18 @@
         android:layout_marginTop="30dp"
         android:layout_marginLeft="60dp">
     </TextView>
-    <EditText
+
+    <AutoCompleteTextView
         android:layout_width="330dp"
-        android:id="@+id/tv_phone"
+        android:id="@+id/spinner_phone"
         android:layout_marginTop="35dp"
         android:hint="Client_Phone"
         android:layout_height="60dp"
         android:layout_marginLeft="30dp"
-        style="@style/edt_login_style"></EditText>
+        android:completionThreshold="1"
+        style="@style/edt_login_style"
+        />
+
     <EditText
         android:layout_width="330dp"
         android:id="@+id/tv_name"
@@ -31,7 +35,8 @@
         android:hint="Client_Name"
         android:layout_height="60dp"
         android:layout_marginLeft="30dp"
-        style="@style/edt_login_style"></EditText>
+        style="@style/edt_login_style" />
+
     <EditText
         android:layout_width="330dp"
         android:id="@+id/tv_address"
@@ -39,12 +44,13 @@
         android:hint="Client_Address"
         android:layout_height="60dp"
         android:layout_marginLeft="30dp"
-        style="@style/edt_login_style"></EditText>
+        style="@style/edt_login_style" />
     <androidx.appcompat.widget.LinearLayoutCompat
         android:layout_width="match_parent"
         android:layout_marginTop="30dp"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -52,27 +58,30 @@
             android:layout_marginLeft="30dp"
             android:textStyle="bold"
             android:textColor="@color/black"
-            android:textSize="23dp"></TextView>
+            android:textSize="23dp" />
+
         <ImageButton
             android:id="@+id/open_dialog"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_round_add_24"
             android:background="@color/white"
-            android:layout_marginLeft="170dp"></ImageButton>
+            android:layout_marginLeft="170dp" />
     </androidx.appcompat.widget.LinearLayoutCompat>
+
     <androidx.recyclerview.widget.RecyclerView
         android:layout_width="match_parent"
         android:id="@+id/new_rental_rcl"
         android:layout_marginTop="20dp"
         android:layout_marginRight="40dp"
         android:layout_marginLeft="40dp"
-        android:layout_height="wrap_content"></androidx.recyclerview.widget.RecyclerView>
-<Button
-    android:layout_width="300dp"
-    android:id="@+id/btn_proceed"
-    android:layout_marginTop="10dp"
-    android:layout_marginLeft="55dp"
-    android:text="Proceed"
-    android:layout_height="wrap_content"></Button>
+        android:layout_height="wrap_content" />
+
+    <Button
+        android:layout_width="300dp"
+        android:id="@+id/btn_proceed"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="55dp"
+        android:text="Proceed"
+        android:layout_height="wrap_content" />
 </androidx.appcompat.widget.LinearLayoutCompat>

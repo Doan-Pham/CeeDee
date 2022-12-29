@@ -121,13 +121,6 @@ class DiskTitlesRepository(private val application: Application) {
         genreId: String,
         name: String
     ) = flow {
-        val hash = hashMapOf(
-            "author" to author,
-            "coverImageUrl" to coverImageUrl,
-            "description" to description,
-            "genreId" to genreId,
-            "name" to name
-        )
 
         emit(Response.Loading())
         emit(
