@@ -3,6 +3,7 @@ package com.haidoan.android.ceedee.ui.rental.fragment
 import android.os.Bundle
 import android.util.Log
 import android.view.*
+import android.widget.PopupMenu
 import android.widget.SearchView
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
@@ -12,6 +13,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.haidoan.android.ceedee.R
+import com.haidoan.android.ceedee.data.Rental
 import com.haidoan.android.ceedee.data.disk_rental.DiskRentalFirestoreDataSource
 import com.haidoan.android.ceedee.data.disk_rental.DiskRentalRepository
 import com.haidoan.android.ceedee.databinding.FragmentRentalBinding
@@ -139,19 +141,41 @@ class RentalFragment : Fragment() {
                 val currentSection = RentalSection(
                     currentMonthRentals.key,
                     currentMonthRentals.value,
-                    onButtonReturnClick = { rental ->
-                        val action =
-                            RentalFragmentDirections.actionRentalFragmentToDiskReturnFragment(
-                                rental.id
-                            )
-                        findNavController().navigate(action)
-                    })
+                    onButtonMoreClick = { rental, buttonView ->
+                        setupPopupMenuForRecyclerViewItem(rental, buttonView)
+                    }
+                )
                 rentalAdapter.addSection(currentSection)
             }
 
             binding.recyclerviewRentals.adapter = rentalAdapter
         }
     }
+
+    private fun setupPopupMenuForRecyclerViewItem(rental: Rental, view: View) {
+        PopupMenu(context, view).apply {
+            setOnMenuItemClickListener {
+                when (it.itemId) {
+                    R.id.menu_item_rental_return_disk -> {
+                        val action =
+                            RentalFragmentDirections.actionRentalFragmentToDiskReturnFragment(
+                                rental.id
+                            )
+                        findNavController().navigate(action)
+                        true
+                    }
+                    else -> false
+                }
+            }
+            inflate(R.menu.popup_menu_rental_more)
+            if (rental.rentalStatus == "In request") {
+                menu.findItem(R.id.menu_item_rental_return_disk).isVisible = false
+            }
+
+            show()
+        }
+    }
+
 
     private fun navigateToNewRentalFragment() {
         val action =

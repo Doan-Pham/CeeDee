@@ -72,7 +72,7 @@
     </LinearLayout>
 
     <ImageButton
-        android:id="@+id/button_return_disk"
+        android:id="@+id/button_more"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="center"
@@ -81,5 +81,5 @@
         android:clickable="true"
         android:contentDescription="@string/return_disks"
         android:focusable="true"
-        android:src="@drawable/ic_arrow_right_to_bracket_black_24dp" />
+        android:src="@drawable/ic_round_more_vert_24" />
 </LinearLayout>
