@@ -23,6 +23,7 @@ import com.haidoan.android.ceedee.databinding.ActivityMainBinding
 import com.haidoan.android.ceedee.ui.login.AuthenticationActivity
 import com.haidoan.android.ceedee.ui.login.AuthenticationRepository
 import com.haidoan.android.ceedee.ui.rental.fragment.NewRentalScreen
+import com.haidoan.android.ceedee.ui.rental.fragment.NewRentalScreen.Companion.ARGUMENT_KEY_IS_USER_CUSTOMER
 
 
 private const val TAG = "MainActivity"
@@ -82,10 +83,15 @@ class MainActivity : AppCompatActivity() {
         // Set up bottomNav
         when (currentUser.role) {
             USER_ROLE_CUSTOMER -> {
+                val newRentalScreen = NewRentalScreen()
+                val newRentalScreenArguments = Bundle()
+
+                newRentalScreenArguments.putBoolean(ARGUMENT_KEY_IS_USER_CUSTOMER, true)
+                newRentalScreen.arguments = newRentalScreenArguments
 
                 supportFragmentManager.popBackStackImmediate()
                 val transaction: FragmentTransaction = supportFragmentManager.beginTransaction()
-                transaction.replace(R.id.mainContainer, NewRentalScreen())
+                transaction.replace(R.id.mainContainer, newRentalScreen, NewRentalScreen.TAG)
                 transaction.commit()
                 return
             }

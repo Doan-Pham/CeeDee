@@ -19,9 +19,6 @@ import com.haidoan.android.ceedee.ui.disk_screen.utils.Response
 import com.haidoan.android.ceedee.ui.rental.adapters.NewRentalAdapter
 import com.haidoan.android.ceedee.ui.rental.viewmodel.NewRentalViewModel
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val TAG = "NewRentalFrag"
 
 class NewRentalScreen : Fragment() {
     private var _binding: FragmentNewRentalScreenBinding? = null
@@ -29,6 +26,9 @@ class NewRentalScreen : Fragment() {
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
+
+    private var isCurrentUserCustomer: Boolean = false
+
 
     private val viewModel: NewRentalViewModel by viewModels(
         factoryProducer = {
@@ -49,6 +49,11 @@ class NewRentalScreen : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        isCurrentUserCustomer = arguments?.getBoolean(ARGUMENT_KEY_IS_USER_CUSTOMER) ?: false
+        Log.d(TAG, "OnViewCreated() - isCurrentUserCustomer: $isCurrentUserCustomer")
+
+
         disksToRentAdapter = NewRentalAdapter(
             onButtonMinusClick = { diskTitle -> viewModel.decrementDiskTitleAmount(diskTitle) },
             onButtonPlusClick = { diskTitle -> viewModel.incrementDiskTitleAmount(diskTitle) },
@@ -97,5 +102,11 @@ class NewRentalScreen : Fragment() {
             disksToRentAdapter.setDisksToRent(it)
             //Log.d(TAG, "disksToImport: $it")
         }
+    }
+
+    companion object{
+        const val TAG = "NewRentalFrag"
+        const val ARGUMENT_KEY_IS_USER_CUSTOMER = "ARGUMENT_KEY_IS_USER_CUSTOMER"
+
     }
 }
