@@ -169,17 +169,26 @@ class RentalFragment : Fragment() {
                         true
                     }
                     R.id.menu_item_rental_view_disk_titles -> {
-                        viewModel.acceptRentalInRequest(rental.id)
+                        RentalDiskTitleDialog(rental).show(
+                            childFragmentManager,
+                            "DISK_TO_ADD_DIALOG"
+                        )
                         true
                     }
                     else -> false
                 }
             }
             inflate(R.menu.popup_menu_rental_more)
-            if (rental.rentalStatus == "In request") {
-                menu.findItem(R.id.menu_item_rental_return_disk).isVisible = false
+            when (rental.rentalStatus) {
+                "In request" -> menu.findItem(R.id.menu_item_rental_return_disk).isVisible = false
+                "In progress", "Overdue" -> menu.findItem(R.id.menu_item_rental_accept_request).isVisible =
+                    false
+                "Completed" -> {
+                    menu.findItem(R.id.menu_item_rental_return_disk).isVisible = false
+                    menu.findItem(R.id.menu_item_rental_accept_request).isVisible =
+                        false
+                }
             }
-
             show()
         }
     }

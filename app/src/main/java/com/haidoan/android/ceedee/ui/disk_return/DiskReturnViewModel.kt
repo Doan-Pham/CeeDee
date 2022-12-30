@@ -34,14 +34,14 @@ class DiskReturnViewModel(
             Log.d(TAG, "SavedState - rentalId: $rentalId")
             liveData(context = viewModelScope.coroutineContext + Dispatchers.IO) {
                 val rental = diskRentalRepository.getRentalStreamById(rentalId).first()
-                diskTitlesRepository.getDiskTitlesByListOfId(rental.diskTitlesRentedAndAmount.keys.toList())
+                diskTitlesRepository.getDiskTitlesByListOfId(rental.diskTitlesToAdd.keys.toList())
                     .collect { diskTitles: List<DiskTitle> ->
                         emit(
                             DiskReturnUiState(
                                 customerName = rental.customerName,
                                 customerPhone = rental.customerPhone,
                                 customerAddress = rental.customerAddress,
-                                diskTitlesToReturn = rental.diskTitlesRentedAndAmount.map { diskTitleIdAndAmount ->
+                                diskTitlesToReturn = rental.diskTitlesToAdd.map { diskTitleIdAndAmount ->
                                     Triple(
                                         diskTitles.first { it.id == diskTitleIdAndAmount.key },
                                         diskTitleIdAndAmount.value,

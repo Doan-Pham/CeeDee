@@ -21,8 +21,7 @@ class DiskToRentDialog : DialogFragment() {
     private val newRentalViewModel: NewRentalViewModel by viewModels(
         ownerProducer = { requireParentFragment() })
 
-    private
-    val disksToRentViewModel: DiskToRentViewModel by lazy {
+    private val disksToRentViewModel: DiskToRentViewModel by lazy {
         ViewModelProvider(
             this, DiskToRentViewModel.Factory(
                 DiskTitlesRepository(requireActivity().application),
@@ -32,8 +31,6 @@ class DiskToRentDialog : DialogFragment() {
 
     private lateinit var disksToRentAdapter: DiskToRentAdapter
 
-    private
-    val diskTitlesToImportAndAmount = mutableMapOf<String, Long>()
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         binding = DialogChooseDiskBinding.inflate(requireActivity().layoutInflater)

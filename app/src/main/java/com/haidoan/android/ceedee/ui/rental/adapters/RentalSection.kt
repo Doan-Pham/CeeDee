@@ -38,19 +38,19 @@ class RentalSection(
                 when (rental.rentalStatus) {
                     "Complete" -> {
                         imageviewItem.setImageResource(R.drawable.ic_in_store)
-                        buttonMore.visibility = View.INVISIBLE
+                        //buttonMore.visibility = View.INVISIBLE
                     }
                     "Overdue" -> {
                         imageviewItem.setImageResource(R.drawable.ic_damaged)
-                        buttonMore.visibility = View.INVISIBLE
+                        //buttonMore.visibility = View.INVISIBLE
                     }
                     "In progress" -> {
                         imageviewItem.setImageResource(R.drawable.ic_rented)
-                        buttonMore.visibility = View.VISIBLE
+                        //buttonMore.visibility = View.VISIBLE
                     }
                     "In request" -> {
                         imageviewItem.setImageResource(R.drawable.ic_in_request_black_24dp)
-                        buttonMore.visibility = View.VISIBLE
+                        //buttonMore.visibility = View.VISIBLE
                     }
                 }
                 tvCustomerName.text = rental.customerName

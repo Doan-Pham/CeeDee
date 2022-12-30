@@ -9,7 +9,7 @@ data class Rental(
     var customerName: String = "NOT_FOUND_CUSTOMER_NAME",
     var customerPhone: String = "NOT_FOUND_CUSTOMER_PHONE",
     var customerAddress: String = "NOT_FOUND_CUSTOMER_ADDRESS",
-    var diskTitlesRentedAndAmount: Map<String, Long> = mapOf(),
+    var diskTitlesToAdd: Map<String, Long> = mapOf(),
     var dueDate: Timestamp? = null,
     var rentDate: Timestamp? = null,
     var returnDate: Timestamp? = null,
