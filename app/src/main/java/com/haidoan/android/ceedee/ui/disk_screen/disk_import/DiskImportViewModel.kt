@@ -71,7 +71,13 @@ class DiskImportViewModel(
                     diskTitlesRepository.updateDiskAmount(
                         disksToImport.value?.mapKeys { it.key.id } ?: mapOf()
                     )
+                },
+                async {
+                    diskTitlesRepository.updateDiskInStoreAmount(
+                        disksToImport.value?.keys?.map { it.id } ?: listOf()
+                    )
                 }
+
             )
             val taskResponses = tasks.awaitAll()
             val taskResults = mutableListOf<Response<Any?>>()

@@ -71,7 +71,7 @@ class DiskTitlesRepository(private val application: Application) {
     }
 
     fun getDiskTitlesAvailableInStore() = flow {
-        emit(queryDiskTitle.whereGreaterThan("diskAmount", 0).get()
+        emit(queryDiskTitle.whereGreaterThan("diskInStoreAmount", 0).get()
             .await().documents.mapNotNull { it.toObject(DiskTitle::class.java) })
     }
 
@@ -100,6 +100,7 @@ class DiskTitlesRepository(private val application: Application) {
             "description" to description,
             "genreId" to genreId,
             "diskAmount" to 0,
+            "diskInStoreAmount" to 0,
             "totalRentalAmount" to 0,
             "name" to name
         )
@@ -191,4 +192,42 @@ class DiskTitlesRepository(private val application: Application) {
 
     }.catch { emit(Response.Failure(it.message.toString())) }
 
+    //  This won't work if listOfId has more than 10 elements due to a limit of Firestore
+//TODO: Modify the method to allow for more than 10 disk titles
+    fun updateDiskInStoreAmount(diskTitleIds: List<String>) = flow {
+        emit(Response.Loading())
+        val diskInStoreAmountGroupByDiskTitle = hashMapOf<String, Long>()
+        val disksInStore =
+            db.collection("Disk")
+                .whereIn("diskTitleId", diskTitleIds)
+                .whereEqualTo("status", "In Store").get()
+                .await().documents
+
+        for (disk in disksInStore) {
+            diskInStoreAmountGroupByDiskTitle[disk.get("diskTitleId") as String] =
+                (diskInStoreAmountGroupByDiskTitle[disk.get("diskTitleId") as String] ?: 0L) + 1L
+
+            Log.d(
+                TAG,
+                " updateDiskInStoreAmount() - diskInStoreAmountGroupByDiskTitle[${disk.get(" diskTitleId")}]: ${
+                    diskInStoreAmountGroupByDiskTitle[disk.get("diskTitleId") as String]
+                }"
+            )
+        }
+        emit(
+            Response.Success(
+                db.runBatch { batch ->
+                    for (diskTitleId in diskTitleIds) {
+                        Log.d(TAG, " updateDiskInStoreAmount() - diskTitleId: $diskTitleId")
+                        batch.update(
+                            queryDiskTitle.document(diskTitleId),
+                            "diskInStoreAmount",
+                            diskInStoreAmountGroupByDiskTitle[diskTitleId]
+                        )
+                    }
+                }.await()
+            )
+        )
+
+    }.catch { emit(Response.Failure(it.message.toString())) }
 }

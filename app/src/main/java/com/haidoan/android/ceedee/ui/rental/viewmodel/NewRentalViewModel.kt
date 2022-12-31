@@ -5,11 +5,9 @@ import com.haidoan.android.ceedee.data.DiskTitle
 import com.haidoan.android.ceedee.data.customer.Customer
 import com.haidoan.android.ceedee.data.customer.CustomerRepository
 import com.haidoan.android.ceedee.data.disk_rental.DiskRentalRepository
-import com.haidoan.android.ceedee.data.supplier.Supplier
 import com.haidoan.android.ceedee.ui.disk_screen.repository.DisksRepository
 import com.haidoan.android.ceedee.ui.disk_screen.utils.Response
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collect
 import okhttp3.internal.toImmutableMap
 
 class NewRentalViewModel(
@@ -42,7 +40,7 @@ class NewRentalViewModel(
     fun incrementDiskTitleAmount(diskTitle: DiskTitle) {
         val currentDiskTitlesMap = _diskTitlesToRent.value
         val diskTitleCurrentAmount = currentDiskTitlesMap?.get(diskTitle) ?: 1
-        if (diskTitleCurrentAmount < diskTitle.diskAmount) {
+        if (diskTitleCurrentAmount < diskTitle.diskInStoreAmount) {
             currentDiskTitlesMap?.put(
                 diskTitle,
                 diskTitleCurrentAmount + 1

@@ -22,7 +22,7 @@ class DiskToRentAdapter(private val onDiskItemClick: (DiskTitle) -> Unit) :
                 textviewDiskTitle.text = diskTitle.name
                 textviewDiskAuthor.text = diskTitle.author
                 imageviewDiskCover.load(diskTitle.coverImageUrl)
-                val diskAmountString = "${diskTitle.diskAmount} CD"
+                val diskAmountString = "${diskTitle.diskInStoreAmount} CD"
                 textviewDiskAmount.text = diskAmountString
                 linearlayoutContentWrapper.setOnClickListener { onDiskItemClick(diskTitle) }
             }

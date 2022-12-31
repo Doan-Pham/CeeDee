@@ -11,5 +11,6 @@ data class DiskTitle(
     val author: String = "",
     val coverImageUrl: String = "",
     val description: String = "",
-    val diskAmount: Long = 0
+    val diskAmount: Long = 0,
+    val diskInStoreAmount: Long = 0,
 ) : Serializable

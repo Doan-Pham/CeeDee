@@ -60,7 +60,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
 
-            android:text="Amount: 34CD" />
+            android:text="In store: 34CD" />
     </LinearLayout>
 
     <ImageButton

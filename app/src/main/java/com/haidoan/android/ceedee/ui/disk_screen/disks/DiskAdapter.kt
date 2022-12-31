@@ -207,7 +207,7 @@ class DiskAdapter(
 
         private fun updateDiskStatusToFireStore(status: String) {
             val disk = displayedDisk[bindingAdapterPosition]
-            diskViewModel.updateDiskStatus(disk.id, status)
+            diskViewModel.updateDiskStatus(disk, status)
                 .observe(viewLifecycleOwner) { response ->
                     when (response) {
                         is Response.Loading -> {

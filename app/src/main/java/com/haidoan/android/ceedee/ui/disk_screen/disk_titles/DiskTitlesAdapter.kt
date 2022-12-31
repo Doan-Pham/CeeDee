@@ -143,7 +143,7 @@ class DiskTitlesAdapter(private val context: Context) :
 
                 tvDiskTitlesAuthor.text = item.author
                 tvDiskTitlesName.text = item.name
-                tvDiskTitlesAmount.text = "Amount: ${item.diskAmount} CD"
+                tvDiskTitlesAmount.text = "In store: ${item.diskInStoreAmount}/${item.diskAmount} CD"
             }
         }
 
