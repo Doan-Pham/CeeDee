@@ -94,4 +94,7 @@ class DiskRentalFirestoreDataSource {
             )
         ).await()
 
+    suspend fun deleteRental(rentalId: String) =
+        firestoreDb.collection("Rental").document(rentalId).delete().await()
+
 }

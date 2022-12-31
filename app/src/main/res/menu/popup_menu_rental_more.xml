@@ -13,6 +13,10 @@
         android:id="@+id/menu_item_rental_view_disk_titles"
         android:title="View rented disk titles"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/menu_item_rental_cancel"
+        android:title="Cancel"
+        app:showAsAction="never" />
     <!--    <item-->
     <!--        android:id="@+id/menu_item_rental_return_disk"-->
     <!--        android:title="@string/edit"-->

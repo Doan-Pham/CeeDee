@@ -43,5 +43,8 @@ class DiskRentalRepository(private val firestoreDataSource: DiskRentalFirestoreD
         }
             .catch { emit(Response.Failure(it.message.toString())) }
 
-    suspend fun acceptRentalInRequest(rentalId: String) = firestoreDataSource.acceptRentalInRequest(rentalId)
+    suspend fun acceptRentalInRequest(rentalId: String) =
+        firestoreDataSource.acceptRentalInRequest(rentalId)
+
+    suspend fun deleteRental(rentalId: String) = firestoreDataSource.deleteRental(rentalId)
 }

@@ -17,6 +17,7 @@ import com.haidoan.android.ceedee.data.Rental
 import com.haidoan.android.ceedee.data.disk_rental.DiskRentalFirestoreDataSource
 import com.haidoan.android.ceedee.data.disk_rental.DiskRentalRepository
 import com.haidoan.android.ceedee.databinding.FragmentRentalBinding
+import com.haidoan.android.ceedee.ui.disk_screen.repository.DisksRepository
 import com.haidoan.android.ceedee.ui.rental.adapters.RentalSection
 import com.haidoan.android.ceedee.ui.rental.viewmodel.RentalFilterCategory
 import com.haidoan.android.ceedee.ui.rental.viewmodel.RentalsViewModel
@@ -36,7 +37,8 @@ class RentalFragment : Fragment() {
     private val viewModel: RentalsViewModel by lazy {
         ViewModelProvider(
             this, RentalsViewModel.Factory(
-                DiskRentalRepository(DiskRentalFirestoreDataSource())
+                DiskRentalRepository(DiskRentalFirestoreDataSource()),
+                DisksRepository(requireActivity().application)
             )
         )[RentalsViewModel::class.java]
     }
@@ -175,6 +177,10 @@ class RentalFragment : Fragment() {
                         )
                         true
                     }
+                    R.id.menu_item_rental_cancel -> {
+                        viewModel.cancelRental(rental.id)
+                        true
+                    }
                     else -> false
                 }
             }
@@ -183,9 +189,11 @@ class RentalFragment : Fragment() {
                 "In request" -> menu.findItem(R.id.menu_item_rental_return_disk).isVisible = false
                 "In progress", "Overdue" -> menu.findItem(R.id.menu_item_rental_accept_request).isVisible =
                     false
-                "Completed" -> {
+                "Complete" -> {
                     menu.findItem(R.id.menu_item_rental_return_disk).isVisible = false
                     menu.findItem(R.id.menu_item_rental_accept_request).isVisible =
+                        false
+                    menu.findItem(R.id.menu_item_rental_cancel).isVisible =
                         false
                 }
             }
