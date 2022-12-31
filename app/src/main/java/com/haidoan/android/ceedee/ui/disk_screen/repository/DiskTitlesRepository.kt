@@ -99,6 +99,8 @@ class DiskTitlesRepository(private val application: Application) {
             "coverImageUrl" to coverImageUrl,
             "description" to description,
             "genreId" to genreId,
+            "diskAmount" to 0,
+            "totalRentalAmount" to 0,
             "name" to name
         )
         emit(Response.Loading())

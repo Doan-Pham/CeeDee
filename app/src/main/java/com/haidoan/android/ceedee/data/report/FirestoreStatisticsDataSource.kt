@@ -178,7 +178,7 @@ class FirestoreStatisticsDataSource {
                     }
 
                     for (document in snapshot.documents) {
-
+//                        Log.d(TAG, "document : ${document.data}")
                         val currentDiskGenreId = document.get("genreId") as String
                         val currentDiskTitleDiskAmount =
                             (document.get("diskAmount") as Long).toInt()
