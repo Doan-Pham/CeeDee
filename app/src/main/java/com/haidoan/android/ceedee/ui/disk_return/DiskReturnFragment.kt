@@ -107,7 +107,7 @@ class DiskReturnFragment : Fragment() {
                         findNavController().popBackStack()
                         Toast.makeText(
                             requireActivity(),
-                            "New rental added!",
+                            "Disk returned!",
                             Toast.LENGTH_LONG
                         ).show()
                     }

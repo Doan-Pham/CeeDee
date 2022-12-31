@@ -43,7 +43,7 @@ class DisksRepository(private val application: Application) {
         emit(Response.Loading())
         emit(
             Response.Success(
-                queryDisk.whereEqualTo("status",status).get().await().documents.mapNotNull { doc ->
+                queryDisk.whereEqualTo("status", status).get().await().documents.mapNotNull { doc ->
                     doc.toObject(Disk::class.java)
                 }
             )
@@ -119,37 +119,33 @@ class DisksRepository(private val application: Application) {
     suspend fun rentDisksOfDiskTitleIds(
         rentalId: String,
         diskTitleIdsAndAmount: Map<String, Long>
-    ) {
+    ) = flow {
 
         // This tracker makes sure the amount of disks marked as "Rented" does not exceed the
         // amount to rent for each disk title
         val disksRentedTracker = diskTitleIdsAndAmount.toMutableMap()
 
-        queryDisk.whereIn("diskTitleId", diskTitleIdsAndAmount.keys.toList())
-            .whereEqualTo("status", "In Store").get()
-            .addOnSuccessListener { documents ->
-                db.runBatch { batch ->
-                    for (document in documents) {
-                        Log.d(
-                            TAG,
-                            "Called rentDisksOfDiskTitleIds: ${document.id} => ${document.data}"
-                        )
-                        val currentDocDiskTitleId = document.get("diskTitleId") as String
-                        if (disksRentedTracker[currentDocDiskTitleId]!! > 0) {
-                            batch.update(
-                                queryDisk.document(document.id),
-                                mapOf("status" to "Rented", "currentRentalId" to rentalId)
-                            )
-                            disksRentedTracker[currentDocDiskTitleId] =
-                                (disksRentedTracker[currentDocDiskTitleId] ?: 0) - 1
-                        }
+        val documents = queryDisk.whereIn("diskTitleId", diskTitleIdsAndAmount.keys.toList())
+            .whereEqualTo("status", "In Store").get().await().documents
 
-                    }
+        emit(db.runBatch { batch ->
+            for (document in documents) {
+                Log.d(
+                    TAG,
+                    "Called rentDisksOfDiskTitleIds: ${document.id} => ${document.data}"
+                )
+                val currentDocDiskTitleId = document.get("diskTitleId") as String
+                if (disksRentedTracker[currentDocDiskTitleId]!! > 0) {
+                    batch.update(
+                        queryDisk.document(document.id),
+                        mapOf("status" to "Rented", "currentRentalId" to rentalId)
+                    )
+                    disksRentedTracker[currentDocDiskTitleId] =
+                        (disksRentedTracker[currentDocDiskTitleId] ?: 0) - 1
                 }
 
             }
-            .addOnFailureListener { exception ->
-                Log.w(TAG, "Error getting documents: ", exception)
-            }
+        }.await())
+
     }
 }

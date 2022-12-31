@@ -14,6 +14,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
 import java.time.LocalDate
 import java.time.ZoneId
@@ -75,7 +76,7 @@ class DiskReturnViewModel(
                     disksRepository.returnDisksRented(
                         savedStateHandle.get<String>(SAVED_STATE_KEY_RENTAL_ID) ?: ""
                     )
-                }
+                },
             )
 
             val taskResponses = tasks.awaitAll()
@@ -96,8 +97,12 @@ class DiskReturnViewModel(
 
                     if (taskResults.size < taskResponses.size) return@collect
 
-                    if (taskResults.all { it is Response.Success }) emit(Response.Success(1))
-                    else if (taskResults.any { it is Response.Loading }) emit(Response.Loading<Int>())
+                    if (taskResults.all { it is Response.Success }) {
+                        diskTitlesRepository.updateDiskInStoreAmount(
+                            uiState.value?.diskTitlesToReturn?.map { it.first.id } ?: listOf()
+                        ).collect()
+                        emit(Response.Success(1))
+                    } else if (taskResults.any { it is Response.Loading }) emit(Response.Loading<Int>())
                     else if (taskResults.any { it is Response.Failure }) emit(Response.Failure("An error has occurred importing new disks"))
                 }
             }

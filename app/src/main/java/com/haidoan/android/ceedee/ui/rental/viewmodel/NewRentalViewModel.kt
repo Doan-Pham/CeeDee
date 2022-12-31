@@ -5,15 +5,18 @@ import com.haidoan.android.ceedee.data.DiskTitle
 import com.haidoan.android.ceedee.data.customer.Customer
 import com.haidoan.android.ceedee.data.customer.CustomerRepository
 import com.haidoan.android.ceedee.data.disk_rental.DiskRentalRepository
+import com.haidoan.android.ceedee.ui.disk_screen.repository.DiskTitlesRepository
 import com.haidoan.android.ceedee.ui.disk_screen.repository.DisksRepository
 import com.haidoan.android.ceedee.ui.disk_screen.utils.Response
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collect
 import okhttp3.internal.toImmutableMap
 
 class NewRentalViewModel(
     private val diskRentalRepository: DiskRentalRepository,
     private val disksRepository: DisksRepository,
-    private val customerRepository: CustomerRepository
+    private val customerRepository: CustomerRepository,
+    private val diskTitlesRepository: DiskTitlesRepository
 ) : ViewModel() {
     private var isCurrentUserCustomer = false
 
@@ -88,7 +91,10 @@ class NewRentalViewModel(
                 if (response is Response.Success) {
                     disksRepository.rentDisksOfDiskTitleIds(
                         response.data?.id ?: "",
-                        disksToRent.value?.mapKeys { it.key.id } ?: mutableMapOf())
+                        disksToRent.value?.mapKeys { it.key.id } ?: mutableMapOf()).collect {
+                        diskTitlesRepository.updateDiskInStoreAmount(
+                            disksToRent.value?.keys?.map { it.id } ?: listOf()).collect()
+                    }
                 }
                 emit(response)
             }
@@ -149,13 +155,14 @@ class NewRentalViewModel(
         private val diskRentalRepository: DiskRentalRepository,
         private val disksRepository: DisksRepository,
         private val customerRepository: CustomerRepository,
+        private val diskTitlesRepository: DiskTitlesRepository
     ) :
         ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             if (modelClass.isAssignableFrom(NewRentalViewModel::class.java)) {
                 @Suppress("UNCHECKED_CAST")
                 return NewRentalViewModel(
-                    diskRentalRepository, disksRepository, customerRepository
+                    diskRentalRepository, disksRepository, customerRepository, diskTitlesRepository
                 ) as T
             }
             throw IllegalArgumentException("Unable to construct viewmodel")

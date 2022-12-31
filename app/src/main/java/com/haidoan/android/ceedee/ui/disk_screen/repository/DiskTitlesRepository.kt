@@ -197,22 +197,28 @@ class DiskTitlesRepository(private val application: Application) {
     fun updateDiskInStoreAmount(diskTitleIds: List<String>) = flow {
         emit(Response.Loading())
         val diskInStoreAmountGroupByDiskTitle = hashMapOf<String, Long>()
-        val disksInStore =
+        val disks =
             db.collection("Disk")
-                .whereIn("diskTitleId", diskTitleIds)
-                .whereEqualTo("status", "In Store").get()
+                .whereIn("diskTitleId", diskTitleIds).get()
                 .await().documents
 
-        for (disk in disksInStore) {
-            diskInStoreAmountGroupByDiskTitle[disk.get("diskTitleId") as String] =
-                (diskInStoreAmountGroupByDiskTitle[disk.get("diskTitleId") as String] ?: 0L) + 1L
+        for (disk in disks) {
+            val currentDiskDiskTitleId = disk.get("diskTitleId") as String
+            if (diskInStoreAmountGroupByDiskTitle[currentDiskDiskTitleId] == null) {
+                diskInStoreAmountGroupByDiskTitle[currentDiskDiskTitleId] = 0L
+            }
 
-            Log.d(
-                TAG,
-                " updateDiskInStoreAmount() - diskInStoreAmountGroupByDiskTitle[${disk.get(" diskTitleId")}]: ${
-                    diskInStoreAmountGroupByDiskTitle[disk.get("diskTitleId") as String]
-                }"
-            )
+            if (disk.get("status") == "In Store") {
+                diskInStoreAmountGroupByDiskTitle[currentDiskDiskTitleId] =
+                    (diskInStoreAmountGroupByDiskTitle[currentDiskDiskTitleId]
+                        ?: 0L) + 1L
+            }
+//            Log.d(
+//                TAG,
+//                " updateDiskInStoreAmount() - diskInStoreAmountGroupByDiskTitle[$currentDiskDiskTitleId]: ${
+//                    diskInStoreAmountGroupByDiskTitle[currentDiskDiskTitleId]
+//                }"
+//            )
         }
         emit(
             Response.Success(

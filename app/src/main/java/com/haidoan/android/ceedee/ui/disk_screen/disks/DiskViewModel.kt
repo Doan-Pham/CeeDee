@@ -31,8 +31,8 @@ class DiskViewModel(application: Application) : AndroidViewModel(application) {
     fun updateDiskStatus(disk: Disk, status: String) = liveData(Dispatchers.IO) {
         disksRepository.updateStatusToFireStore(disk.id, status).collect { response ->
             emit(response)
+            diskTitlesRepository.updateDiskInStoreAmount(listOf(disk.diskTitleId)).collect()
         }
-        diskTitlesRepository.updateDiskInStoreAmount(listOf(disk.diskTitleId)).collect()
     }
 
     fun getDisks() = liveData(Dispatchers.IO) {

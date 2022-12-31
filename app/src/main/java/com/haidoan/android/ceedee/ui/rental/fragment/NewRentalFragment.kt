@@ -19,6 +19,7 @@ import com.haidoan.android.ceedee.data.customer.CustomerRepository
 import com.haidoan.android.ceedee.data.disk_rental.DiskRentalFirestoreDataSource
 import com.haidoan.android.ceedee.data.disk_rental.DiskRentalRepository
 import com.haidoan.android.ceedee.databinding.FragmentNewRentalScreenBinding
+import com.haidoan.android.ceedee.ui.disk_screen.repository.DiskTitlesRepository
 import com.haidoan.android.ceedee.ui.disk_screen.repository.DisksRepository
 import com.haidoan.android.ceedee.ui.disk_screen.utils.Response
 import com.haidoan.android.ceedee.ui.rental.adapters.NewRentalAdapter
@@ -41,7 +42,8 @@ class NewRentalScreen : Fragment() {
             NewRentalViewModel.Factory(
                 DiskRentalRepository(DiskRentalFirestoreDataSource()),
                 DisksRepository(requireActivity().application),
-                CustomerRepository(CustomerFireStoreDataSource())
+                CustomerRepository(CustomerFireStoreDataSource()),
+                DiskTitlesRepository(requireActivity().application)
             )
         })
     private lateinit var disksToRentAdapter: NewRentalAdapter
