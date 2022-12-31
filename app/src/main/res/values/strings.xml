@@ -101,4 +101,7 @@
     <string name="resend_otp">Resend OTP</string>
     <string name="enter_the_verification_code_sent_to_your_phone">Enter the verification code sent to your phone</string>
     <string name="otp_verification">OTP Verification</string>
+    <string name="full_name">Full Name</string>
+    <string name="phone">Phone</string>
+    <string name="address_without_colon">Address</string>
 </resources>
