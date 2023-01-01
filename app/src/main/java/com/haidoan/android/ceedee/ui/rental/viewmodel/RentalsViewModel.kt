@@ -4,16 +4,19 @@ import android.util.Log
 import androidx.lifecycle.*
 import com.haidoan.android.ceedee.data.Rental
 import com.haidoan.android.ceedee.data.disk_rental.DiskRentalRepository
+import com.haidoan.android.ceedee.ui.disk_screen.repository.DiskTitlesRepository
 import com.haidoan.android.ceedee.ui.disk_screen.repository.DisksRepository
 import com.haidoan.android.ceedee.ui.disk_screen.utils.Response
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 private const val TAG = "RentalsViewModel"
 
 class RentalsViewModel(
     private val rentalsRepository: DiskRentalRepository,
-    private val disksRepository: DisksRepository
+    private val disksRepository: DisksRepository,
+    private val diskTitlesRepository: DiskTitlesRepository
 ) : ViewModel() {
 
     private val filteringCategory =
@@ -53,19 +56,30 @@ class RentalsViewModel(
         filteringCategory.value = inputFilteringCategory
     }
 
-    fun acceptRentalInRequest(rentalId: String) {
+    fun acceptRentalInRequest(rental: Rental) {
         viewModelScope.launch {
-            rentalsRepository.acceptRentalInRequest(rentalId)
+            rentalsRepository.acceptRentalInRequest(rental.id)
+            disksRepository.rentDisksOfDiskTitleIds(
+                rental.id,
+                rental.diskTitlesToAdd
+            ).collect {
+                diskTitlesRepository.updateDiskInStoreAmount(
+                    rental.diskTitlesToAdd.keys.toList()
+                ).collect()
+            }
         }
     }
 
-    fun cancelRental(rentalId: String) {
+    fun cancelRental(rental: Rental) {
         viewModelScope.launch {
-            rentalsRepository.deleteRental(rentalId)
-            disksRepository.returnDisksRented(rentalId).collect {
+            rentalsRepository.deleteRental(rental.id)
+            disksRepository.returnDisksRented(rental.id).collect {
                 if (it is Response.Success) {
                     Log.d(TAG, "cancelRental() - returnDisksRented: ${it.data.documents}")
                 }
+                diskTitlesRepository.updateDiskInStoreAmount(
+                    rental.diskTitlesToAdd.keys.toList()
+                ).collect()
             }
         }
     }
@@ -92,13 +106,18 @@ class RentalsViewModel(
 
     class Factory(
         private val rentalsRepository: DiskRentalRepository,
-        private val disksRepository: DisksRepository
+        private val disksRepository: DisksRepository,
+        private val diskTitlesRepository: DiskTitlesRepository
     ) :
         ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             if (modelClass.isAssignableFrom(RentalsViewModel::class.java)) {
                 @Suppress("UNCHECKED_CAST")
-                return RentalsViewModel(rentalsRepository, disksRepository) as T
+                return RentalsViewModel(
+                    rentalsRepository,
+                    disksRepository,
+                    diskTitlesRepository
+                ) as T
             }
             throw IllegalArgumentException("Unable to construct viewmodel")
         }

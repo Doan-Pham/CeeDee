@@ -19,6 +19,7 @@ import com.haidoan.android.ceedee.data.Rental
 import com.haidoan.android.ceedee.data.disk_rental.DiskRentalFirestoreDataSource
 import com.haidoan.android.ceedee.data.disk_rental.DiskRentalRepository
 import com.haidoan.android.ceedee.databinding.FragmentRentalBinding
+import com.haidoan.android.ceedee.ui.disk_screen.repository.DiskTitlesRepository
 import com.haidoan.android.ceedee.ui.disk_screen.repository.DisksRepository
 import com.haidoan.android.ceedee.ui.rental.adapters.RentalSection
 import com.haidoan.android.ceedee.ui.rental.viewmodel.RentalFilterCategory
@@ -40,7 +41,8 @@ class RentalFragment : Fragment() {
         ViewModelProvider(
             this, RentalsViewModel.Factory(
                 DiskRentalRepository(DiskRentalFirestoreDataSource()),
-                DisksRepository(requireActivity().application)
+                DisksRepository(requireActivity().application),
+                DiskTitlesRepository(requireActivity().application)
             )
         )[RentalsViewModel::class.java]
     }
@@ -171,7 +173,7 @@ class RentalFragment : Fragment() {
                     R.id.menu_item_rental_accept_request -> {
                         createDialog(message = "Accept this rental made by customer: ${rental.customerName}?") { _, _ ->
                             viewModel.acceptRentalInRequest(
-                                rental.id
+                                rental
                             )
                         }
 
@@ -187,7 +189,7 @@ class RentalFragment : Fragment() {
                     R.id.menu_item_rental_cancel -> {
                         createDialog(message = "Cancel this rental made by customer: ${rental.customerName}?") { _, _ ->
                             viewModel.cancelRental(
-                                rental.id
+                                rental
                             )
                         }
                         true
