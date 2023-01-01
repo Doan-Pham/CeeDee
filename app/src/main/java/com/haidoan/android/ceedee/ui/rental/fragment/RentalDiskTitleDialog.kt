@@ -11,6 +11,7 @@ import com.haidoan.android.ceedee.data.Rental
 import com.haidoan.android.ceedee.databinding.DialogRentalDiskTitlesBinding
 import com.haidoan.android.ceedee.ui.disk_screen.repository.DiskTitlesRepository
 import com.haidoan.android.ceedee.ui.rental.adapters.DiskToRentAdapter
+import com.haidoan.android.ceedee.ui.rental.adapters.ShowDiskAmountOptions
 import com.haidoan.android.ceedee.ui.rental.viewmodel.RentalDiskTitleViewModel
 
 class RentalDiskTitleDialog(private val currentRental: Rental) : DialogFragment() {
@@ -37,7 +38,7 @@ class RentalDiskTitleDialog(private val currentRental: Rental) : DialogFragment(
 
         disksToRentViewModel.setCurrentRental(currentRental)
 
-        disksToRentAdapter = DiskToRentAdapter {}
+        disksToRentAdapter = DiskToRentAdapter({}, ShowDiskAmountOptions.SHOW_DISK_AMOUNT)
         binding.recyclerviewDisksToRent.adapter = disksToRentAdapter
         binding.recyclerviewDisksToRent.layoutManager = LinearLayoutManager(context)
 

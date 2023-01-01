@@ -35,9 +35,9 @@ class DiskToRentDialog : DialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         binding = DialogChooseDiskBinding.inflate(requireActivity().layoutInflater)
 
-        disksToRentAdapter = DiskToRentAdapter { diskTitle ->
+        disksToRentAdapter = DiskToRentAdapter({ diskTitle ->
             newRentalViewModel.addDiskTitleToRent(diskTitle)
-        }
+        })
         binding.chooseDiskRecyclerView.adapter = disksToRentAdapter
         binding.chooseDiskRecyclerView.layoutManager = LinearLayoutManager(context)
 

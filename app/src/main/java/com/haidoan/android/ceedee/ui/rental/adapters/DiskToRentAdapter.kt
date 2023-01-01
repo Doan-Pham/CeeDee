@@ -8,12 +8,22 @@ import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import com.haidoan.android.ceedee.data.DiskTitle
 import com.haidoan.android.ceedee.databinding.ItemImportDiskToImportBinding
+import com.haidoan.android.ceedee.ui.disk_screen.disk_titles.DiskTitlesAdapter
 
-class DiskToRentAdapter(private val onDiskItemClick: (DiskTitle) -> Unit) :
-    ListAdapter<DiskTitle, DiskToRentAdapter.DiskToRentViewHolder>(DiskTitleUtils()) {
+enum class ShowDiskAmountOptions {
+    SHOW_DISK_IN_STORE_AMOUNT,
+    SHOW_DISK_AMOUNT
+}
+
+class DiskToRentAdapter(
+    private val onDiskItemClick: (DiskTitle) -> Unit,
+    private val showDiskAmountOption: ShowDiskAmountOptions = ShowDiskAmountOptions.SHOW_DISK_IN_STORE_AMOUNT
+) :
+    ListAdapter<DiskTitle, DiskToRentAdapter.DiskToRentViewHolder>(DiskTitlesAdapter.DiskTitleUtils()) {
     class DiskToRentViewHolder(
         private val binding: ItemImportDiskToImportBinding,
-        val onDiskItemClick: (DiskTitle) -> Unit
+        val onDiskItemClick: (DiskTitle) -> Unit,
+        val showDiskAmountOption: ShowDiskAmountOptions = ShowDiskAmountOptions.SHOW_DISK_IN_STORE_AMOUNT
     ) :
         RecyclerView.ViewHolder(binding.root) {
 
@@ -22,7 +32,12 @@ class DiskToRentAdapter(private val onDiskItemClick: (DiskTitle) -> Unit) :
                 textviewDiskTitle.text = diskTitle.name
                 textviewDiskAuthor.text = diskTitle.author
                 imageviewDiskCover.load(diskTitle.coverImageUrl)
-                val diskAmountString = "${diskTitle.diskInStoreAmount} CD"
+                var diskAmountString = "0 CD"
+                if (showDiskAmountOption == ShowDiskAmountOptions.SHOW_DISK_IN_STORE_AMOUNT) {
+                    diskAmountString = "${diskTitle.diskInStoreAmount} CD"
+                } else if (showDiskAmountOption == ShowDiskAmountOptions.SHOW_DISK_AMOUNT) {
+                    diskAmountString = "${diskTitle.diskAmount} CD"
+                }
                 textviewDiskAmount.text = diskAmountString
                 linearlayoutContentWrapper.setOnClickListener { onDiskItemClick(diskTitle) }
             }
@@ -39,7 +54,7 @@ class DiskToRentAdapter(private val onDiskItemClick: (DiskTitle) -> Unit) :
                 parent,
                 false
             )
-        return DiskToRentViewHolder(binding, onDiskItemClick)
+        return DiskToRentViewHolder(binding, onDiskItemClick, showDiskAmountOption)
     }
 
     override fun onBindViewHolder(holder: DiskToRentViewHolder, position: Int) {
