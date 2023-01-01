@@ -1,5 +1,7 @@
 package com.haidoan.android.ceedee.ui.rental.fragment
 
+import android.app.AlertDialog
+import android.content.DialogInterface
 import android.os.Bundle
 import android.util.Log
 import android.view.*
@@ -167,7 +169,12 @@ class RentalFragment : Fragment() {
                         true
                     }
                     R.id.menu_item_rental_accept_request -> {
-                        viewModel.acceptRentalInRequest(rental.id)
+                        createDialog(message = "Accept this rental made by customer: ${rental.customerName}?") { _, _ ->
+                            viewModel.acceptRentalInRequest(
+                                rental.id
+                            )
+                        }
+
                         true
                     }
                     R.id.menu_item_rental_view_disk_titles -> {
@@ -178,7 +185,11 @@ class RentalFragment : Fragment() {
                         true
                     }
                     R.id.menu_item_rental_cancel -> {
-                        viewModel.cancelRental(rental.id)
+                        createDialog(message = "Cancel this rental made by customer: ${rental.customerName}?") { _, _ ->
+                            viewModel.cancelRental(
+                                rental.id
+                            )
+                        }
                         true
                     }
                     else -> false
@@ -206,5 +217,21 @@ class RentalFragment : Fragment() {
         val action =
             RentalFragmentDirections.actionRentalFragmentToNewRentalScreen2()
         findNavController().navigate(action)
+    }
+
+    private fun createDialog(
+        title: String = "Confirmation",
+        message: String,
+        onPositiveButtonClick: DialogInterface.OnClickListener
+    ) {
+        // 1. Instantiate an <code><a href="/reference/android/app/AlertDialog.Builder.html">AlertDialog.Builder</a></code> with its constructor
+
+        AlertDialog.Builder(context)
+            .setTitle(title)
+            .setMessage(message)
+            .setPositiveButton("Proceed", onPositiveButtonClick)
+            .setNegativeButton("Cancel") { _, _ -> }
+            .create()
+            .show()
     }
 }
