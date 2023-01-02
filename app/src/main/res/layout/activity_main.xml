@@ -73,7 +73,8 @@
         android:layout_width="match_parent"
         android:layout_height="55dp"
         android:layout_gravity="bottom|end"
-
+        app:itemTextAppearanceActive="@style/BottomNavigationViewTextStyle"
+        app:itemTextAppearanceInactive="@style/BottomNavigationViewTextStyle"
         app:layout_constraintBottom_toBottomOf="parent"
         app:menu="@menu/menu_bottom_nav_manager" />
 </androidx.constraintlayout.widget.ConstraintLayout>
