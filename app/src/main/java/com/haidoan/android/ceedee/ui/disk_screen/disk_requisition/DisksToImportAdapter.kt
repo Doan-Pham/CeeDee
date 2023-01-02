@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
+import com.haidoan.android.ceedee.R
 import com.haidoan.android.ceedee.data.DiskTitle
 import com.haidoan.android.ceedee.databinding.ItemImportDiskToImportBinding
 
@@ -22,7 +23,11 @@ class DisksToImportAdapter(private val onDiskItemClick: (DiskTitle) -> Unit) :
             binding.apply {
                 textviewDiskTitle.text = diskTitle.name
                 textviewDiskAuthor.text = diskTitle.author
-                imageviewDiskCover.load(diskTitle.coverImageUrl)
+                imageviewDiskCover.load(diskTitle.coverImageUrl){
+                    crossfade(true)
+                    placeholder(R.drawable.ic_disk_cover_placeholder_96)
+                    error(R.drawable.ic_disk_cover_placeholder_96)
+                }
 
                 val diskAmountString = "${diskTitle.diskAmount} CD"
                 textviewDiskAmount.text = diskAmountString

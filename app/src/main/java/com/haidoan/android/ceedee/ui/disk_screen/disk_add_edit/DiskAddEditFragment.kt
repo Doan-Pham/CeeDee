@@ -1,6 +1,7 @@
 package com.haidoan.android.ceedee.ui.disk_screen.disk_add_edit
 
 
+import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -89,7 +90,7 @@ class DiskAddEditFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         // Inflate the layout for this fragment
         _binding = FragmentDiskAddEditBinding.inflate(inflater, container, false)
         return binding.root
@@ -116,7 +117,7 @@ class DiskAddEditFragment : Fragment() {
             for (i in genreList.indices) {
                 if (genreList[i].id == diskTitle.genreId) {
                     binding.spinnerDiskAddEditGenre.setSelection(i)
-                    break;
+                    break
                 }
             }
         }
@@ -208,6 +209,7 @@ class DiskAddEditFragment : Fragment() {
         }
     }
 
+    @SuppressLint("SetTextI18n")
     private fun updateDiskTitle() {
         if (binding.edtDiskAddEditDescription.text.toString() == ""
             || binding.edtDiskAddEditAuthor.text.toString() == ""
@@ -439,7 +441,11 @@ class DiskAddEditFragment : Fragment() {
         try {
             val imageStream: InputStream = requireActivity().contentResolver.openInputStream(uri)!!
             currentBitmap = BitmapFactory.decodeStream(imageStream)
-            binding.imgDiskAddEditCoverImg.load(currentBitmap)
+            binding.imgDiskAddEditCoverImg.load(currentBitmap) {
+                crossfade(true)
+                placeholder(R.drawable.ic_disk_cover_placeholder_96)
+                error(R.drawable.ic_disk_cover_placeholder_96)
+            }
         } catch (e: FileNotFoundException) {
             Toast.makeText(
                 requireActivity(),
@@ -453,8 +459,9 @@ class DiskAddEditFragment : Fragment() {
         imgUrl?.let {
             val imgUri = imgUrl.toUri().buildUpon().scheme("https").build()
             imgView.load(imgUri) {
-                placeholder(R.drawable.ic_launcher)
-                error(R.drawable.ic_app_logo)
+                crossfade(true)
+                placeholder(R.drawable.ic_disk_cover_placeholder_96)
+                error(R.drawable.ic_disk_cover_placeholder_96)
             }
         }
     }

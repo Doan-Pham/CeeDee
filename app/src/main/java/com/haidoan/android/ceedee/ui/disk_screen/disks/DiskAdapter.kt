@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Context
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.lifecycle.LifecycleOwner
@@ -26,7 +25,7 @@ class DiskAdapter(
     private val viewLifecycleOwner: LifecycleOwner,
     private val diskTabFragment: DisksTabFragment
 ) :
-    ListAdapter<Disk, DiskAdapter.DiskViewHolder>(DiskAdapter.DiskUtils()), Filterable {
+    ListAdapter<Disk, DiskAdapter.DiskViewHolder>(DiskUtils()), Filterable {
 
     private val displayedDisk = arrayListOf<Disk>()
     private val allDisk = arrayListOf<Disk>()
@@ -48,14 +47,6 @@ class DiskAdapter(
         displayedDisk.clear()
         displayedDisk.addAll(newList)
         notifyDataSetChanged()
-    }
-
-    fun getListData(): ArrayList<Disk> {
-        return allDisk
-    }
-
-    fun getItemAt(position: Int): Disk {
-        return displayedDisk[position]
     }
 
     override fun getItemCount() = displayedDisk.size
@@ -103,20 +94,23 @@ class DiskAdapter(
             when (status) {
                 "In Store" -> {
                     imgView.load(R.drawable.ic_in_store) {
-                        placeholder(R.drawable.ic_launcher)
-                        error(R.drawable.ic_app_logo)
+                        crossfade(true)
+                        placeholder(R.drawable.ic_disk_cover_placeholder_96)
+                        error(R.drawable.ic_disk_cover_placeholder_96)
                     }
                 }
                 "Rented" -> {
                     imgView.load(R.drawable.ic_rented) {
-                        placeholder(R.drawable.ic_launcher)
-                        error(R.drawable.ic_app_logo)
+                        crossfade(true)
+                        placeholder(R.drawable.ic_disk_cover_placeholder_96)
+                        error(R.drawable.ic_disk_cover_placeholder_96)
                     }
                 }
                 else -> {
                     imgView.load(R.drawable.ic_damaged) {
-                        placeholder(R.drawable.ic_launcher)
-                        error(R.drawable.ic_app_logo)
+                        crossfade(true)
+                        placeholder(R.drawable.ic_disk_cover_placeholder_96)
+                        error(R.drawable.ic_disk_cover_placeholder_96)
                     }
                 }
             }
@@ -130,7 +124,7 @@ class DiskAdapter(
                     R.menu.popup_menu_disk_tab_more,
                     popupMenu.menu
                 )
-                popupMenu.setOnMenuItemClickListener(PopupMenu.OnMenuItemClickListener { item ->
+                popupMenu.setOnMenuItemClickListener({ item ->
                     when (item.itemId) {
                         R.id.popup_disk_set_status -> {
                             setStatus()
@@ -143,7 +137,7 @@ class DiskAdapter(
         }
 
         private fun setStatus() {
-            withSetStatus(itemView, LayoutInflater.from(context))
+            withSetStatus(LayoutInflater.from(context))
         }
 
         private fun makeToast(text: String) {
@@ -154,7 +148,7 @@ class DiskAdapter(
          *  Create dialog for add set status
          * */
         @SuppressLint("MissingInflatedId")
-        private fun withSetStatus(view: View, layoutInflater: LayoutInflater) {
+        private fun withSetStatus(layoutInflater: LayoutInflater) {
             val builder = AlertDialog.Builder(context)
             val inflater = layoutInflater
             builder.setTitle("Set status")

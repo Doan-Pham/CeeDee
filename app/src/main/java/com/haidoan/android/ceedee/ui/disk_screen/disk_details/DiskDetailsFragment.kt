@@ -1,18 +1,17 @@
 package com.haidoan.android.ceedee.ui.disk_screen.disk_details
 
-import android.content.Intent
+import android.annotation.SuppressLint
 import android.os.Build
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.core.net.toUri
+import androidx.fragment.app.Fragment
 import coil.load
 import com.haidoan.android.ceedee.R
 import com.haidoan.android.ceedee.data.DiskTitle
-
 import com.haidoan.android.ceedee.databinding.FragmentDiskDetailsBinding
 import java.io.Serializable
 
@@ -36,12 +35,13 @@ class DiskDetailsFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         // Inflate the layout for this fragment
         _binding = FragmentDiskDetailsBinding.inflate(inflater, container, false)
         return binding.root
     }
 
+    @SuppressLint("SetTextI18n")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -53,7 +53,7 @@ class DiskDetailsFragment : Fragment() {
             binding.tvDiskDetailsTitle.text = diskTitle.name
             binding.tvDiskDetailsAuthor.text=diskTitle.author
             binding.tvDiskDetailsGenreName.text = genreName
-            binding.tvDiskDetailsAmountName.text= amount.toString() + " CD"
+            binding.tvDiskDetailsAmountName.text= "$amount CD"
             binding.tvDiskDetailsDescriptionName.text=diskTitle.description
         }
 
@@ -63,8 +63,9 @@ class DiskDetailsFragment : Fragment() {
         imgUrl?.let {
             val imgUri = imgUrl.toUri().buildUpon().scheme("https").build()
             imgView.load(imgUri) {
-                placeholder(R.drawable.ic_launcher)
-                error(R.drawable.ic_app_logo)
+                crossfade(true)
+                placeholder(R.drawable.ic_disk_cover_placeholder_96)
+                error(R.drawable.ic_disk_cover_placeholder_96)
             }
         }
     }

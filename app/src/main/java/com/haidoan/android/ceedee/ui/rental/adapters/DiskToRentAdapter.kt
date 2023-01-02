@@ -6,9 +6,9 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
+import com.haidoan.android.ceedee.R
 import com.haidoan.android.ceedee.data.DiskTitle
 import com.haidoan.android.ceedee.databinding.ItemImportDiskToImportBinding
-import com.haidoan.android.ceedee.ui.disk_screen.disk_titles.DiskTitlesAdapter
 
 enum class ShowDiskAmountOptions {
     SHOW_DISK_IN_STORE_AMOUNT,
@@ -19,7 +19,7 @@ class DiskToRentAdapter(
     private val onDiskItemClick: (DiskTitle) -> Unit,
     private val showDiskAmountOption: ShowDiskAmountOptions = ShowDiskAmountOptions.SHOW_DISK_IN_STORE_AMOUNT
 ) :
-    ListAdapter<DiskTitle, DiskToRentAdapter.DiskToRentViewHolder>(DiskTitlesAdapter.DiskTitleUtils()) {
+    ListAdapter<DiskTitle, DiskToRentAdapter.DiskToRentViewHolder>(DiskTitleUtils()) {
     class DiskToRentViewHolder(
         private val binding: ItemImportDiskToImportBinding,
         val onDiskItemClick: (DiskTitle) -> Unit,
@@ -31,7 +31,11 @@ class DiskToRentAdapter(
             binding.apply {
                 textviewDiskTitle.text = diskTitle.name
                 textviewDiskAuthor.text = diskTitle.author
-                imageviewDiskCover.load(diskTitle.coverImageUrl)
+                imageviewDiskCover.load(diskTitle.coverImageUrl) {
+                    crossfade(true)
+                    placeholder(R.drawable.ic_disk_cover_placeholder_96)
+                }
+
                 var diskAmountString = "0 CD"
                 if (showDiskAmountOption == ShowDiskAmountOptions.SHOW_DISK_IN_STORE_AMOUNT) {
                     diskAmountString = "${diskTitle.diskInStoreAmount} CD"

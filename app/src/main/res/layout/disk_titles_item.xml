@@ -11,24 +11,17 @@
     android:padding="20dp"
     tools:ignore="RtlSymmetry">
 
-    <androidx.cardview.widget.CardView
-        android:id="@+id/cardView_disk_titles"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:cardCornerRadius="12dp"
-
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/img_disk_titles_cover_img"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <ImageView
-            android:id="@+id/img_disk_titles_cover_img"
-            android:layout_width="84dp"
-            android:layout_height="84dp"
-
-            android:src="@drawable/ic_launcher" />
-
-    </androidx.cardview.widget.CardView>
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_width="90dp"
+        android:layout_height="90dp"
+        android:layout_weight="3"
+        android:scaleType="centerCrop"
+        android:src="@drawable/ic_app_logo"
+        app:shapeAppearanceOverlay="@style/roundedCornerImageView" />
 
     <LinearLayout
         android:id="@+id/layout_info"
@@ -37,9 +30,9 @@
         android:layout_marginStart="20dp"
         android:orientation="vertical"
 
-        app:layout_constraintBottom_toBottomOf="@id/cardView_disk_titles"
-        app:layout_constraintStart_toEndOf="@id/cardView_disk_titles"
-        app:layout_constraintTop_toTopOf="@id/cardView_disk_titles">
+        app:layout_constraintBottom_toBottomOf="@id/img_disk_titles_cover_img"
+        app:layout_constraintStart_toEndOf="@id/img_disk_titles_cover_img"
+        app:layout_constraintTop_toTopOf="@id/img_disk_titles_cover_img">
 
         <TextView
             android:id="@+id/tv_disk_titles_name"
