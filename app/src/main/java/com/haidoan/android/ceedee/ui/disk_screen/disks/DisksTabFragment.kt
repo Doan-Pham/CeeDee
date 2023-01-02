@@ -69,8 +69,8 @@ class DisksTabFragment : Fragment() {
                 is Response.Success -> {
                     val list = response.data
                     //Do what you need to do with your list
-                    diskAdapter.submitList(list.toMutableList())
-                    diskAdapter.setAllDiskFilterByDiskStatus(list)
+                    diskAdapter.submitList(list.toMutableList() as MutableList<DiskAndSomeInfo>)
+                    diskAdapter.setAllDiskFilterByDiskStatus(list.toMutableList() as MutableList<DiskAndSomeInfo>)
                     Log.d("TAG_LIST", list.toString())
                     //Hide the ProgressBar
                     binding.progressbarDisk.visibility = View.GONE

@@ -7,6 +7,7 @@ import com.haidoan.android.ceedee.data.Disk
 import com.haidoan.android.ceedee.ui.disk_screen.repository.DiskStatusRepository
 import com.haidoan.android.ceedee.ui.disk_screen.repository.DiskTitlesRepository
 import com.haidoan.android.ceedee.ui.disk_screen.repository.DisksRepository
+import com.haidoan.android.ceedee.ui.disk_screen.utils.Response
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
 
@@ -22,8 +23,25 @@ class DiskViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun getDiskByDiskStatus(status: String) = liveData(Dispatchers.IO) {
+
         disksRepository.getDisksByStatusFromFireStore(status).collect { response ->
-            emit(response)
+            if (response is Response.Success) {
+                diskTitlesRepository.getDiskTitlesByListOfId(response.data.map { it.diskTitleId })
+                    .collect { diskTitles ->
+                        emit(Response.Success(response.data.map {
+                            DiskAndSomeInfo(
+                                disk = it,
+                                coverImage = diskTitles.first { diskTitle ->
+                                    diskTitle.id == it.diskTitleId
+                                }.coverImageUrl,
+                                diskTitle = diskTitles.first { diskTitle ->
+                                    diskTitle.id == it.diskTitleId
+                                }.name
+                            )
+                        }))
+                    }
+            } else
+                emit(response)
         }
     }
 
@@ -37,7 +55,23 @@ class DiskViewModel(application: Application) : AndroidViewModel(application) {
 
     fun getDisks() = liveData(Dispatchers.IO) {
         disksRepository.getDisksFromFireStore().collect { response ->
-            emit(response)
+            if (response is Response.Success) {
+                diskTitlesRepository.getDiskTitlesByListOfId(response.data.map { it.diskTitleId })
+                    .collect { diskTitles ->
+                        emit(Response.Success(response.data.map {
+                            DiskAndSomeInfo(
+                                disk = it,
+                                coverImage = diskTitles.first { diskTitle ->
+                                    diskTitle.id == it.diskTitleId
+                                }.coverImageUrl,
+                                diskTitle = diskTitles.first { diskTitle ->
+                                    diskTitle.id == it.diskTitleId
+                                }.name
+                            )
+                        }))
+                    }
+            } else
+                emit(response)
         }
     }
 
@@ -48,3 +82,5 @@ class DiskViewModel(application: Application) : AndroidViewModel(application) {
     }
 
 }
+
+data class DiskAndSomeInfo(val disk: Disk, val coverImage: String, val diskTitle: String)

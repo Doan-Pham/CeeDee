@@ -31,12 +31,19 @@
         app:layout_constraintStart_toEndOf="@id/img_disk"
         app:layout_constraintTop_toTopOf="parent">
 
+
         <TextView
             android:id="@+id/tv_disk_id"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Disk ID"
             android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tv_disk_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Disk ID" />
 
         <TextView
             android:id="@+id/tv_disk_status"

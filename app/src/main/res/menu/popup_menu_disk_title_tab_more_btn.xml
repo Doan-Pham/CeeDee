@@ -4,7 +4,8 @@
     <item
         android:id="@+id/popup_disk_title_add_to_import"
         android:title="@string/add_to_import"
-        app:showAsAction="never"/>
+        app:showAsAction="never"
+        android:visible="false"/>
     <item
         android:id="@+id/popup_disk_title_edit"
         android:title="@string/edit"

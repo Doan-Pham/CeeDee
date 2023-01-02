@@ -12,7 +12,6 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import com.haidoan.android.ceedee.R
-import com.haidoan.android.ceedee.data.Disk
 import com.haidoan.android.ceedee.data.DiskStatus
 import com.haidoan.android.ceedee.databinding.DiskItemBinding
 import com.haidoan.android.ceedee.ui.disk_screen.utils.Response
@@ -25,25 +24,25 @@ class DiskAdapter(
     private val viewLifecycleOwner: LifecycleOwner,
     private val diskTabFragment: DisksTabFragment
 ) :
-    ListAdapter<Disk, DiskAdapter.DiskViewHolder>(DiskUtils()), Filterable {
+    ListAdapter<DiskAndSomeInfo, DiskAdapter.DiskViewHolder>(DiskUtils()), Filterable {
 
-    private val displayedDisk = arrayListOf<Disk>()
-    private val allDisk = arrayListOf<Disk>()
-    private val allDiskFilterByDiskStatus = arrayListOf<Disk>()
+    private val displayedDisk = arrayListOf<DiskAndSomeInfo>()
+    private val allDisk = arrayListOf<DiskAndSomeInfo>()
+    private val allDiskFilterByDiskStatus = arrayListOf<DiskAndSomeInfo>()
 
-    override fun submitList(newList: MutableList<Disk>?) {
+    override fun submitList(newList: MutableList<DiskAndSomeInfo>?) {
         super.submitList(newList!!.toList())
         allDisk.addAll(newList.toList())
         displayedDisk.clear()
         displayedDisk.addAll(newList.toList())
     }
 
-    fun setAllDiskFilterByDiskStatus(newList: List<Disk>) {
+    fun setAllDiskFilterByDiskStatus(newList: List<DiskAndSomeInfo>) {
         allDiskFilterByDiskStatus.clear()
         allDiskFilterByDiskStatus.addAll(newList.toList())
     }
 
-    fun setFilterByDiskStatusList(newList: List<Disk>) {
+    fun setFilterByDiskStatusList(newList: List<DiskAndSomeInfo>) {
         displayedDisk.clear()
         displayedDisk.addAll(newList)
         notifyDataSetChanged()
@@ -51,13 +50,16 @@ class DiskAdapter(
 
     override fun getItemCount() = displayedDisk.size
 
-    class DiskUtils : DiffUtil.ItemCallback<Disk>() {
-        override fun areItemsTheSame(oldItem: Disk, newItem: Disk): Boolean {
+    class DiskUtils : DiffUtil.ItemCallback<DiskAndSomeInfo>() {
+        override fun areItemsTheSame(oldItem: DiskAndSomeInfo, newItem: DiskAndSomeInfo): Boolean {
             return oldItem == newItem
         }
 
-        override fun areContentsTheSame(oldItem: Disk, newItem: Disk): Boolean {
-            return oldItem.id == newItem.id
+        override fun areContentsTheSame(
+            oldItem: DiskAndSomeInfo,
+            newItem: DiskAndSomeInfo
+        ): Boolean {
+            return oldItem.disk.id == newItem.disk.id
         }
     }
 
@@ -81,16 +83,17 @@ class DiskAdapter(
 
         private lateinit var adapterForSpinnerStatus: ArrayAdapter<DiskStatus>
 
-        fun setData(item: Disk) {
+        fun setData(item: DiskAndSomeInfo) {
             binding.apply {
-                bindImage(imgDisk, item.status)
+                bindImage(imgDisk, item.disk.status, item.coverImage)
 
-                tvDiskId.text = item.id
-                tvDiskStatus.text = item.status
+                tvDiskId.text = item.disk.id
+                tvDiskTitle.text = item.diskTitle
+                tvDiskStatus.text = item.disk.status
             }
         }
 
-        private fun bindImage(imgView: ImageView, status: String) {
+        private fun bindImage(imgView: ImageView, status: String, imageCover: String) {
             when (status) {
                 "In Store" -> {
                     imgView.load(R.drawable.ic_in_store) {
@@ -114,7 +117,11 @@ class DiskAdapter(
                     }
                 }
             }
-
+            imgView.load(imageCover) {
+                crossfade(true)
+                placeholder(R.drawable.ic_disk_cover_placeholder_96)
+                error(R.drawable.ic_disk_cover_placeholder_96)
+            }
         }
 
         init {
@@ -124,14 +131,14 @@ class DiskAdapter(
                     R.menu.popup_menu_disk_tab_more,
                     popupMenu.menu
                 )
-                popupMenu.setOnMenuItemClickListener({ item ->
+                popupMenu.setOnMenuItemClickListener { item ->
                     when (item.itemId) {
                         R.id.popup_disk_set_status -> {
                             setStatus()
                         }
                     }
                     true
-                })
+                }
                 popupMenu.show()
             }
         }
@@ -201,7 +208,7 @@ class DiskAdapter(
 
         private fun updateDiskStatusToFireStore(status: String) {
             val disk = displayedDisk[bindingAdapterPosition]
-            diskViewModel.updateDiskStatus(disk, status)
+            diskViewModel.updateDiskStatus(disk.disk, status)
                 .observe(viewLifecycleOwner) { response ->
                     when (response) {
                         is Response.Loading -> {
@@ -226,14 +233,14 @@ class DiskAdapter(
     override fun getFilter(): Filter {
         return object : Filter() {
             override fun performFiltering(constraint: CharSequence?): FilterResults {
-                val filteredList = arrayListOf<Disk>()
+                val filteredList = arrayListOf<DiskAndSomeInfo>()
                 if (constraint == null || constraint.isEmpty()) {
                     filteredList.addAll(allDiskFilterByDiskStatus)
                 } else {
                     val filterPattern: String =
                         constraint.toString().lowercase(Locale.getDefault()).trim()
                     allDiskFilterByDiskStatus.forEach { item ->
-                        if (item.id.lowercase(Locale.getDefault()).trim()
+                        if (item.disk.id.lowercase(Locale.getDefault()).trim()
                                 .contains(filterPattern)
                         ) {
                             filteredList.add(item)
@@ -248,7 +255,7 @@ class DiskAdapter(
             @Suppress("UNCHECKED_CAST")
             override fun publishResults(constraint: CharSequence?, results: FilterResults?) {
                 displayedDisk.clear()
-                displayedDisk.addAll(results?.values as List<Disk>)
+                displayedDisk.addAll(results?.values as List<DiskAndSomeInfo>)
                 notifyDataSetChanged()
             }
         }

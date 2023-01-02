@@ -74,6 +74,11 @@ class DiskImportFragment : Fragment() {
 
             diskTitlesToImportAndAmount.clear()
             diskTitlesToImportAndAmount.putAll(currentRequisition.diskTitlesToImport)
+
+            if (currentRequisition.requisitionStatus == "Completed") {
+                binding.buttonImport.visibility = View.GONE
+                //binding.edittextTotalPayment.text = currentRequisition
+            }
         }
 
         viewModel.disksToImport.observe(viewLifecycleOwner) {
