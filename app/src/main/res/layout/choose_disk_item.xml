@@ -26,7 +26,7 @@
             android:layout_width="84dp"
             android:layout_height="84dp"
 
-            android:src="@drawable/ic_launcher" />
+            android:src="@drawable/ic_disk_cover_placeholder_96" />
 
     </androidx.cardview.widget.CardView>
 
