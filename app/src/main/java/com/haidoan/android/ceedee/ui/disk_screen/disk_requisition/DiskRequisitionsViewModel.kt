@@ -31,7 +31,8 @@ class DiskRequisitionsViewModel(
                         ?: DiskRequisitionFilterCategory.FILTER_BY_PENDING
                     val currentSearchQuery = requisitionsModifications.second ?: ""
                     emit(
-                        requisitions.searchBySupplierName(currentSearchQuery)
+                        requisitions.sortedByDescending { it.sentDate }
+                            .searchBySupplierName(currentSearchQuery)
                             .filter(currentFilteringCategory)
                     )
                 }
