@@ -46,6 +46,15 @@
                 android:background="@drawable/login_edit_text_background"
                 android:padding="4dp" />
 
+            <TextView
+                android:id="@+id/textview_supplier_email"
+                style="@style/edt_login_style"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:autofillHints="name"
+                android:hint="@string/supplier_email" />
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
