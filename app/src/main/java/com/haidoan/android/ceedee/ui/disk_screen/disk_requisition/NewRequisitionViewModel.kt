@@ -44,13 +44,10 @@ class NewRequisitionViewModel(
     fun incrementDiskTitleAmount(diskTitle: DiskTitle) {
         val currentDiskTitlesMap = _diskTitlesToImport.value
         val diskTitleCurrentAmount = currentDiskTitlesMap?.get(diskTitle) ?: 1
-        if (diskTitleCurrentAmount < diskTitle.diskAmount) {
-            currentDiskTitlesMap?.put(
-                diskTitle,
-                diskTitleCurrentAmount + 1
-            )
-        }
-
+        currentDiskTitlesMap?.put(
+            diskTitle,
+            diskTitleCurrentAmount + 1
+        )
         _diskTitlesToImport.value = currentDiskTitlesMap!!
         //Log.d(TAG, "addDiskTitleToImport : ${disksToImport.value}")
     }
