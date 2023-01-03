@@ -1,6 +1,7 @@
 package com.haidoan.android.ceedee.ui.disk_screen.disks
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.liveData
 import com.haidoan.android.ceedee.data.Disk
@@ -10,6 +11,8 @@ import com.haidoan.android.ceedee.ui.disk_screen.repository.DisksRepository
 import com.haidoan.android.ceedee.ui.disk_screen.utils.Response
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
+
+private const val TAG = "DiskViewModel"
 
 class DiskViewModel(application: Application) : AndroidViewModel(application) {
     private val disksRepository: DisksRepository
@@ -58,7 +61,17 @@ class DiskViewModel(application: Application) : AndroidViewModel(application) {
             if (response is Response.Success) {
                 diskTitlesRepository.getDiskTitlesByListOfId(response.data.map { it.diskTitleId })
                     .collect { diskTitles ->
+                        Log.d(TAG, "getDisks() - diskTitles: $diskTitles")
                         emit(Response.Success(response.data.map {
+                            Log.d(TAG, "currentDisk - diskid: ${it.id}")
+                            Log.d(TAG, "currentDisk - disk disktitleid: ${it.diskTitleId}")
+                            Log.d(
+                                TAG, "currentDisk - disktitle: ${
+                                    diskTitles.first { diskTitle ->
+                                        diskTitle.id == it.diskTitleId
+                                    }.id
+                                }"
+                            )
                             DiskAndSomeInfo(
                                 disk = it,
                                 coverImage = diskTitles.first { diskTitle ->

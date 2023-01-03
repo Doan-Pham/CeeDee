@@ -3,18 +3,21 @@ package com.haidoan.android.ceedee.ui.disk_screen.repository
 import android.app.Application
 import android.net.Uri
 import android.util.Log
-import com.google.firebase.firestore.CollectionReference
-import com.google.firebase.firestore.FieldPath
-import com.google.firebase.firestore.FieldValue
-import com.google.firebase.firestore.FirebaseFirestore
+import com.google.android.gms.tasks.Task
+import com.google.firebase.firestore.*
 import com.google.firebase.storage.FirebaseStorage
 import com.haidoan.android.ceedee.data.DiskTitle
 import com.haidoan.android.ceedee.ui.disk_screen.utils.Response
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.tasks.await
 
 private const val TAG = "DiskTitlesRepository"
+private const val MAX_ELEMENT_FIRESTORE_WHERE_QUERY = 10;
 
 class DiskTitlesRepository(private val application: Application) {
     private val db: FirebaseFirestore = FirebaseFirestore.getInstance()
@@ -79,12 +82,44 @@ class DiskTitlesRepository(private val application: Application) {
     //  This won't work if listOfId has more than 10 elements due to a limit of Firestore
 //TODO: Modify the method to allow for more than 10 disk titles
     fun getDiskTitlesByListOfId(listOfId: List<String>) = flow {
-        emit(
-            queryDiskTitle.whereIn(FieldPath.documentId(), listOfId).get()
-                .await().documents.mapNotNull {
-                    it.toObject(DiskTitle::class.java)
+        Log.d(TAG, "listOfId - 1:  $listOfId")
+        val listOfIdWithoutDuplicates = listOfId.distinct()
+        Log.d(TAG, "listOfIdWithoutDuplicates:  $listOfIdWithoutDuplicates")
+        val idSubLists = listOfIdWithoutDuplicates.chunked(MAX_ELEMENT_FIRESTORE_WHERE_QUERY)
+        Log.d(TAG, "idSubLists - 1:  $idSubLists")
+
+        val tasks = mutableListOf<Deferred<Task<QuerySnapshot>>>()
+        val diskTitlesList = coroutineScope {
+            idSubLists.forEach {
+                tasks.add(async {
+                    Log.d(TAG, "currentSubListIndex :  $it")
+                    queryDiskTitle.whereIn(
+                        FieldPath.documentId(),
+                        it
+                    ).get()
+
                 })
+            }
+            val results = mutableListOf<DiskTitle>()
+            Log.d(TAG, "getDiskTitlesByListOfId() - results: $results")
+            for (task in tasks.awaitAll()) {
+                results.addAll(task.await().documents.mapNotNull { it.toObject(DiskTitle::class.java) })
+                Log.d(
+                    TAG,
+                    "getDiskTitlesByListOfId() - results: ${
+                        task.await().documents.mapNotNull {
+                            it.toObject(DiskTitle::class.java)
+                        }
+                    }"
+                )
+
+            }
+            Log.d(TAG, "getDiskTitlesByListOfId() - results: $results")
+            results
+        }.toList()
+        emit(diskTitlesList)
     }
+        .catch { Log.d(TAG, "[Error] getDiskTitlesByListOfId() - ${it.message} ") }
 
 
     fun addDiskTitleToFireStore(

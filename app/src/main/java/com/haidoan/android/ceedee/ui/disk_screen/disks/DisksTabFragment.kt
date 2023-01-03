@@ -22,6 +22,7 @@ import com.haidoan.android.ceedee.ui.disk_screen.disk_titles.DiskTitlesViewModel
 import com.haidoan.android.ceedee.ui.disk_screen.repository.DiskStatusRepository
 import com.haidoan.android.ceedee.ui.disk_screen.utils.Response
 
+private const val TAG = "DisksTabFragment"
 class DisksTabFragment : Fragment() {
 
     private lateinit var diskAdapter: DiskAdapter
@@ -64,10 +65,11 @@ class DisksTabFragment : Fragment() {
                 is Response.Loading -> {
                     //Load a ProgressBar
                     binding.progressbarDisk.visibility = View.VISIBLE
-                    Log.d("TAG_LIST", "LOADING...")
+                    Log.d(TAG, "LOADING...")
                 }
                 is Response.Success -> {
                     val list = response.data
+                    Log.d(TAG, "getDisks() - ${list}")
                     //Do what you need to do with your list
                     diskAdapter.submitList(list.toMutableList() as MutableList<DiskAndSomeInfo>)
                     diskAdapter.setAllDiskFilterByDiskStatus(list.toMutableList() as MutableList<DiskAndSomeInfo>)
