@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
+import com.haidoan.android.ceedee.R
 import com.haidoan.android.ceedee.data.DiskTitle
 import com.haidoan.android.ceedee.databinding.ItemDiskToReturnBinding
 import com.haidoan.android.ceedee.ui.utils.toFormattedCurrencyString
@@ -25,7 +26,11 @@ class DisksToReturnAdapter :
         fun bind(diskTitlesToReturn: Triple<DiskTitle, Long, Long>) {
             binding.apply {
                 textviewDiskTitle.text = diskTitlesToReturn.first.name
-                imageviewDiskCover.load(diskTitlesToReturn.first.coverImageUrl)
+                imageviewDiskCover.load(diskTitlesToReturn.first.coverImageUrl) {
+                    crossfade(true)
+                    placeholder(R.drawable.ic_disk_cover_placeholder_96)
+                    error(R.drawable.ic_disk_cover_placeholder_96)
+                }
                 textviewDiskAmount.text = "${diskTitlesToReturn.second} CD"
                 textviewDiskFee.text = diskTitlesToReturn.third.toFormattedCurrencyString()
             }

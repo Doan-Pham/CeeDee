@@ -1,6 +1,7 @@
 package com.haidoan.android.ceedee.ui.user_management
 
 import android.app.AlertDialog
+import android.content.DialogInterface
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -75,7 +76,12 @@ class UserManagementFragment : Fragment() {
                     Toast.LENGTH_SHORT
                 ).show()
             } else {
-                viewModel.deleteUser(it)
+                createDialog(message = "Delete this user: ${it.username}?") { _, _ ->
+                    viewModel.deleteUser(
+                        it
+                    )
+                }
+
             }
         }
 
@@ -168,6 +174,22 @@ class UserManagementFragment : Fragment() {
                 // addGenreToFireStore(editText.text.toString())
             }
             .setNegativeButton("Cancel") { _, _ -> }
+            .show()
+    }
+
+    private fun createDialog(
+        title: String = "Confirmation",
+        message: String,
+        onPositiveButtonClick: DialogInterface.OnClickListener
+    ) {
+        // 1. Instantiate an <code><a href="/reference/android/app/AlertDialog.Builder.html">AlertDialog.Builder</a></code> with its constructor
+
+        AlertDialog.Builder(context)
+            .setTitle(title)
+            .setMessage(message)
+            .setPositiveButton("Proceed", onPositiveButtonClick)
+            .setNegativeButton("Cancel") { _, _ -> }
+            .create()
             .show()
     }
 }

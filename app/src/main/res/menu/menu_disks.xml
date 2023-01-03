@@ -5,7 +5,7 @@
 
     <item
         android:id="@+id/menu_disks_search"
-        android:icon="@drawable/ic_round_search_24"
+        android:icon="@drawable/ic_search_24_dp"
         android:orderInCategory="100"
         app:iconTint="@color/black"
         android:title="@string/search"
@@ -28,13 +28,5 @@
 
     </item>
 
-    <item
-        android:id="@+id/menu_disks_cart"
-        android:icon="@drawable/ic_round_shopping_cart_24"
-        android:orderInCategory="104"
-        android:title="@string/cart"
-        app:iconTint="@color/white"
-        app:showAsAction="always"
-        tools:targetApi="o"></item>
 
 </menu>

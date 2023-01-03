@@ -21,6 +21,7 @@ private const val TAG = "AuthenticationRepo"
 
 class AuthenticationRepository(private val application: Application) {
     private val isUserSignedIn: MutableLiveData<Boolean> = MutableLiveData()
+    var currentUser: FirebaseUser? = null
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
     private var authSecond: FirebaseAuth = FirebaseAuth.getInstance()
     private var authDeleteUser: FirebaseAuth = FirebaseAuth.getInstance()
@@ -32,6 +33,7 @@ class AuthenticationRepository(private val application: Application) {
     init {
         auth.addAuthStateListener {
             Log.d(TAG, "Init - currentUser: ${it.currentUser?.uid}")
+            currentUser = it.currentUser
             if (it.currentUser != null) {
                 isUserSignedIn.postValue(true)
             } else {
@@ -152,7 +154,7 @@ class AuthenticationRepository(private val application: Application) {
         PhoneAuthProvider.verifyPhoneNumber(options)
     }
 
-    suspend fun signInWithPhoneAuthCredential(activity: Activity,credential: PhoneAuthCredential) =
+    suspend fun signInWithPhoneAuthCredential(activity: Activity, credential: PhoneAuthCredential) =
         auth.signInWithCredential(credential)
 
 }

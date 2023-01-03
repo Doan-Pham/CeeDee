@@ -19,7 +19,7 @@ import java.time.format.DateTimeFormatter
 class RentalSection(
     private val currentMonth: String?,
     private val currentMonthRentals: List<Rental>,
-    private val onButtonReturnClick: (Rental) -> Unit
+    private val onButtonMoreClick: (Rental, View) -> Unit
 ) : Section(
     SectionParameters.builder()
         .itemResourceId(R.layout.item_rental)
@@ -28,7 +28,7 @@ class RentalSection(
 ) {
     class RentalViewHolder(
         private val binding: ItemRentalBinding,
-        val onButtonReturnClick: (Rental) -> Unit
+        val onButtonMoreClick: (Rental, View) -> Unit
     ) :
         RecyclerView.ViewHolder(binding.root) {
 
@@ -37,24 +37,28 @@ class RentalSection(
 
                 when (rental.rentalStatus) {
                     "Complete" -> {
-                        imageviewItem.setImageResource(R.drawable.check)
-                        buttonReturnDisk.visibility = View.INVISIBLE
+                        imageviewItem.setImageResource(R.drawable.ic_in_store)
+                        //buttonMore.visibility = View.INVISIBLE
                     }
                     "Overdue" -> {
-                        imageviewItem.setImageResource(R.drawable.multiply)
-                        buttonReturnDisk.visibility = View.INVISIBLE
+                        imageviewItem.setImageResource(R.drawable.ic_damaged)
+                        //buttonMore.visibility = View.INVISIBLE
                     }
                     "In progress" -> {
-                        imageviewItem.setImageResource(R.drawable.clock)
-                        buttonReturnDisk.visibility = View.VISIBLE
+                        imageviewItem.setImageResource(R.drawable.ic_rented)
+                        //buttonMore.visibility = View.VISIBLE
+                    }
+                    "In request" -> {
+                        imageviewItem.setImageResource(R.drawable.ic_in_request_black_24dp)
+                        //buttonMore.visibility = View.VISIBLE
                     }
                 }
                 tvCustomerName.text = rental.customerName
                 tvRentDate.text = convertToLocalDate(rental.rentDate)
                 tvDueDate.text = convertToLocalDate(rental.dueDate)
 
-                buttonReturnDisk.setOnClickListener {
-                    onButtonReturnClick(rental)
+                buttonMore.setOnClickListener {
+                    onButtonMoreClick(rental, buttonMore)
                 }
             }
         }
@@ -80,7 +84,7 @@ class RentalSection(
                 view as ViewGroup,
                 false
             )
-        return RentalViewHolder(binding, onButtonReturnClick)
+        return RentalViewHolder(binding, onButtonMoreClick)
     }
 
     override fun onBindItemViewHolder(holder: RecyclerView.ViewHolder?, position: Int) {

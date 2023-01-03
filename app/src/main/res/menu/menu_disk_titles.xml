@@ -5,7 +5,7 @@
 
     <item
         android:id="@+id/menu_disk_titles_search"
-        android:icon="@drawable/ic_round_search_24"
+        android:icon="@drawable/ic_search_24_dp"
         android:orderInCategory="100"
         android:title="@string/search"
         app:actionViewClass="android.widget.SearchView"
@@ -18,7 +18,7 @@
 
     <item
         android:id="@+id/menu_disk_titles_filter"
-        android:icon="@drawable/ic_round_filter_alt_24"
+        android:icon="@drawable/ic_sort_black_24"
         android:orderInCategory="102"
         android:title="@string/sort_by"
         android:visible="true"

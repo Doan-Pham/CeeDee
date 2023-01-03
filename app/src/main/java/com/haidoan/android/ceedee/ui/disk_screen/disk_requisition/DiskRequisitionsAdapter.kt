@@ -23,12 +23,13 @@ class DiskRequisitionAdapter(private val onButtonImportClick: (Requisition) -> U
         fun bind(requisition: Requisition) {
             binding.apply {
                 textviewSupplierName.text = requisition.supplierName
+                textviewSupplierEmail.text = requisition.supplierEmail
 
-                val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy")
+                val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("h:mm a dd-MM-yyyy")
                 textviewRequisitionSentDate.text = dateFormatter.format(requisition.sentDate)
 
                 if (requisition.requisitionStatus == "Completed") {
-                    buttonImport.visibility = View.GONE
+                    buttonImport.visibility = View.INVISIBLE
                 } else {
                     buttonImport.visibility = View.VISIBLE
                     buttonImport.setOnClickListener { onButtonImportClick(requisition) }

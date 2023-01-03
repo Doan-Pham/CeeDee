@@ -1,16 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <item android:title="Rental"
+    <item
         android:id="@+id/rentalFragment"
-        android:icon="@drawable/ic_baseline_playlist_play_24"/>
-    <item android:title="Disk"
+        android:icon="@drawable/ic_rental_24_dp"
+        android:title="Rental" />
+    <item
         android:id="@+id/diskFragment"
-        android:icon="@drawable/ic_baseline_album_24"/>
-    <item android:title="Report"
+        android:icon="@drawable/ic_disk_black_24"
+        android:title="Disk" />
+    <item
         android:id="@+id/reportFragment"
-        android:icon="@drawable/ic_baseline_equalizer_24"/>
-    <item android:title="User"
+        android:icon="@drawable/ic_statistics_black_24"
+        android:title="Report" />
+    <item
         android:id="@+id/userManagementFragment"
-        android:icon="@drawable/ic_round_add_24"/>
+        android:icon="@drawable/ic_user_black_24"
+        android:title="User" />
 </menu>

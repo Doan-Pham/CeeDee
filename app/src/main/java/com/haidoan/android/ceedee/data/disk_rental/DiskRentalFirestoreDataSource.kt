@@ -61,7 +61,8 @@ class DiskRentalFirestoreDataSource {
         customerName: String?,
         customerAddress: String?,
         customerPhone: String?,
-        diskTitlesToAdd: Map<DiskTitle, Long>
+        diskTitlesToAdd: Map<DiskTitle, Long>,
+        rentalStatus: String? = "In progress"
     ): DocumentReference? {
 
         //val diskTitleIdToAmountMap = diskTitlesToAdd
@@ -74,11 +75,26 @@ class DiskRentalFirestoreDataSource {
                 (LocalDate.now().plusDays(30).atStartOfDay(zoneId).toEpochSecond()), 0
             ),
             "returnDate" to Timestamp.now(),
-            "rentalStatus" to "In progress",
+            "rentalStatus" to rentalStatus,
             "diskTitlesToAdd" to diskTitlesToAdd.mapKeys { it.key.id },
             "totalPayment" to 0,
         )
         Log.d("RentalFirestore", "Called Addrental")
         return firestoreDb.collection("Rental").add(newRentalAsMap).await()
     }
+
+    suspend fun acceptRentalInRequest(rentalId: String) =
+        firestoreDb.collection("Rental").document(rentalId).update(
+            mapOf(
+                "rentalStatus" to "In progress",
+                "rentDate" to Timestamp.now(),
+                "dueDate" to Timestamp(
+                    (LocalDate.now().plusDays(30).atStartOfDay(zoneId).toEpochSecond()), 0
+                )
+            )
+        ).await()
+
+    suspend fun deleteRental(rentalId: String) =
+        firestoreDb.collection("Rental").document(rentalId).delete().await()
+
 }

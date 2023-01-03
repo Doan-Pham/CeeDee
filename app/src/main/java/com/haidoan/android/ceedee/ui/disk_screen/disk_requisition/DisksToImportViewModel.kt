@@ -3,6 +3,7 @@ package com.haidoan.android.ceedee.ui.disk_screen.disk_requisition
 import androidx.lifecycle.*
 import com.haidoan.android.ceedee.data.DiskTitle
 import com.haidoan.android.ceedee.ui.disk_screen.repository.DiskTitlesRepository
+import com.haidoan.android.ceedee.ui.disk_screen.utils.Response
 import kotlinx.coroutines.Dispatchers
 
 class DisksToImportViewModel(private val diskTitlesRepository: DiskTitlesRepository) :
@@ -12,14 +13,17 @@ class DisksToImportViewModel(private val diskTitlesRepository: DiskTitlesReposit
 
     private val _diskTitlesInStore = searchQuery.switchMap { currentSearchQuery ->
         liveData(context = viewModelScope.coroutineContext + Dispatchers.IO) {
-            diskTitlesRepository.getDiskTitlesAvailableInStore()
+            diskTitlesRepository.getDiskTitlesFromFireStore()
                 .collect {
-                    emit(it.filter { diskTitle ->
-                        diskTitle.name.contains(
-                            currentSearchQuery.toString(),
-                            true
-                        )
-                    })
+                    if (it is Response.Success) {
+                        emit(it.data.filter { diskTitle ->
+                            diskTitle.name.contains(
+                                currentSearchQuery.toString(),
+                                true
+                            )
+                        })
+                    }
+
                 }
         }
     }

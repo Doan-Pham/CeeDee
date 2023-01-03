@@ -62,7 +62,7 @@ class DiskTitlesAdapter(private val context: Context) :
     }
 
     fun setDiskTitlesTabFragment(fragment: DiskTitlesTabFragment) {
-        diskTitlesTabFragment = fragment;
+        diskTitlesTabFragment = fragment
     }
 
     fun setGenreAdapter(g: GenreAdapter) {
@@ -137,13 +137,14 @@ class DiskTitlesAdapter(private val context: Context) :
         private val diskTitlesViewModel: DiskTitlesViewModel,
         private val viewLifecycleOwner: LifecycleOwner,
     ) : RecyclerView.ViewHolder(binding.root) {
+        @SuppressLint("SetTextI18n")
         fun setData(item: DiskTitle) {
             binding.apply {
                 bindImage(imgDiskTitlesCoverImg, item.coverImageUrl)
 
                 tvDiskTitlesAuthor.text = item.author
                 tvDiskTitlesName.text = item.name
-                tvDiskTitlesAmount.text = "Amount: ${item.diskAmount} CD"
+                tvDiskTitlesAmount.text = "In store: ${item.diskInStoreAmount}/${item.diskAmount} CD"
             }
         }
 
@@ -151,8 +152,9 @@ class DiskTitlesAdapter(private val context: Context) :
             imgUrl?.let {
                 val imgUri = imgUrl.toUri().buildUpon().scheme("https").build()
                 imgView.load(imgUri) {
-                    placeholder(R.drawable.ic_launcher)
-                    error(R.drawable.ic_app_logo)
+                    placeholder(R.drawable.ic_disk_cover_placeholder_96)
+                    error(R.drawable.ic_disk_cover_placeholder_96)
+                    crossfade(true)
                 }
             }
         }
@@ -169,7 +171,7 @@ class DiskTitlesAdapter(private val context: Context) :
                     R.menu.popup_menu_disk_title_tab_more_btn,
                     popupMenu.menu
                 )
-                popupMenu.setOnMenuItemClickListener(PopupMenu.OnMenuItemClickListener { item ->
+                popupMenu.setOnMenuItemClickListener({ item ->
                     when (item.itemId) {
                         R.id.popup_disk_title_add_to_import -> {
                             //TODO: Add to import
@@ -223,7 +225,7 @@ class DiskTitlesAdapter(private val context: Context) :
 
                         }
                         is Response.Success -> {
-                            diskTitlesTabFragment.init();
+                            diskTitlesTabFragment.init()
                             Toast.makeText(
                                 context,
                                 "Delete disk title success!",

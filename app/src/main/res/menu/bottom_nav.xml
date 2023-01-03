@@ -3,11 +3,11 @@
 
     <item android:title="Rental"
         android:id="@+id/rentalFragment"
-        android:icon="@drawable/ic_baseline_playlist_play_24"/>
+        android:icon="@drawable/ic_rental_24_dp"/>
     <item android:title="Disk"
         android:id="@+id/diskFragment"
-        android:icon="@drawable/ic_baseline_album_24"/>
+        android:icon="@drawable/ic_disk_black_24"/>
     <item android:title="Report"
         android:id="@+id/reportFragment"
-        android:icon="@drawable/ic_baseline_equalizer_24"/>
+        android:icon="@drawable/ic_statistics_black_24"/>
 </menu>

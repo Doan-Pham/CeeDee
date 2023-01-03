@@ -24,7 +24,8 @@ class DiskRentalRepository(private val firestoreDataSource: DiskRentalFirestoreD
         customerName: String?,
         customerAddress: String?,
         customerPhone: String?,
-        diskTitlesToAdd: Map<DiskTitle, Long>
+        diskTitlesToAdd: Map<DiskTitle, Long>,
+        rentalStatus: String?
     ) =
         flow {
             emit(Response.Loading())
@@ -34,11 +35,16 @@ class DiskRentalRepository(private val firestoreDataSource: DiskRentalFirestoreD
                         customerName,
                         customerAddress,
                         customerPhone,
-                        diskTitlesToAdd
+                        diskTitlesToAdd,
+                        rentalStatus
                     )
                 )
             )
         }
             .catch { emit(Response.Failure(it.message.toString())) }
 
+    suspend fun acceptRentalInRequest(rentalId: String) =
+        firestoreDataSource.acceptRentalInRequest(rentalId)
+
+    suspend fun deleteRental(rentalId: String) = firestoreDataSource.deleteRental(rentalId)
 }

@@ -33,9 +33,6 @@ class DisksToImportDialog : DialogFragment() {
 
     private lateinit var disksToImportAdapter: DisksToImportAdapter
 
-    private
-    val diskTitlesToImportAndAmount = mutableMapOf<String, Long>()
-
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         binding = DialogAddDiskToImportBinding.inflate(requireActivity().layoutInflater)

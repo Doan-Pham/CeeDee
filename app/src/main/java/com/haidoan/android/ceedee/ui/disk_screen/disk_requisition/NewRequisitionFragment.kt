@@ -88,6 +88,7 @@ class NewRequisitionFragment : Fragment() {
                 id: Long
             ) {
                 viewModel.setSupplierOfNewRequisition(suppliers[position])
+                binding.textviewSupplierEmail.text = suppliers[position].email
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {}

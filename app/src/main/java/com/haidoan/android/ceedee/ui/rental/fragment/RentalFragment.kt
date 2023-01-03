@@ -1,8 +1,11 @@
 package com.haidoan.android.ceedee.ui.rental.fragment
 
+import android.app.AlertDialog
+import android.content.DialogInterface
 import android.os.Bundle
 import android.util.Log
 import android.view.*
+import android.widget.PopupMenu
 import android.widget.SearchView
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
@@ -11,19 +14,18 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.firebase.Timestamp
 import com.haidoan.android.ceedee.R
+import com.haidoan.android.ceedee.data.Rental
 import com.haidoan.android.ceedee.data.disk_rental.DiskRentalFirestoreDataSource
 import com.haidoan.android.ceedee.data.disk_rental.DiskRentalRepository
 import com.haidoan.android.ceedee.databinding.FragmentRentalBinding
+import com.haidoan.android.ceedee.ui.disk_screen.repository.DiskTitlesRepository
+import com.haidoan.android.ceedee.ui.disk_screen.repository.DisksRepository
 import com.haidoan.android.ceedee.ui.rental.adapters.RentalSection
 import com.haidoan.android.ceedee.ui.rental.viewmodel.RentalFilterCategory
 import com.haidoan.android.ceedee.ui.rental.viewmodel.RentalsViewModel
 import com.haidoan.android.ceedee.ui.utils.toFormattedMonthYearString
 import io.github.luizgrp.sectionedrecyclerviewadapter.SectionedRecyclerViewAdapter
-import java.time.LocalDate
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
 
 private const val TAG = "RentalFragment"
 
@@ -38,7 +40,9 @@ class RentalFragment : Fragment() {
     private val viewModel: RentalsViewModel by lazy {
         ViewModelProvider(
             this, RentalsViewModel.Factory(
-                DiskRentalRepository(DiskRentalFirestoreDataSource())
+                DiskRentalRepository(DiskRentalFirestoreDataSource()),
+                DisksRepository(requireActivity().application),
+                DiskTitlesRepository(requireActivity().application)
             )
         )[RentalsViewModel::class.java]
     }
@@ -56,71 +60,10 @@ class RentalFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setUpOptionMenu()
-
-
-//        rentalAdapter =
-//            RentalAdapter(onButtonReturnClick = { rental ->
-//                val action =
-//                    RentalFragmentDirections.actionRentalFragmentToDiskReturnFragment(
-//                        rental.id
-//                    )
-//                findNavController().navigate(action)
-//            })
-        rentalAdapter = SectionedRecyclerViewAdapter()
-
-        binding.apply {
-            fab.setOnClickListener { navigateToNewRentalFragment() }
-
-            recyclerviewRentals.adapter = rentalAdapter
-            recyclerviewRentals.layoutManager = LinearLayoutManager(activity)
-
-            chipGroupFilter.setOnCheckedStateChangeListener { group, _ ->
-                when (group.checkedChipId) {
-                    R.id.chip_filter_by_complete -> viewModel.setFilteringCategory(
-                        RentalFilterCategory.FILTER_BY_COMPLETE
-                    )
-                    R.id.chip_filter_by_in_progress -> viewModel.setFilteringCategory(
-                        RentalFilterCategory.FILTER_BY_IN_PROGRESS
-                    )
-                    R.id.chip_filter_by_overdue -> viewModel.setFilteringCategory(
-                        RentalFilterCategory.FILTER_BY_OVERDUE
-                    )
-                    R.id.chip_filter_by_all -> viewModel.setFilteringCategory(
-                        RentalFilterCategory.FILTER_BY_ALL
-                    )
-                }
-                Log.d(TAG, "CheckId change: ${group.checkedChipId}")
-            }
-        }
-
-        viewModel.rentals.observe(viewLifecycleOwner) { rentals ->
-            val rentalsGroupedByMonth =
-                rentals.sortedByDescending { it.rentDate }
-                    .groupBy { it.rentDate?.toFormattedMonthYearString() }
-
-            rentalAdapter.removeAllSections()
-
-            for (currentMonthRentals in rentalsGroupedByMonth) {
-                Log.d(TAG, "currentMonthRentals: $currentMonthRentals")
-                val currentSection = RentalSection(
-                    currentMonthRentals.key,
-                    currentMonthRentals.value,
-                    onButtonReturnClick = { rental ->
-                        val action =
-                            RentalFragmentDirections.actionRentalFragmentToDiskReturnFragment(
-                                rental.id
-                            )
-                        findNavController().navigate(action)
-                    })
-                rentalAdapter.addSection(currentSection)
-            }
-
-            binding.recyclerviewRentals.adapter = rentalAdapter
-
-//            rentalAdapter.submitList(
-//                rentals
-//            )
-        }
+        setUpRecyclerView()
+        setUpFab()
+        setUpChipGroup()
+        observeViewModel()
     }
 
     private fun setUpOptionMenu() {
@@ -157,16 +100,140 @@ class RentalFragment : Fragment() {
         }, viewLifecycleOwner, Lifecycle.State.RESUMED)
     }
 
+    private fun setUpRecyclerView() {
+        rentalAdapter = SectionedRecyclerViewAdapter()
+        binding.recyclerviewRentals.adapter = rentalAdapter
+        binding.recyclerviewRentals.layoutManager = LinearLayoutManager(activity)
+    }
+
+    private fun setUpFab() {
+        binding.fab.setOnClickListener { navigateToNewRentalFragment() }
+    }
+
+    private fun setUpChipGroup() {
+        //TODO: Fetch rental status from backend to create chips dynamically
+        binding.chipGroupFilter.setOnCheckedStateChangeListener { group, _ ->
+            when (group.checkedChipId) {
+                R.id.chip_filter_by_complete -> viewModel.setFilteringCategory(
+                    RentalFilterCategory.FILTER_BY_COMPLETE
+                )
+                R.id.chip_filter_by_in_progress -> viewModel.setFilteringCategory(
+                    RentalFilterCategory.FILTER_BY_IN_PROGRESS
+                )
+                R.id.chip_filter_by_overdue -> viewModel.setFilteringCategory(
+                    RentalFilterCategory.FILTER_BY_OVERDUE
+                )
+                R.id.chip_filter_by_in_request -> viewModel.setFilteringCategory(
+                    RentalFilterCategory.FILTER_BY_IN_REQUEST
+                )
+                R.id.chip_filter_by_all -> viewModel.setFilteringCategory(
+                    RentalFilterCategory.FILTER_BY_ALL
+                )
+            }
+            Log.d(TAG, "CheckId change: ${group.checkedChipId}")
+        }
+    }
+
+    private fun observeViewModel() {
+        viewModel.rentals.observe(viewLifecycleOwner) { rentals ->
+            val rentalsGroupedByMonth =
+                rentals.sortedByDescending { it.rentDate }
+                    .groupBy { it.rentDate?.toFormattedMonthYearString() }
+
+            rentalAdapter.removeAllSections()
+
+            for (currentMonthRentals in rentalsGroupedByMonth) {
+                Log.d(TAG, "currentMonthRentals: $currentMonthRentals")
+                val currentSection = RentalSection(
+                    currentMonthRentals.key,
+                    currentMonthRentals.value,
+                    onButtonMoreClick = { rental, buttonView ->
+                        setupPopupMenuForRecyclerViewItem(rental, buttonView)
+                    }
+                )
+                rentalAdapter.addSection(currentSection)
+            }
+
+            binding.recyclerviewRentals.adapter = rentalAdapter
+        }
+    }
+
+    private fun setupPopupMenuForRecyclerViewItem(rental: Rental, view: View) {
+        PopupMenu(context, view).apply {
+            setOnMenuItemClickListener {
+                when (it.itemId) {
+                    R.id.menu_item_rental_return_disk -> {
+                        val action =
+                            RentalFragmentDirections.actionRentalFragmentToDiskReturnFragment(
+                                rental.id
+                            )
+                        findNavController().navigate(action)
+                        true
+                    }
+                    R.id.menu_item_rental_accept_request -> {
+                        createDialog(message = "Accept this rental made by customer: ${rental.customerName}?") { _, _ ->
+                            viewModel.acceptRentalInRequest(
+                                rental
+                            )
+                        }
+
+                        true
+                    }
+                    R.id.menu_item_rental_view_disk_titles -> {
+                        RentalDiskTitleDialog(rental).show(
+                            childFragmentManager,
+                            "DISK_TO_ADD_DIALOG"
+                        )
+                        true
+                    }
+                    R.id.menu_item_rental_cancel -> {
+                        createDialog(message = "Cancel this rental made by customer: ${rental.customerName}?") { _, _ ->
+                            viewModel.cancelRental(
+                                rental
+                            )
+                        }
+                        true
+                    }
+                    else -> false
+                }
+            }
+            inflate(R.menu.popup_menu_rental_more)
+            when (rental.rentalStatus) {
+                "In request" -> menu.findItem(R.id.menu_item_rental_return_disk).isVisible = false
+                "In progress", "Overdue" -> menu.findItem(R.id.menu_item_rental_accept_request).isVisible =
+                    false
+                "Complete" -> {
+                    menu.findItem(R.id.menu_item_rental_return_disk).isVisible = false
+                    menu.findItem(R.id.menu_item_rental_accept_request).isVisible =
+                        false
+                    menu.findItem(R.id.menu_item_rental_cancel).isVisible =
+                        false
+                }
+            }
+            show()
+        }
+    }
+
+
     private fun navigateToNewRentalFragment() {
         val action =
             RentalFragmentDirections.actionRentalFragmentToNewRentalScreen2()
         findNavController().navigate(action)
     }
-}
 
-private fun convertToLocalDate(time: Timestamp?): String? {
-    val zoneId = ZoneId.of("Asia/Ho_Chi_Minh")
-    val dtf: DateTimeFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy")
-    val localDate: LocalDate? = time?.toDate()?.toInstant()?.atZone(zoneId)?.toLocalDate()
-    return dtf.format(localDate)
+    private fun createDialog(
+        title: String = "Confirmation",
+        message: String,
+        onPositiveButtonClick: DialogInterface.OnClickListener
+    ) {
+        // 1. Instantiate an <code><a href="/reference/android/app/AlertDialog.Builder.html">AlertDialog.Builder</a></code> with its constructor
+
+        AlertDialog.Builder(context)
+            .setTitle(title)
+            .setMessage(message)
+            .setPositiveButton("Proceed", onPositiveButtonClick)
+            .setNegativeButton("Cancel") { _, _ -> }
+            .create()
+            .show()
+    }
 }

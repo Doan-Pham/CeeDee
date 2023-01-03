@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools">
     <item
         android:id="@+id/menu_item_disk_requisition_search"
-        android:icon="@drawable/ic_round_search_24"
+        android:icon="@drawable/ic_search_24_dp"
         android:title="@string/search"
         app:actionViewClass="android.widget.SearchView"
         app:iconTint="@color/black"
@@ -13,7 +13,7 @@
 
     <item
         android:id="@+id/menu_item_disk_requisition_import"
-        android:icon="@drawable/ic_import_black_24dp"
+        android:icon="@drawable/ic_new_requisition_black_24"
         android:title="@string/new_requisition"
         app:iconTint="@color/black"
         app:showAsAction="always"

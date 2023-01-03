@@ -5,7 +5,7 @@
 
     <item
         android:id="@+id/menu_disk_search"
-        android:icon="@drawable/ic_round_search_24"
+        android:icon="@drawable/ic_search_24_dp"
         android:orderInCategory="100"
         android:title="@string/search"
         app:actionViewClass="android.widget.SearchView"

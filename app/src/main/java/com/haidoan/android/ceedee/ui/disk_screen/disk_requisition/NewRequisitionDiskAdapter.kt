@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
+import com.haidoan.android.ceedee.R
 import com.haidoan.android.ceedee.data.DiskTitle
 import com.haidoan.android.ceedee.databinding.ItemNewrequisitionDiskToImportBinding
 
@@ -42,7 +43,11 @@ class NewRequisitionDiskAdapter(
 
         fun bind(diskTitle: DiskTitle, diskAmount: Long?) {
             binding.apply {
-                imageviewDiskCover.load(diskTitle.coverImageUrl)
+                imageviewDiskCover.load(diskTitle.coverImageUrl) {
+                    crossfade(true)
+                    placeholder(R.drawable.ic_disk_cover_placeholder_96)
+                    error(R.drawable.ic_disk_cover_placeholder_96)
+                }
                 textviewDiskTitle.text = diskTitle.name
                 val diskAmountString = "${diskAmount ?: 0}"
                 textviewDiskAmount.text = diskAmountString

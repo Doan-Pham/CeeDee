@@ -76,8 +76,8 @@ class DiskStatusAdapter(
                             progressBar?.visibility =
                                 View.GONE
                             rcvDiskTitle?.visibility = View.VISIBLE
-                            diskAdapter.setFilterByDiskStatusList(list)
-                            diskAdapter.setAllDiskFilterByDiskStatus(list)
+                            diskAdapter.setFilterByDiskStatusList(list.toMutableList() as MutableList<DiskAndSomeInfo>)
+                            diskAdapter.setAllDiskFilterByDiskStatus(list.toMutableList() as MutableList<DiskAndSomeInfo>)
                         }
                         is Response.Failure -> {
                             println(response.errorMessage)
@@ -106,8 +106,8 @@ class DiskStatusAdapter(
                             View.GONE
                         rcvDisk?.visibility = View.VISIBLE
 
-                        diskAdapter.setFilterByDiskStatusList(list)
-                        diskAdapter.setAllDiskFilterByDiskStatus(list)
+                        diskAdapter.setFilterByDiskStatusList(list.toMutableList() as MutableList<DiskAndSomeInfo>)
+                        diskAdapter.setAllDiskFilterByDiskStatus(list.toMutableList() as MutableList<DiskAndSomeInfo>)
                     }
                     is Response.Failure -> {
                         print(response.errorMessage)

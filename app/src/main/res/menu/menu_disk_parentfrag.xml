@@ -5,7 +5,7 @@
 
     <item
         android:id="@+id/menu_item_disk_parentfrag_import"
-        android:icon="@drawable/ic_import_black_24dp"
+        android:icon="@drawable/ic_new_requisition_black_24"
         android:title="@string/new_requisition"
         app:iconTint="@color/black"
         app:showAsAction="always"
