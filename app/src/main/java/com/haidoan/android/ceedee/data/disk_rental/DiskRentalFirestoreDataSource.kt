@@ -97,4 +97,14 @@ class DiskRentalFirestoreDataSource {
     suspend fun deleteRental(rentalId: String) =
         firestoreDb.collection("Rental").document(rentalId).delete().await()
 
+    fun getRentalsByCustomerPhoneStream(customerPhone: String) =
+        firestoreDb
+            .collection("Rental")
+            .whereEqualTo("customerPhone", customerPhone)
+            .snapshots()
+            .mapNotNull { querySnapshot ->
+                querySnapshot.documents.mapNotNull {
+                    it.toObject(Rental::class.java)
+                }
+            }
 }

@@ -8,10 +8,10 @@
         android:id="@+id/customer_disk_fragment"
         android:name="com.haidoan.android.ceedee.ui.customer_related.disk.CustomerDiskFragment"
         android:label="Disk"
-        tools:layout="@layout/fragment_customer_disk" />
+        tools:layout="@layout/fragment_customer_rental" />
     <fragment
         android:id="@+id/customer_rental_fragment"
         android:name="com.haidoan.android.ceedee.ui.customer_related.rental.CustomerRentalFragment"
         android:label="Rental"
-        tools:layout="@layout/fragment_customer_rental" />
+        tools:layout="@layout/fragment_customer_disk" />
 </navigation>

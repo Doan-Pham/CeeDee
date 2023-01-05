@@ -2,6 +2,7 @@ package com.haidoan.android.ceedee.ui.customer_related
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.viewModels
@@ -13,6 +14,8 @@ import com.haidoan.android.ceedee.R
 import com.haidoan.android.ceedee.databinding.ActivityCustomerBinding
 import com.haidoan.android.ceedee.ui.login.AuthenticationActivity
 import com.haidoan.android.ceedee.ui.login.AuthenticationRepository
+
+private const val TAG = "CustomerActivity"
 
 class CustomerActivity : AppCompatActivity() {
 
@@ -38,6 +41,18 @@ class CustomerActivity : AppCompatActivity() {
         binding.toolbar.setupWithNavController(navController, appBarConfiguration)
 
         binding.bottomNav.setupWithNavController(navController)
+        viewModel.isUserSignedIn.observe(this) {
+            if (it == true) {
+                viewModel.resetUser()
+            }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        Log.d(TAG, "onResume Called")
+        viewModel.resetUser()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
