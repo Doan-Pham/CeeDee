@@ -101,7 +101,9 @@ class NewRentalViewModel(
         }
 
     fun proceedCustomer() = liveData(context = viewModelScope.coroutineContext + Dispatchers.IO) {
-        if (isExistsCustomer()) {
+        val isExistsCustomer = isExistsCustomer()
+
+        if (isExistsCustomer) {
             customerRepository.updateCustomer(
                 _customerId.value!!,
                 _customerAddress.value,
@@ -120,6 +122,7 @@ class NewRentalViewModel(
     private fun isExistsCustomer(): Boolean {
         _allCustomers.value?.forEach {
             if (_customerPhone.value.equals(it.phone)) {
+                _customerId.value = it.id
                 return true
             }
         }

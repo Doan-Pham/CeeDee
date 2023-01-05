@@ -49,7 +49,7 @@ class NewRentalScreen : Fragment() {
     private lateinit var disksToRentAdapter: NewRentalAdapter
 
     private val customers = mutableListOf<Customer>()
-    private var selectedCustomerId: String = ""
+    private var selectedCustomerId: String = "-1"
     private var currentUserPhoneNumber = ""
 
     override fun onCreateView(
