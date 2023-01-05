@@ -2,7 +2,7 @@
 <resources>
     <item name="filter_chip_in_progress" type="id"/>
     <item name="filter_chip_in_request" type="id"/>
-    <item name="filter_chip_completed" type="id"/>
+    <item name="filter_chip_complete" type="id"/>
     <item name="filter_chip_overdue" type="id"/>
     <item name="filter_chip_unknown" type="id"/>
 

@@ -2,6 +2,7 @@ package com.haidoan.android.ceedee.ui.customer_related.rental
 
 import android.util.Log
 import androidx.lifecycle.*
+import com.haidoan.android.ceedee.data.Rental
 import com.haidoan.android.ceedee.data.RentalStatus
 import com.haidoan.android.ceedee.data.disk_rental.DiskRentalRepository
 import com.haidoan.android.ceedee.data.disk_rental.RentalStatusRepository
@@ -27,11 +28,24 @@ class CustomerRentalViewModel(
         )
     }
 
-    val diskTitles = _currentCustomerPhone.switchMap {
+    private val filteringCategory =
+        MutableLiveData(RentalFilterCategory.FILTER_BY_IN_PROGRESS)
+
+    private val rentalsModifications =
+        MediatorLiveData<Pair<String?, RentalFilterCategory?>>().apply {
+            addSource(_currentCustomerPhone) { value = Pair(it, filteringCategory.value) }
+            addSource(filteringCategory) { value = Pair(_currentCustomerPhone.value, it) }
+        }
+
+    val rentals = rentalsModifications.switchMap { rentalsModifications ->
         liveData(viewModelScope.coroutineContext + Dispatchers.IO) {
-            diskRentalRepository.getRentalsByCustomerPhoneStream(_currentCustomerPhone.value ?: "")
+            diskRentalRepository.getRentalsByCustomerPhoneStream(rentalsModifications.first ?: "")
                 .collect {
-                    emit(it)
+                    emit(
+                        it.filter(
+                            rentalsModifications.second ?: RentalFilterCategory.FILTER_BY_IN_REQUEST
+                        )
+                    )
                 }
         }
     }
@@ -47,6 +61,20 @@ class CustomerRentalViewModel(
     val rentalStatus: LiveData<List<RentalStatus>>
         get() = _rentalStatus
 
+    fun setFilteringCategory(inputFilteringCategory: RentalFilterCategory) {
+        filteringCategory.value = inputFilteringCategory
+    }
+
+    private fun List<Rental>.filter(filteringCategory: RentalFilterCategory) =
+        this.filter { individualRental ->
+            when (filteringCategory) {
+                RentalFilterCategory.FILTER_BY_IN_PROGRESS -> individualRental.rentalStatus == "In progress"
+                RentalFilterCategory.FILTER_BY_COMPLETE -> individualRental.rentalStatus == "Complete"
+                RentalFilterCategory.FILTER_BY_OVERDUE -> individualRental.rentalStatus == "Overdue"
+                RentalFilterCategory.FILTER_BY_IN_REQUEST -> individualRental.rentalStatus == "In request"
+            }
+        }
+
     class Factory(
         private val diskRentalRepository: DiskRentalRepository,
         private val rentalStatusRepository: RentalStatusRepository
@@ -60,4 +88,11 @@ class CustomerRentalViewModel(
             throw IllegalArgumentException("Unable to construct viewmodel")
         }
     }
+}
+
+enum class RentalFilterCategory {
+    FILTER_BY_COMPLETE,
+    FILTER_BY_OVERDUE,
+    FILTER_BY_IN_PROGRESS,
+    FILTER_BY_IN_REQUEST,
 }
