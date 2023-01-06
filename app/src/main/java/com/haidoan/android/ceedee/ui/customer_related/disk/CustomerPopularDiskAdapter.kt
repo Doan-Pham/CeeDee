@@ -2,6 +2,7 @@ package com.haidoan.android.ceedee.ui.customer_related.disk
 
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -11,12 +12,13 @@ import com.haidoan.android.ceedee.R
 import com.haidoan.android.ceedee.data.DiskTitle
 import com.haidoan.android.ceedee.databinding.ItemCustomerPopularDiskTitleBinding
 
-class CustomerPopularDiskAdapter :
+class CustomerPopularDiskAdapter(private val onButtonOptionClick: (DiskTitle, View) -> Unit) :
     ListAdapter<DiskTitle, CustomerPopularDiskAdapter.CustomerPopularDiskViewHolder>
         (CustomerDiskUtils()) {
 
     class CustomerPopularDiskViewHolder(
-        private val binding: ItemCustomerPopularDiskTitleBinding
+        private val binding: ItemCustomerPopularDiskTitleBinding,
+        private val onButtonOptionClick: (DiskTitle, View) -> Unit
     ) :
         RecyclerView.ViewHolder(binding.root) {
 
@@ -28,6 +30,9 @@ class CustomerPopularDiskAdapter :
                 imageviewDiskCover.load(diskTitle.coverImageUrl) {
                     crossfade(true)
                     placeholder(R.drawable.ic_disk_cover_placeholder_96)
+                }
+                buttonOptions.setOnClickListener {
+                    onButtonOptionClick(diskTitle, buttonOptions)
                 }
             }
         }
@@ -43,7 +48,7 @@ class CustomerPopularDiskAdapter :
                 parent,
                 false
             )
-        return CustomerPopularDiskViewHolder(binding)
+        return CustomerPopularDiskViewHolder(binding, onButtonOptionClick)
     }
 
     override fun onBindViewHolder(holder: CustomerPopularDiskViewHolder, position: Int) {

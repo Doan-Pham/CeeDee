@@ -3,16 +3,20 @@ package com.haidoan.android.ceedee.ui.customer_related.disk
 import android.os.Bundle
 import android.util.Log
 import android.view.*
+import android.widget.PopupMenu
 import android.widget.SearchView
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.chip.Chip
 import com.haidoan.android.ceedee.R
+import com.haidoan.android.ceedee.data.DiskTitle
 import com.haidoan.android.ceedee.databinding.FragmentCustomerDiskBinding
+import com.haidoan.android.ceedee.ui.customer_related.CustomerActivityViewModel
 import com.haidoan.android.ceedee.ui.disk_screen.repository.DiskTitlesRepository
 import com.haidoan.android.ceedee.ui.disk_screen.repository.GenreRepository
 
@@ -34,6 +38,8 @@ class CustomerDiskFragment : Fragment() {
             GenreRepository(requireActivity().application)
         )
     }
+    private val customerActivityViewModel: CustomerActivityViewModel by activityViewModels()
+
     private lateinit var diskAdapter: CustomerDiskAdapter
     private lateinit var popularDiskAdapter: CustomerPopularDiskAdapter
 
@@ -90,7 +96,12 @@ class CustomerDiskFragment : Fragment() {
     }
 
     private fun setUpRecyclerViewDiskTitles() {
-        diskAdapter = CustomerDiskAdapter()
+        diskAdapter = CustomerDiskAdapter { diskTitle, buttonView ->
+            setupPopupMenuForRecyclerViewItem(
+                diskTitle,
+                buttonView
+            )
+        }
         binding.recyclerviewDiskTitles.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = diskAdapter
@@ -99,7 +110,12 @@ class CustomerDiskFragment : Fragment() {
     }
 
     private fun setUpRecyclerViewPopularDiskTitles() {
-        popularDiskAdapter = CustomerPopularDiskAdapter()
+        popularDiskAdapter = CustomerPopularDiskAdapter { diskTitle, buttonView ->
+            setupPopupMenuForRecyclerViewItem(
+                diskTitle,
+                buttonView
+            )
+        }
         binding.recyclerviewPopularDiskTitles.apply {
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
             adapter = popularDiskAdapter
@@ -148,6 +164,22 @@ class CustomerDiskFragment : Fragment() {
                 }
             }
         }, viewLifecycleOwner, Lifecycle.State.RESUMED)
+    }
+
+    private fun setupPopupMenuForRecyclerViewItem(diskTitle: DiskTitle, view: View) {
+        PopupMenu(context, view).apply {
+            setOnMenuItemClickListener {
+                when (it.itemId) {
+                    R.id.menu_item_customer_add_to_cart -> {
+                        customerActivityViewModel.addDiskTitleToRent(diskTitle)
+                        true
+                    }
+                    else -> false
+                }
+            }
+            inflate(R.menu.popup_menu_customer_disk_option)
+            show()
+        }
     }
 
     private fun observeViewModel() {
