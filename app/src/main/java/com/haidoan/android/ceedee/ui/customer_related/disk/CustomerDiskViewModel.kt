@@ -29,8 +29,9 @@ class CustomerDiskViewModel(
     }
     val genres: LiveData<List<Genre>>
         get() = _genres
-    private val _currentFilteringGenreId = MutableLiveData("")
 
+
+    private val _currentFilteringGenreId = MutableLiveData("")
     fun setFilteringGenreId(genreId: String = "") {
         _currentFilteringGenreId.value = genreId
         Log.d(
@@ -39,10 +40,27 @@ class CustomerDiskViewModel(
         )
     }
 
-    val diskTitles = _currentFilteringGenreId.switchMap { currentFilteringGenreId ->
+
+    private val _searchQuery = MutableLiveData("")
+    fun searchDiskTitle(query: String?) {
+        _searchQuery.value = query
+    }
+
+    private val diskTitleModifications =
+        MediatorLiveData<Pair<String?, String?>>().apply {
+            addSource(_currentFilteringGenreId) { value = Pair(it, _searchQuery.value) }
+            addSource(_searchQuery) { value = Pair(_currentFilteringGenreId.value, it) }
+        }
+
+    val diskTitles = diskTitleModifications.switchMap { diskTitleModifications ->
         liveData(viewModelScope.coroutineContext + Dispatchers.IO) {
             diskTitlesRepository.getDiskTitlesAvailableInStore()
-                .collect { emit(it.filterByGenreId(currentFilteringGenreId)) }
+                .collect {
+                    emit(
+                        it.filterByGenreId(diskTitleModifications.first ?: "")
+                            .searchByDiskTitle(diskTitleModifications.second ?: "")
+                    )
+                }
         }
     }
 
@@ -50,6 +68,11 @@ class CustomerDiskViewModel(
     private fun List<DiskTitle>.filterByGenreId(genreId: String = "") =
         if (genreId.isEmpty()) this
         else this.filter { it.genreId == genreId }
+
+    private fun List<DiskTitle>.searchByDiskTitle(query: String) =
+        this.filter { diskTitle ->
+            diskTitle.name.lowercase().contains(query.lowercase())
+        }
 
     class Factory(
         private val diskTitlesRepository: DiskTitlesRepository,

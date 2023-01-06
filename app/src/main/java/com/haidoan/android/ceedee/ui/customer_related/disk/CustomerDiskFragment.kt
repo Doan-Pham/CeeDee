@@ -2,11 +2,13 @@ package com.haidoan.android.ceedee.ui.customer_related.disk
 
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
+import android.widget.SearchView
+import androidx.core.view.MenuHost
+import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.chip.Chip
 import com.haidoan.android.ceedee.R
@@ -65,6 +67,7 @@ class CustomerDiskFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setUpRecyclerView()
         setUpChipGroup()
+        setUpOptionMenu()
         observeViewModel()
     }
 
@@ -91,6 +94,42 @@ class CustomerDiskFragment : Fragment() {
         }
     }
 
+    private fun setUpOptionMenu() {
+        val menuHost: MenuHost = requireActivity()
+        menuHost.addMenuProvider(object : MenuProvider {
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                menuInflater.inflate(R.menu.menu_customer_disk_fragment, menu)
+
+                val searchView: SearchView =
+                    (menu.findItem(R.id.menu_item_customer_disk_search).actionView as SearchView)
+                searchView.queryHint = "Type here to search"
+                searchView.maxWidth = Int.MAX_VALUE
+
+                searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+                    override fun onQueryTextSubmit(query: String?): Boolean {
+                        return false
+                    }
+
+                    override fun onQueryTextChange(newText: String?): Boolean {
+                        viewModel.searchDiskTitle(newText)
+                        return false
+                    }
+                })
+            }
+
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                return when (menuItem.itemId) {
+                    R.id.menu_item_customer_disk_search -> {
+                        true
+                    }
+                    else -> {
+                        true
+                    }
+                }
+            }
+        }, viewLifecycleOwner, Lifecycle.State.RESUMED)
+    }
+
     private fun observeViewModel() {
         viewModel.diskTitles.observe(viewLifecycleOwner) { diskTitles ->
             if (diskTitles == null) {
@@ -104,6 +143,5 @@ class CustomerDiskFragment : Fragment() {
             }
         }
     }
-
 
 }
