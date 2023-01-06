@@ -9,14 +9,14 @@ import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import com.haidoan.android.ceedee.R
 import com.haidoan.android.ceedee.data.DiskTitle
-import com.haidoan.android.ceedee.databinding.ItemDiskTitleBinding
+import com.haidoan.android.ceedee.databinding.ItemCustomerPopularDiskTitleBinding
 
-class CustomerDiskAdapter :
-    ListAdapter<DiskTitle, CustomerDiskAdapter.CustomerDiskViewHolder>
+class CustomerPopularDiskAdapter :
+    ListAdapter<DiskTitle, CustomerPopularDiskAdapter.CustomerPopularDiskViewHolder>
         (CustomerDiskUtils()) {
 
-    class CustomerDiskViewHolder(
-        private val binding: ItemDiskTitleBinding
+    class CustomerPopularDiskViewHolder(
+        private val binding: ItemCustomerPopularDiskTitleBinding
     ) :
         RecyclerView.ViewHolder(binding.root) {
 
@@ -25,7 +25,6 @@ class CustomerDiskAdapter :
             binding.apply {
                 textviewDiskTitle.text = diskTitle.name
                 textviewDiskAuthor.text = diskTitle.author
-                textviewDiskAmount.text = "In Store: ${diskTitle.diskInStoreAmount} CD"
                 imageviewDiskCover.load(diskTitle.coverImageUrl) {
                     crossfade(true)
                     placeholder(R.drawable.ic_disk_cover_placeholder_96)
@@ -37,27 +36,28 @@ class CustomerDiskAdapter :
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
-    ): CustomerDiskViewHolder {
+    ): CustomerPopularDiskViewHolder {
         val binding =
-            ItemDiskTitleBinding.inflate(
+            ItemCustomerPopularDiskTitleBinding.inflate(
                 LayoutInflater.from(parent.context),
                 parent,
                 false
             )
-        return CustomerDiskViewHolder(binding)
+        return CustomerPopularDiskViewHolder(binding)
     }
 
-    override fun onBindViewHolder(holder: CustomerDiskViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: CustomerPopularDiskViewHolder, position: Int) {
         holder.bind(getItem(position))
     }
+
+    private class CustomerDiskUtils : DiffUtil.ItemCallback<DiskTitle>() {
+        override fun areItemsTheSame(oldItem: DiskTitle, newItem: DiskTitle): Boolean {
+            return oldItem == newItem
+        }
+
+        override fun areContentsTheSame(oldItem: DiskTitle, newItem: DiskTitle): Boolean {
+            return oldItem.id == newItem.id
+        }
+    }
 }
 
-class CustomerDiskUtils : DiffUtil.ItemCallback<DiskTitle>() {
-    override fun areItemsTheSame(oldItem: DiskTitle, newItem: DiskTitle): Boolean {
-        return oldItem == newItem
-    }
-
-    override fun areContentsTheSame(oldItem: DiskTitle, newItem: DiskTitle): Boolean {
-        return oldItem.id == newItem.id
-    }
-}

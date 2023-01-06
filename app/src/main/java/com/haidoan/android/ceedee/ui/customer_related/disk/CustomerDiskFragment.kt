@@ -34,7 +34,10 @@ class CustomerDiskFragment : Fragment() {
             GenreRepository(requireActivity().application)
         )
     }
-    private lateinit var customerDiskAdapter: CustomerDiskAdapter
+    private lateinit var diskAdapter: CustomerDiskAdapter
+    private lateinit var popularDiskAdapter: CustomerPopularDiskAdapter
+
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
@@ -65,7 +68,8 @@ class CustomerDiskFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setUpRecyclerView()
+        setUpRecyclerViewDiskTitles()
+        setUpRecyclerViewPopularDiskTitles()
         setUpChipGroup()
         setUpOptionMenu()
         observeViewModel()
@@ -85,12 +89,21 @@ class CustomerDiskFragment : Fragment() {
         binding.chipGroupFilter.check(filterChipIds.values.first())
     }
 
-    private fun setUpRecyclerView() {
-        customerDiskAdapter = CustomerDiskAdapter()
+    private fun setUpRecyclerViewDiskTitles() {
+        diskAdapter = CustomerDiskAdapter()
         binding.recyclerviewDiskTitles.apply {
             layoutManager = LinearLayoutManager(context)
-            adapter = customerDiskAdapter
-            addItemDecoration(MarginItemDecoration(16))
+            adapter = diskAdapter
+            addItemDecoration(MarginItemDecoration(spaceHeight = 16))
+        }
+    }
+
+    private fun setUpRecyclerViewPopularDiskTitles() {
+        popularDiskAdapter = CustomerPopularDiskAdapter()
+        binding.recyclerviewPopularDiskTitles.apply {
+            layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+            adapter = popularDiskAdapter
+            addItemDecoration(MarginItemDecoration(spaceWidth = 48))
         }
     }
 
@@ -111,6 +124,13 @@ class CustomerDiskFragment : Fragment() {
                     }
 
                     override fun onQueryTextChange(newText: String?): Boolean {
+                        if (!newText.isNullOrEmpty()) {
+                            binding.recyclerviewPopularDiskTitles.visibility = View.GONE
+                            binding.textviewPopular.visibility = View.GONE
+                        } else {
+                            binding.recyclerviewPopularDiskTitles.visibility = View.VISIBLE
+                            binding.textviewPopular.visibility = View.VISIBLE
+                        }
                         viewModel.searchDiskTitle(newText)
                         return false
                     }
@@ -138,10 +158,13 @@ class CustomerDiskFragment : Fragment() {
             } else {
                 binding.progressbar.visibility = View.GONE
                 binding.linearlayoutContentWrapper.visibility = View.VISIBLE
-                customerDiskAdapter.submitList(diskTitles)
+                diskAdapter.submitList(diskTitles)
                 Log.d(TAG, "observeViewModel() - diskTitles: ${diskTitles.map { it.id }}")
             }
         }
+        viewModel.popularDiskTitles.observe(viewLifecycleOwner) { diskTitles ->
+            popularDiskAdapter.submitList(diskTitles)
+            Log.d(TAG, "observeViewModel() - popularDiskTitles: ${diskTitles.map { it.id }}")
+        }
     }
-
 }

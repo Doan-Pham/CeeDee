@@ -46,6 +46,10 @@ class CustomerDiskViewModel(
         _searchQuery.value = query
     }
 
+    private val _popularDiskTitles = MutableLiveData(listOf<DiskTitle>())
+    val popularDiskTitles: LiveData<List<DiskTitle>>
+        get() = _popularDiskTitles
+
     private val diskTitleModifications =
         MediatorLiveData<Pair<String?, String?>>().apply {
             addSource(_currentFilteringGenreId) { value = Pair(it, _searchQuery.value) }
@@ -55,9 +59,14 @@ class CustomerDiskViewModel(
     val diskTitles = diskTitleModifications.switchMap { diskTitleModifications ->
         liveData(viewModelScope.coroutineContext + Dispatchers.IO) {
             diskTitlesRepository.getDiskTitlesAvailableInStore()
-                .collect {
+                .collect { diskTitles ->
+                    _popularDiskTitles.postValue(diskTitles.sortedByDescending { it.totalRentalAmount })
+                    Log.d(
+                        TAG,
+                        "diskTitlesRepository.getDiskTitlesAvailableInStore() - diskTitles.sortedByDescending { it.totalRentalAmount }: ${diskTitles.sortedByDescending { it.totalRentalAmount }}"
+                    )
                     emit(
-                        it.filterByGenreId(diskTitleModifications.first ?: "")
+                        diskTitles.filterByGenreId(diskTitleModifications.first ?: "")
                             .searchByDiskTitle(diskTitleModifications.second ?: "")
                     )
                 }
