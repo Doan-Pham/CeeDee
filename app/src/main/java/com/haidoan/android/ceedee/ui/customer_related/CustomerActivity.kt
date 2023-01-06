@@ -5,6 +5,9 @@ import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
+import android.widget.FrameLayout
+import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.fragment.NavHostFragment
@@ -50,22 +53,42 @@ class CustomerActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-
         Log.d(TAG, "onResume Called")
         viewModel.resetUser()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.menu_main, menu)
+        menuInflater.inflate(R.menu.menu_customer_activity, menu)
+        val menuItemCart = menu.findItem(R.id.menu_item_customer_cart)
+
+        val cartActionView = (menuItemCart.actionView as FrameLayout)
+        val textViewBadge =
+            cartActionView.findViewById(R.id.textview_badge) as TextView
+        viewModel.disksToRentAndAmount.observe(this) {
+            if (it.isEmpty()) {
+                textViewBadge.visibility = View.GONE
+            } else {
+                textViewBadge.visibility = View.VISIBLE
+                textViewBadge.text = it.size.toString()
+            }
+
+        }
+        cartActionView.setOnClickListener {
+            onOptionsItemSelected(menuItemCart)
+        }
         return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
-            R.id.menu_item_main_sign_out -> {
+            R.id.menu_item_customer_sign_out -> {
                 viewModel.signOut()
                 startActivity(Intent(this, AuthenticationActivity::class.java))
                 finish()
+                true
+            }
+            R.id.menu_item_customer_cart -> {
+                Log.d(TAG, "menu_item_customer_cart Clicked")
                 true
             }
             else -> super.onOptionsItemSelected(item)
