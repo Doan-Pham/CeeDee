@@ -1,14 +1,19 @@
 package com.haidoan.android.ceedee.ui.report.fragment
 
 import android.app.AlertDialog
+import android.content.ActivityNotFoundException
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Paint.FILTER_BITMAP_FLAG
 import android.graphics.Typeface
 import android.graphics.pdf.PdfDocument
+import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
+import android.os.StrictMode
+import android.os.StrictMode.VmPolicy
 import android.util.Log
 import android.view.*
 import android.widget.Toast
@@ -44,6 +49,7 @@ import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import java.time.temporal.TemporalAdjusters
 import java.util.*
+
 
 private const val BAR_CHART_BAR_WIDTH = 0.45f
 private const val BAR_CHART_BAR_SPACE = 0.02f
@@ -92,6 +98,7 @@ class RevenueExpensesFragment : Fragment() {
 
     private var currentChartTypeShown: ChartType = ChartType.BAR_CHART
 
+    private lateinit var pdfFile: File
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -100,6 +107,13 @@ class RevenueExpensesFragment : Fragment() {
         // Inflate the layout for this fragment
         binding = FragmentRevenueExpensesBinding.inflate(inflater)
         return binding.root
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        val builder = VmPolicy.Builder()
+        StrictMode.setVmPolicy(builder.build())
+        builder.detectFileUriExposure()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -117,6 +131,7 @@ class RevenueExpensesFragment : Fragment() {
         setUpTextViewChooseEndTime()
         setUpOptionMenu()
         setUpButtonPrint()
+        setUpButtonOpenPdf()
 
         viewModel.monthlyRevenue.observe(viewLifecycleOwner) {
             styleLineChart()
@@ -135,6 +150,7 @@ class RevenueExpensesFragment : Fragment() {
             expensesDataCache.putAll(it)
         }
     }
+
 
     private fun setUpTextViewChooseStartTime() {
         val displayedStartTime = "${startTime.monthValue}/${startTime.year}"
@@ -197,7 +213,10 @@ class RevenueExpensesFragment : Fragment() {
             AlertDialog.Builder(requireContext())
                 .setTitle("Important Note")
                 .setMessage(R.string.chart_print_note)
-                .setPositiveButton("Print") { _, _ -> printReportAsPdf() }
+                .setPositiveButton("Print") { _, _ ->
+                    printReportAsPdf()
+                    enabledButtonViewPdfFile()
+                }
                 .setNegativeButton("Cancel") { dialog, _ -> dialog.cancel() }
                 .create()
                 .show()
@@ -295,6 +314,7 @@ class RevenueExpensesFragment : Fragment() {
             Environment.getExternalStorageDirectory(),
             "Report_Revenue_Expenses_${formatter.format(LocalDateTime.now())}.pdf"
         )
+        pdfFile = fileOutput
         val outputStream = FileOutputStream(fileOutput)
         try {
             reportAsPdf.writeTo(outputStream)
@@ -317,6 +337,32 @@ class RevenueExpensesFragment : Fragment() {
         outputStream.flush()
         outputStream.close()
         reportAsPdf.close()
+    }
+
+    private fun setUpButtonOpenPdf() {
+        binding.buttonViewPdf.setOnClickListener {
+            // on below line we are checking permission
+            if (!handlePermission()) return@setOnClickListener
+
+            openPdf()
+        }
+    }
+    private fun enabledButtonViewPdfFile() {
+        binding.buttonViewPdf.visibility = View.VISIBLE
+    }
+    private fun openPdf() {
+        val file = pdfFile
+        val target = Intent(Intent.ACTION_VIEW)
+        target.setDataAndType(Uri.fromFile(file), "application/pdf")
+        target.flags = Intent.FLAG_ACTIVITY_NO_HISTORY
+
+        val intent = Intent.createChooser(target, "Open File")
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        try {
+            requireContext().startActivity(intent)
+        } catch (e: ActivityNotFoundException) {
+            // Instruct the user to install a PDF reader here, or something
+        }
     }
 
     private fun hasPermissions(permissions: Array<String>): Boolean {
