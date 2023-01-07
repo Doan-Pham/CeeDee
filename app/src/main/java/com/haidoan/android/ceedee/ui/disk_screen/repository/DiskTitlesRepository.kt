@@ -51,7 +51,6 @@ class DiskTitlesRepository(private val application: Application) {
                 .await()
                 .documents
                 .mapNotNull { doc ->
-                    Log.d("TAG", "GET POST SUCCESS")
                     doc.toObject(DiskTitle::class.java)
                 })
         )
@@ -61,10 +60,21 @@ class DiskTitlesRepository(private val application: Application) {
         }
     }
 
+    fun getFiveDiskTitlesWithTotalRentalAmountDescendingFromFireStore() = flow {
+        emit(Response.Loading())
+        emit(Response.Success(
+            queryDiskTitle.orderBy("totalRentalAmount", Query.Direction.DESCENDING).limit(5).get().await().documents.mapNotNull { doc ->
+                doc.toObject(DiskTitle::class.java)
+        }))
+    }.catch { error ->
+        error.message?.let { errorMessage ->
+            emit(Response.Failure(errorMessage))
+        }
+    }
+
     fun getDiskTitlesFromFireStore() = flow {
         emit(Response.Loading())
         emit(Response.Success(queryDiskTitle.get().await().documents.mapNotNull { doc ->
-            Log.d("TAG", "GET POST SUCCESS")
             doc.toObject(DiskTitle::class.java)
         }))
     }.catch { error ->
