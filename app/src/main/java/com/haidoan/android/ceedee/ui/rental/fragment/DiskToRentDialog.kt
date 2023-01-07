@@ -8,6 +8,7 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.haidoan.android.ceedee.data.DiskTitle
 import com.haidoan.android.ceedee.databinding.DialogChooseDiskBinding
 import com.haidoan.android.ceedee.ui.disk_screen.repository.DiskTitlesRepository
 import com.haidoan.android.ceedee.ui.rental.adapters.DiskToRentAdapter
@@ -15,7 +16,7 @@ import com.haidoan.android.ceedee.ui.rental.viewmodel.DiskToRentViewModel
 import com.haidoan.android.ceedee.ui.rental.viewmodel.NewRentalViewModel
 
 
-class DiskToRentDialog : DialogFragment() {
+class DiskToRentDialog(private val onDiskItemClick: (DiskTitle) -> Unit) : DialogFragment() {
     private lateinit var binding: DialogChooseDiskBinding
 
     private val newRentalViewModel: NewRentalViewModel by viewModels(
@@ -35,9 +36,7 @@ class DiskToRentDialog : DialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         binding = DialogChooseDiskBinding.inflate(requireActivity().layoutInflater)
 
-        disksToRentAdapter = DiskToRentAdapter({ diskTitle ->
-            newRentalViewModel.addDiskTitleToRent(diskTitle)
-        })
+        disksToRentAdapter = DiskToRentAdapter(onDiskItemClick)
         binding.chooseDiskRecyclerView.adapter = disksToRentAdapter
         binding.chooseDiskRecyclerView.layoutManager = LinearLayoutManager(context)
 

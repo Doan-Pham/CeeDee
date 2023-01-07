@@ -47,7 +47,8 @@ class CustomerNewRentalFragment : Fragment() {
         binding.recyclerviewDisksToRent.adapter = disksToRentAdapter
         binding.recyclerviewDisksToRent.layoutManager = LinearLayoutManager(context)
         binding.buttonAddDiskToRent.setOnClickListener {
-            val disksToRentDialog = DiskToRentDialog()
+            val disksToRentDialog =
+                DiskToRentDialog { diskTitle -> viewModel.addDiskTitleToRent(diskTitle) }
             disksToRentDialog.show(childFragmentManager, "DISK_TO_ADD_DIALOG")
             //viewModel.addDiskTitleToImport(DiskTitle(name = "What"))
         }
