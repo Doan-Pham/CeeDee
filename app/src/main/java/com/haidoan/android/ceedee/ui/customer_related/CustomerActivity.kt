@@ -10,10 +10,13 @@ import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
 import com.haidoan.android.ceedee.R
+import com.haidoan.android.ceedee.data.customer.CustomerFireStoreDataSource
+import com.haidoan.android.ceedee.data.customer.CustomerRepository
 import com.haidoan.android.ceedee.databinding.ActivityCustomerBinding
 import com.haidoan.android.ceedee.ui.login.AuthenticationActivity
 import com.haidoan.android.ceedee.ui.login.AuthenticationRepository
@@ -28,8 +31,13 @@ class CustomerActivity : AppCompatActivity() {
             R.id.customer_disk_fragment, R.id.customer_rental_fragment
         )
     )
+    private lateinit var navController: NavController
     private val viewModel: CustomerActivityViewModel by viewModels {
-        CustomerActivityViewModel.Factory(AuthenticationRepository(application))
+        CustomerActivityViewModel.Factory(
+            AuthenticationRepository(application), CustomerRepository(
+                CustomerFireStoreDataSource()
+            )
+        )
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -37,7 +45,7 @@ class CustomerActivity : AppCompatActivity() {
         binding = ActivityCustomerBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val navController =
+        navController =
             (supportFragmentManager.findFragmentById(R.id.nav_host_fragment_activity_customer) as NavHostFragment).navController
 
         setSupportActionBar(binding.toolbar)
@@ -47,6 +55,13 @@ class CustomerActivity : AppCompatActivity() {
         viewModel.isUserSignedIn.observe(this) {
             if (it == true) {
                 viewModel.resetUser()
+            }
+        }
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            if (appBarConfiguration.topLevelDestinations.contains(destination.id)) {
+                binding.bottomNav.visibility = View.VISIBLE
+            } else {
+                binding.bottomNav.visibility = View.GONE
             }
         }
     }
@@ -89,6 +104,7 @@ class CustomerActivity : AppCompatActivity() {
             }
             R.id.menu_item_customer_cart -> {
                 Log.d(TAG, "menu_item_customer_cart Clicked")
+                navController.navigate(R.id.customerNewRentalFragment)
                 true
             }
             else -> super.onOptionsItemSelected(item)

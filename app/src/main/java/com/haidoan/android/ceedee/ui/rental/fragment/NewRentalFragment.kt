@@ -148,7 +148,6 @@ class NewRentalScreen : Fragment() {
 
     }
 
-
     private fun setAutoCompleteTextViewPhone() {
         binding.spinnerPhone.onItemClickListener =
             AdapterView.OnItemClickListener { _, _, position, _ ->

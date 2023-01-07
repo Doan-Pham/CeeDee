@@ -17,6 +17,10 @@ class CustomerFireStoreDataSource {
             }
         }
 
+    suspend fun getCustomerByPhone(phoneNumber: String) =
+        firestoreDb.collection("Customer").whereEqualTo("phone", phoneNumber).get().await()
+            .map { it.toObject(Customer::class.java) }
+
     suspend fun addCustomer(
         customerName: String?,
         customerAddress: String?,
@@ -42,5 +46,8 @@ class CustomerFireStoreDataSource {
             "fullName", fullName
         ).await()
     }
+
+    suspend fun addOrUpdateCustomer(customer: Customer): Void =
+        firestoreDb.collection("Customer").document(customer.id).set(customer).await()
 
 }

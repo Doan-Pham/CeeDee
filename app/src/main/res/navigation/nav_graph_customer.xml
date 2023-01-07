@@ -14,4 +14,9 @@
         android:name="com.haidoan.android.ceedee.ui.customer_related.rental.CustomerRentalFragment"
         android:label="Rental"
         tools:layout="@layout/fragment_customer_disk" />
+    <fragment
+        android:id="@+id/customerNewRentalFragment"
+        android:name="com.haidoan.android.ceedee.ui.customer_related.rental.CustomerNewRentalFragment"
+        android:label="New Rental"
+        tools:layout="@layout/fragment_customer_new_rental" />
 </navigation>
