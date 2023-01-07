@@ -7,7 +7,16 @@
     android:paddingStart="48dp"
     android:paddingEnd="48dp"
     tools:context=".ui.disk_screen.disk_details.DiskDetailsFragment">
-
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_gravity="center"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        />
     <androidx.cardview.widget.CardView
         android:id="@+id/cardView_disk_details"
         android:layout_width="wrap_content"

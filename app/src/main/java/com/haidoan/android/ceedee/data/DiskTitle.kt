@@ -13,4 +13,5 @@ data class DiskTitle(
     val description: String = "",
     val diskAmount: Long = 0,
     val diskInStoreAmount: Long = 0,
+    val totalRentalAmount: Long = 0,
 ) : Serializable
