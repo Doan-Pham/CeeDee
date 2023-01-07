@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.haidoan.android.ceedee.databinding.FragmentCustomerNewRentalBinding
 import com.haidoan.android.ceedee.ui.customer_related.CustomerActivityViewModel
@@ -65,10 +66,14 @@ class CustomerNewRentalFragment : Fragment() {
                     Toast.LENGTH_LONG
                 ).show()
             } else {
-                viewModel.addOrUpdate(
-                    binding.textviewCustomerPhone.text.toString(),
-                    binding.textviewCustomerName.text.toString(),
-                    binding.textviewCustomerAddress.text.toString()
+                val customerPhone = binding.textviewCustomerPhone.text.toString()
+                val customerName = binding.textviewCustomerName.text.toString()
+                val customerAddress = binding.textviewCustomerAddress.text.toString()
+
+                viewModel.addOrUpdateCustomerInfo(
+                    customerPhone,
+                    customerName,
+                    customerAddress
                 ).observe(viewLifecycleOwner) { result ->
                     when (result) {
                         is Response.Loading -> {
@@ -81,29 +86,30 @@ class CustomerNewRentalFragment : Fragment() {
                         }
                     }
                 }
-//                viewModel.addRental().observe(viewLifecycleOwner) { result ->
-//                    when (result) {
-//                        is Response.Loading -> {
-//                        }
-//                        is Response.Success -> {
-//                            Toast.makeText(
-//                                requireActivity(),
-//                                "Rental added!",
-//                                Toast.LENGTH_LONG
-//                            ).show()
-//                            viewModel.clearDiskTitleToRent()
-//
-//                            if (!isCurrentUserCustomer) {
-//                                findNavController().popBackStack()
-//                            }
-//                        }
-//                        is Response.Failure -> {
-//                            Log.d(NewRentalScreen.TAG, "Error: ${result.errorMessage}")
-//                        }
-//                    }
-//                }
-            }
 
+                viewModel.requestRental(
+                    customerPhone,
+                    customerName,
+                    customerAddress
+                ).observe(viewLifecycleOwner) { result ->
+                    when (result) {
+                        is Response.Loading -> {
+                        }
+                        is Response.Success -> {
+                            Toast.makeText(
+                                requireActivity(),
+                                "New rental request sent!",
+                                Toast.LENGTH_LONG
+                            ).show()
+                            viewModel.clearDiskTitleToRent()
+                            findNavController().popBackStack()
+                        }
+                        is Response.Failure -> {
+                            Log.d(NewRentalScreen.TAG, "Error: ${result.errorMessage}")
+                        }
+                    }
+                }
+            }
         }
 
     }

@@ -6,16 +6,20 @@ import com.google.firebase.auth.FirebaseUser
 import com.haidoan.android.ceedee.data.DiskTitle
 import com.haidoan.android.ceedee.data.customer.Customer
 import com.haidoan.android.ceedee.data.customer.CustomerRepository
+import com.haidoan.android.ceedee.data.disk_rental.DiskRentalRepository
+import com.haidoan.android.ceedee.ui.disk_screen.utils.Response
 import com.haidoan.android.ceedee.ui.login.AuthenticationRepository
 import com.haidoan.android.ceedee.ui.utils.toPhoneNumberWithoutCountryCode
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import okhttp3.internal.toImmutableMap
 
 private const val TAG = "CustomerActivityVM"
 
 class CustomerActivityViewModel(
     private val authenticationRepository: AuthenticationRepository,
-    private val customerRepository: CustomerRepository
+    private val customerRepository: CustomerRepository,
+    private val diskRentalRepository: DiskRentalRepository
 ) :
     ViewModel() {
 
@@ -23,7 +27,7 @@ class CustomerActivityViewModel(
     val isUserSignedIn = authenticationRepository.isUserSignedIn()
     val currentCustomer = MutableLiveData<Customer>(null)
 
-    fun addOrUpdate(customerPhone: String, customerName: String, customerAddress: String) =
+    fun addOrUpdateCustomerInfo(customerPhone: String, customerName: String, customerAddress: String) =
         liveData(context = viewModelScope.coroutineContext + Dispatchers.IO) {
             customerRepository.addOrUpdateCustomer(
                 Customer(
@@ -82,6 +86,10 @@ class CustomerActivityViewModel(
         //Log.d(TAG, "addDiskTitleToRent : ${disksToRent.value}")
     }
 
+    fun clearDiskTitleToRent() {
+        _disksToRentAndAmount.value = mutableMapOf()
+    }
+
     fun resetUser() {
         currentUser.value =
             authenticationRepository.currentUser
@@ -109,15 +117,40 @@ class CustomerActivityViewModel(
         }
     }
 
+    fun requestRental(customerPhone: String, customerName: String, customerAddress: String) =     liveData(context = viewModelScope.coroutineContext + Dispatchers.IO) {
+        emit(Response.Loading())
+
+        diskRentalRepository.addRental(
+            customerName,
+            customerAddress,
+            customerPhone,
+            _disksToRentAndAmount.value?.toImmutableMap()!!,
+            "In request"
+        ).collect {
+                response ->
+//            if (response is Response.Success) {
+//                disksRepository.rentDisksOfDiskTitleIds(
+//                    response.data?.id ?: "",
+//                    disksToRent.value?.mapKeys { it.key.id } ?: mutableMapOf()).collect {
+//                    diskTitlesRepository.updateDiskInStoreAmount(
+//                        disksToRent.value?.keys?.map { it.id } ?: listOf()).collect()
+//                }
+//            }
+            emit(response)
+        }
+    }
+
+
     class Factory(
         private val authenticationRepository: AuthenticationRepository,
-        private val customerRepository: CustomerRepository
+        private val customerRepository: CustomerRepository,
+        private val diskRentalRepository: DiskRentalRepository
     ) :
         ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             if (modelClass.isAssignableFrom(CustomerActivityViewModel::class.java)) {
                 @Suppress("UNCHECKED_CAST")
-                return CustomerActivityViewModel(authenticationRepository, customerRepository) as T
+                return CustomerActivityViewModel(authenticationRepository, customerRepository, diskRentalRepository) as T
             }
             throw IllegalArgumentException("Unable to construct viewmodel")
         }

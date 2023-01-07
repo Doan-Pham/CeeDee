@@ -17,6 +17,8 @@ import androidx.navigation.ui.setupWithNavController
 import com.haidoan.android.ceedee.R
 import com.haidoan.android.ceedee.data.customer.CustomerFireStoreDataSource
 import com.haidoan.android.ceedee.data.customer.CustomerRepository
+import com.haidoan.android.ceedee.data.disk_rental.DiskRentalFirestoreDataSource
+import com.haidoan.android.ceedee.data.disk_rental.DiskRentalRepository
 import com.haidoan.android.ceedee.databinding.ActivityCustomerBinding
 import com.haidoan.android.ceedee.ui.login.AuthenticationActivity
 import com.haidoan.android.ceedee.ui.login.AuthenticationRepository
@@ -36,7 +38,7 @@ class CustomerActivity : AppCompatActivity() {
         CustomerActivityViewModel.Factory(
             AuthenticationRepository(application), CustomerRepository(
                 CustomerFireStoreDataSource()
-            )
+            ), DiskRentalRepository(DiskRentalFirestoreDataSource())
         )
     }
 
