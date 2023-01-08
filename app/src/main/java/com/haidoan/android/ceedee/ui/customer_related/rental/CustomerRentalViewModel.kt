@@ -21,20 +21,25 @@ class CustomerRentalViewModel(
 
     fun setCurrentCustomerPhone(customerPhone: String) {
         _currentCustomerPhone.value = customerPhone.toPhoneNumberWithoutCountryCode()
-
         Log.d(
             TAG,
             "setCurrentCustomerPhone() - _currentCustomerPhone: ${_currentCustomerPhone.value}"
         )
     }
 
-    private val filteringCategory =
-        MutableLiveData(RentalFilterCategory.FILTER_BY_IN_PROGRESS)
+    private val _currentFilteringStatus = MutableLiveData("")
+    fun setFilteringStatus(status: String = "") {
+        _currentFilteringStatus.value = status
+        Log.d(
+            TAG,
+            "setFilteringStatus() - _currentFilteringStatus.value: ${_currentFilteringStatus.value}"
+        )
+    }
 
     private val rentalsModifications =
-        MediatorLiveData<Pair<String?, RentalFilterCategory?>>().apply {
-            addSource(_currentCustomerPhone) { value = Pair(it, filteringCategory.value) }
-            addSource(filteringCategory) { value = Pair(_currentCustomerPhone.value, it) }
+        MediatorLiveData<Pair<String?, String?>>().apply {
+            addSource(_currentCustomerPhone) { value = Pair(it, _currentFilteringStatus.value) }
+            addSource(_currentFilteringStatus) { value = Pair(_currentCustomerPhone.value, it) }
         }
 
     val rentals = rentalsModifications.switchMap { rentalsModifications ->
@@ -42,8 +47,8 @@ class CustomerRentalViewModel(
             diskRentalRepository.getRentalsByCustomerPhoneStream(rentalsModifications.first ?: "")
                 .collect {
                     emit(
-                        it.filter(
-                            rentalsModifications.second ?: RentalFilterCategory.FILTER_BY_IN_REQUEST
+                        it.filterByStatus(
+                            rentalsModifications.second ?: ""
                         )
                     )
                 }
@@ -61,19 +66,13 @@ class CustomerRentalViewModel(
     val rentalStatus: LiveData<List<RentalStatus>>
         get() = _rentalStatus
 
-    fun setFilteringCategory(inputFilteringCategory: RentalFilterCategory) {
-        filteringCategory.value = inputFilteringCategory
-    }
 
-    private fun List<Rental>.filter(filteringCategory: RentalFilterCategory) =
+    private fun List<Rental>.filterByStatus(status: String) =
         this.filter { individualRental ->
-            when (filteringCategory) {
-                RentalFilterCategory.FILTER_BY_IN_PROGRESS -> individualRental.rentalStatus == "In progress"
-                RentalFilterCategory.FILTER_BY_COMPLETE -> individualRental.rentalStatus == "Complete"
-                RentalFilterCategory.FILTER_BY_OVERDUE -> individualRental.rentalStatus == "Overdue"
-                RentalFilterCategory.FILTER_BY_IN_REQUEST -> individualRental.rentalStatus == "In request"
-            }
+//            Log.d(TAG, "individualRental.rentalStatus: ${individualRental.rentalStatus}, status: $status")
+            individualRental.rentalStatus == status
         }
+
 
     class Factory(
         private val diskRentalRepository: DiskRentalRepository,
@@ -88,11 +87,4 @@ class CustomerRentalViewModel(
             throw IllegalArgumentException("Unable to construct viewmodel")
         }
     }
-}
-
-enum class RentalFilterCategory {
-    FILTER_BY_COMPLETE,
-    FILTER_BY_OVERDUE,
-    FILTER_BY_IN_PROGRESS,
-    FILTER_BY_IN_REQUEST,
 }

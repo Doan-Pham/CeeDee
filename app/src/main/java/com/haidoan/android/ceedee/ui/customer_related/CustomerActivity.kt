@@ -36,7 +36,7 @@ class CustomerActivity : AppCompatActivity() {
     private lateinit var navController: NavController
     private val viewModel: CustomerActivityViewModel by viewModels {
         CustomerActivityViewModel.Factory(
-            AuthenticationRepository(application), CustomerRepository(
+            AuthenticationRepository(), CustomerRepository(
                 CustomerFireStoreDataSource()
             ), DiskRentalRepository(DiskRentalFirestoreDataSource())
         )

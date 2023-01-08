@@ -32,7 +32,7 @@ class UserManagementFragment : Fragment() {
     private val viewModel: UserManagementViewModel by lazy {
         ViewModelProvider(
             this, UserManagementViewModel.Factory(
-                AuthenticationRepository(requireActivity().application),
+                AuthenticationRepository(),
                 UserRepository(UserFirestoreDataSource())
             )
         )[UserManagementViewModel::class.java]

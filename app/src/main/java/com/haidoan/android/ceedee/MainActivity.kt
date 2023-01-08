@@ -43,7 +43,7 @@ class MainActivity : AppCompatActivity() {
         )
     )
     private val viewModel: MainActivityViewModel by viewModels {
-        MainActivityViewModel.Factory(AuthenticationRepository(application))
+        MainActivityViewModel.Factory(AuthenticationRepository())
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

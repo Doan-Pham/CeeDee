@@ -17,7 +17,7 @@ class AuthenticationViewModel(application: Application) : AndroidViewModel(appli
     private val isUserSignedIn: MutableLiveData<Boolean>
     private val requiredText: MutableLiveData<String>
     init {
-        repository = AuthenticationRepository(application)
+        repository = AuthenticationRepository()
         userRepository = UserRepository(UserFirestoreDataSource())
         isUserSignedIn = repository.isUserSignedIn()
         requiredText = repository.getRequiredTextMessage()
@@ -50,7 +50,7 @@ class AuthenticationViewModel(application: Application) : AndroidViewModel(appli
             emit(repository.signInWithPhoneAuthCredential(activity, credential))
         }
 
-    fun signOut() {
-        repository.signOut()
-    }
+//    fun signOut() {
+//        repository.signOut()
+//    }
 }

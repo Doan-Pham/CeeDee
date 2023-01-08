@@ -31,11 +31,7 @@ class CustomerRentalFragment : Fragment() {
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
-    private val filter_chip_ids = hashMapOf(
-        "In progress" to R.id.filter_chip_in_progress,
-        "In request" to R.id.filter_chip_in_request,
-        "Completed" to R.id.filter_chip_complete,
-        "Overdue" to R.id.filter_chip_overdue
+    private val filterChipIds = hashMapOf<String, Int>(
     )
     private val viewModel: CustomerRentalViewModel by viewModels {
         CustomerRentalViewModel.Factory(
@@ -69,18 +65,17 @@ class CustomerRentalFragment : Fragment() {
 
         viewModel.rentalStatus.observe(viewLifecycleOwner) { rentalStatus ->
             for (status in rentalStatus) {
+                filterChipIds[status.name] = View.generateViewId()
                 val chip =
                     inflater.inflate(R.layout.chip_choice, binding.chipGroupFilter, false) as Chip
                 chip.text = status.name
-                chip.id = filter_chip_ids[status.name] ?: R.id.filter_chip_unknown
-                if (chip.id == R.id.filter_chip_unknown) {
+                chip.id = filterChipIds[status.name] ?: R.id.filter_chip_unknown
+
+                if (chip.id == filterChipIds["Unknown"]) {
                     Log.e(
                         TAG,
                         "onCreateView() - viewModel.rentalStatus - Unknown rental status: ${status.name}"
                     )
-                }
-                if (status.name == "In progress") {
-                    chip.isChecked = true
                 }
                 binding.chipGroupFilter.addView(chip)
             }
@@ -97,22 +92,13 @@ class CustomerRentalFragment : Fragment() {
 
     private fun setUpChipGroup() {
         binding.chipGroupFilter.setOnCheckedStateChangeListener { group, _ ->
-            when (group.checkedChipId) {
-                R.id.filter_chip_complete -> viewModel.setFilteringCategory(
-                    RentalFilterCategory.FILTER_BY_COMPLETE
-                )
-                R.id.filter_chip_in_progress -> viewModel.setFilteringCategory(
-                    RentalFilterCategory.FILTER_BY_IN_PROGRESS
-                )
-                R.id.filter_chip_overdue -> viewModel.setFilteringCategory(
-                    RentalFilterCategory.FILTER_BY_OVERDUE
-                )
-                R.id.filter_chip_in_request -> viewModel.setFilteringCategory(
-                    RentalFilterCategory.FILTER_BY_IN_REQUEST
-                )
-            }
+            viewModel.setFilteringStatus(
+                filterChipIds.entries.find { it.value == group.checkedChipId }?.key ?: ""
+            )
             Log.d(TAG, "CheckId change: ${group.checkedChipId}")
         }
+        binding.chipGroupFilter.check(filterChipIds.values.first())
+        Log.d(TAG, "setUpChipGroup() -: ${filterChipIds.values.first()}")
     }
 
     private fun setUpRecyclerView() {
