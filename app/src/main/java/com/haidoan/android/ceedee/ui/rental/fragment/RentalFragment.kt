@@ -126,6 +126,9 @@ class RentalFragment : Fragment() {
                 R.id.chip_filter_by_in_request -> viewModel.setFilteringCategory(
                     RentalFilterCategory.FILTER_BY_IN_REQUEST
                 )
+                R.id.chip_filter_by_request_accepted -> viewModel.setFilteringCategory(
+                    RentalFilterCategory.FILTER_BY_REQUEST_ACCEPTED
+                )
                 R.id.chip_filter_by_all -> viewModel.setFilteringCategory(
                     RentalFilterCategory.FILTER_BY_ALL
                 )
@@ -172,12 +175,19 @@ class RentalFragment : Fragment() {
                         true
                     }
                     R.id.menu_item_rental_accept_request -> {
-                        createDialog(message = "Accept this rental made by customer: ${rental.customerName}?") { _, _ ->
+                        createDialog(message = "Accept this rental made by customer: ${rental.customerName} ?") { _, _ ->
                             viewModel.acceptRentalInRequest(
                                 rental
                             )
                         }
-
+                        true
+                    }
+                    R.id.menu_item_rental_start_accepted_rental -> {
+                        createDialog(message = "Start this rental made by customer: ${rental.customerName} ?") { _, _ ->
+                            viewModel.startAcceptedRental(
+                                rental
+                            )
+                        }
                         true
                     }
                     R.id.menu_item_rental_view_disk_titles -> {
@@ -188,7 +198,7 @@ class RentalFragment : Fragment() {
                         true
                     }
                     R.id.menu_item_rental_cancel -> {
-                        createDialog(message = "Cancel this rental made by customer: ${rental.customerName}?") { _, _ ->
+                        createDialog(message = "Cancel this rental made by customer: ${rental.customerName} ?") { _, _ ->
                             viewModel.cancelRental(
                                 rental
                             )
@@ -200,14 +210,27 @@ class RentalFragment : Fragment() {
             }
             inflate(R.menu.popup_menu_rental_more)
             when (rental.rentalStatus) {
-                "In request" -> menu.findItem(R.id.menu_item_rental_return_disk).isVisible = false
-                "In progress", "Overdue" -> menu.findItem(R.id.menu_item_rental_accept_request).isVisible =
-                    false
+                "In request" -> {
+                    menu.findItem(R.id.menu_item_rental_return_disk).isVisible = false
+                    menu.findItem(R.id.menu_item_rental_start_accepted_rental).isVisible = false
+                }
+                "In progress", "Overdue" -> {
+                    menu.findItem(R.id.menu_item_rental_accept_request).isVisible =
+                        false
+                    menu.findItem(R.id.menu_item_rental_start_accepted_rental).isVisible = false
+
+                }
                 "Complete" -> {
                     menu.findItem(R.id.menu_item_rental_return_disk).isVisible = false
                     menu.findItem(R.id.menu_item_rental_accept_request).isVisible =
                         false
                     menu.findItem(R.id.menu_item_rental_cancel).isVisible =
+                        false
+                    menu.findItem(R.id.menu_item_rental_start_accepted_rental).isVisible = false
+                }
+                "Request accepted" -> {
+                    menu.findItem(R.id.menu_item_rental_return_disk).isVisible = false
+                    menu.findItem(R.id.menu_item_rental_accept_request).isVisible =
                         false
                 }
             }
