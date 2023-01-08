@@ -155,6 +155,7 @@ class RentalFragment : Fragment() {
             }
 
             binding.recyclerviewRentals.adapter = rentalAdapter
+            binding.progressBar.visibility = View.GONE
         }
     }
 

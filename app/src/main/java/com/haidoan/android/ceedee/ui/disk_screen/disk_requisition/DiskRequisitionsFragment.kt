@@ -81,6 +81,7 @@ class DiskRequisitionsFragment : Fragment() {
             requisitionAdapter.submitList(
                 requisitions
             )
+            binding.progressBar.visibility = View.GONE
         }
     }
 

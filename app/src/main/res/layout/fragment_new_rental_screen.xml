@@ -65,7 +65,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:layout_weight="7"
-                android:text="@string/disks_to_import"
+                android:text="@string/disks_to_rent"
                 android:textColor="@color/black"
                 android:textSize="18sp"
                 android:textStyle="bold"

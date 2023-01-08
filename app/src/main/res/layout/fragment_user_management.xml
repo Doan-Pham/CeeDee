@@ -6,6 +6,13 @@
     android:layout_height="match_parent"
     tools:context=".ui.user_management.UserManagementFragment">
 
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_gravity="center"
+        />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerview_users"
         android:layout_width="match_parent"

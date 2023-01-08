@@ -96,6 +96,7 @@ class UserManagementFragment : Fragment() {
             usersAdapter.submitList(
                 users
             )
+            binding.progressBar.visibility = View.GONE
         }
 
         viewModel.userRoles.observe(viewLifecycleOwner) {

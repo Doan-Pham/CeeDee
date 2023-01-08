@@ -55,6 +55,7 @@ class DiskDetailsFragment : Fragment() {
             binding.tvDiskDetailsGenreName.text = genreName
             binding.tvDiskDetailsAmountName.text= "$amount CD"
             binding.tvDiskDetailsDescriptionName.text=diskTitle.description
+            binding.progressBar.visibility = View.GONE
         }
 
     }
