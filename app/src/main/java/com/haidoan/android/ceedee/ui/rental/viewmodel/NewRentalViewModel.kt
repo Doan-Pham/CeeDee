@@ -118,8 +118,9 @@ class NewRentalViewModel(
     }
 
     private fun isExistsCustomer(): Boolean {
-        _allCustomers.value?.forEach {
-            if (_customerPhone.value.equals(it.phone)) {
+        _allCustomers.value?.forEach { customer ->
+            if (_customerPhone.value.equals(customer.phone)) {
+                _customerId.postValue(customer.id)
                 return true
             }
         }

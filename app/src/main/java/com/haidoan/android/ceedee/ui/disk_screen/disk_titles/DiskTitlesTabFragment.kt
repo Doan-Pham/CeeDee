@@ -18,6 +18,7 @@ import androidx.navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.haidoan.android.ceedee.R
+import com.haidoan.android.ceedee.data.DiskTitle
 import com.haidoan.android.ceedee.data.Genre
 import com.haidoan.android.ceedee.databinding.FragmentDiskTabDiskTitlesBinding
 import com.haidoan.android.ceedee.ui.disk_screen.repository.GenreRepository
@@ -28,9 +29,12 @@ class DiskTitlesTabFragment : Fragment() {
     private var _binding: FragmentDiskTabDiskTitlesBinding? = null
 
     private lateinit var diskTitleAdapter: DiskTitlesAdapter
+    private lateinit var popularAdapter: PopularAdapter
     private lateinit var diskTitlesViewModel: DiskTitlesViewModel
 
     private lateinit var genreAdapter: GenreAdapter
+
+    private var popularList = listOf<DiskTitle>()
 
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -53,7 +57,7 @@ class DiskTitlesTabFragment : Fragment() {
         createMenu()
     }
 
-     fun init() {
+    fun init() {
         diskTitlesViewModel = ViewModelProvider(requireActivity())[DiskTitlesViewModel::class.java]
 
         diskTitleAdapter = DiskTitlesAdapter(requireActivity())
@@ -67,7 +71,7 @@ class DiskTitlesTabFragment : Fragment() {
             diskTitlesAdapter = diskTitleAdapter,
             fragmentDiskTitlesBinding = binding
         )
-
+        popularAdapter = PopularAdapter(requireActivity(),genreAdapter)
         diskTitleAdapter.setGenreAdapter(genreAdapter)
         diskTitlesViewModel.getDiskTitles().observe(viewLifecycleOwner) { response ->
             when (response) {
@@ -89,6 +93,9 @@ class DiskTitlesTabFragment : Fragment() {
                             diskTitleAdapter.itemCount.toString() + " Titles"
                     else binding.tvDiskTitlesTotal.text =
                         diskTitleAdapter.itemCount.toString() + " Title"
+
+                    popularList = list.sortedByDescending { it.totalRentalAmount }.take(5)
+                    popularAdapter.submitList(popularList.toMutableList())
                 }
                 is Response.Failure -> {
                     print(response.errorMessage)
@@ -121,9 +128,15 @@ class DiskTitlesTabFragment : Fragment() {
             }
         }
 
+        val myLinearLayoutManager = object : LinearLayoutManager(requireActivity()) {
+            override fun canScrollVertically(): Boolean {
+                return false
+            }
+        }
+
         binding.apply {
             rcvDiskTitles.apply {
-                layoutManager = LinearLayoutManager(activity)
+                layoutManager = myLinearLayoutManager
                 adapter = diskTitleAdapter
             }
             rcvGenres.apply {
@@ -133,6 +146,12 @@ class DiskTitlesTabFragment : Fragment() {
                 adapter = genreAdapter
             }
             (rcvGenres.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
+            rcvPopular.apply {
+                layoutManager = LinearLayoutManager(activity).apply {
+                    orientation = LinearLayoutManager.HORIZONTAL
+                }
+                adapter = popularAdapter
+            }
         }
     }
 

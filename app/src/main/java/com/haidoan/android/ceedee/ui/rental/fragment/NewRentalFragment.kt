@@ -104,11 +104,13 @@ class NewRentalScreen : Fragment() {
                 Toast.LENGTH_LONG
             ).show()
             else {
+                val spinnerPhoneText = binding.spinnerPhone.text.toString()
+                selectedCustomerId = customers.find { it.phone == spinnerPhoneText }?.id ?: ""
                 viewModel.setCustomerInformation(
                     selectedCustomerId,
                     binding.tvName.text.toString(),
                     binding.tvAddress.text.toString(),
-                    binding.spinnerPhone.text.toString()
+                    spinnerPhoneText
                 )
                 viewModel.proceedCustomer().observe(viewLifecycleOwner) { result ->
                     when (result) {
@@ -152,9 +154,14 @@ class NewRentalScreen : Fragment() {
     private fun setAutoCompleteTextViewPhone() {
         binding.spinnerPhone.onItemClickListener =
             AdapterView.OnItemClickListener { _, _, position, _ ->
-                binding.tvName.setText(customers[position].fullName)
-                binding.tvAddress.setText(customers[position].address)
-                selectedCustomerId = customers[position].id
+                val spinnerPhoneText = binding.spinnerPhone.text.toString()
+                binding.tvName.setText(
+                    customers.find { it.phone == spinnerPhoneText }?.fullName ?: ""
+                )
+                binding.tvAddress.setText(
+                    customers.find { it.phone == spinnerPhoneText }?.address ?: ""
+                )
+                selectedCustomerId = customers.find { it.phone == spinnerPhoneText }?.id ?: ""
             }
 
         if (isCurrentUserCustomer) {

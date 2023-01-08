@@ -27,6 +27,12 @@ class DiskTitlesViewModel(application: Application) : AndroidViewModel(applicati
         }
     }
 
+    fun getFiveDiskTitlesWithTotalRentalAmountDescending()= liveData(Dispatchers.IO) {
+        diskTitlesRepository.getFiveDiskTitlesWithTotalRentalAmountDescendingFromFireStore().collect { response ->
+            emit(response)
+        }
+    }
+
     fun getDiskTitleFilterByGenreId(id: String) = liveData(Dispatchers.IO) {
         diskTitlesRepository.getDiskTitleFilterByGenreIdFromFireStore(id).collect { response ->
             emit(response)

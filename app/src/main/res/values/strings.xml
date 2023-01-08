@@ -63,7 +63,7 @@
     <string name="email_colon">Email:</string>
     <string name="supplier">Supplier</string>
     <string name="supplier_email">Supplier email</string>
-    <string name="disks_to_import">Disks to Import</string>
+    <string name="disks_to_rent">Disks to Rent</string>
     <string name="amount">Amount:</string>
     <string name="_0_cd">0 CD</string>
     <string name="disk_title">Disk Title</string>
@@ -110,4 +110,5 @@
     <string name="complete">Complete</string>
     <string name="supplier_email_no_colon">Supplier email</string>
     <string name="title_activity_customer">CustomerActivity</string>
+    <string name="disks_to_import">Disks to Import</string>
 </resources>
