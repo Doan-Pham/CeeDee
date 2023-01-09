@@ -31,6 +31,7 @@ class CustomerDiskAdapter(private val onButtonOptionClick: (DiskTitle, View) -> 
                 imageviewDiskCover.load(diskTitle.coverImageUrl) {
                     crossfade(true)
                     placeholder(R.drawable.ic_disk_cover_placeholder_96)
+                    error(R.drawable.ic_disk_cover_placeholder_96)
                 }
                 buttonOptions.setOnClickListener {
                     onButtonOptionClick(diskTitle, buttonOptions)

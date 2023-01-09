@@ -64,6 +64,7 @@ class CustomerRentalFragment : Fragment() {
         }
 
         viewModel.rentalStatus.observe(viewLifecycleOwner) { rentalStatus ->
+            if (!rentalStatus.isNullOrEmpty()) binding.chipGroupFilter.removeAllViews()
             for (status in rentalStatus) {
                 filterChipIds[status.name] = View.generateViewId()
                 val chip =
