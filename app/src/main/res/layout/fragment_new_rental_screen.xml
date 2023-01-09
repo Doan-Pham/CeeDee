@@ -6,9 +6,17 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:paddingHorizontal="30dp"
+    android:gravity="center"
     tools:context=".ui.rental.fragment.NewRentalScreen">
+    <ProgressBar
+        android:id="@+id/progressbar"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_gravity="center"
 
+        android:visibility="gone" />
     <LinearLayout
+        android:id="@+id/linearlayout_content_wrapper"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="7"
@@ -96,7 +104,7 @@
         android:layout_marginTop="10dp"
         android:layout_marginBottom="20dp"
         android:background="@drawable/background_button_default"
-        android:text="@string/proceed"
+        android:text="Add new rental"
         android:textAllCaps="false"
         android:textStyle="bold"
         app:backgroundTint="@color/primary" />

@@ -86,6 +86,17 @@ class DiskRentalFirestoreDataSource {
     suspend fun acceptRentalInRequest(rentalId: String) =
         firestoreDb.collection("Rental").document(rentalId).update(
             mapOf(
+                "rentalStatus" to "Request accepted",
+                "rentDate" to Timestamp.now(),
+                "dueDate" to Timestamp(
+                    (LocalDate.now().plusDays(5).atStartOfDay(zoneId).toEpochSecond()), 0
+                )
+            )
+        ).await()
+
+    suspend fun startAcceptedRental(rentalId: String) =
+        firestoreDb.collection("Rental").document(rentalId).update(
+            mapOf(
                 "rentalStatus" to "In progress",
                 "rentDate" to Timestamp.now(),
                 "dueDate" to Timestamp(
@@ -97,4 +108,14 @@ class DiskRentalFirestoreDataSource {
     suspend fun deleteRental(rentalId: String) =
         firestoreDb.collection("Rental").document(rentalId).delete().await()
 
+    fun getRentalsByCustomerPhoneStream(customerPhone: String) =
+        firestoreDb
+            .collection("Rental")
+            .whereEqualTo("customerPhone", customerPhone)
+            .snapshots()
+            .mapNotNull { querySnapshot ->
+                querySnapshot.documents.mapNotNull {
+                    it.toObject(Rental::class.java)
+                }
+            }
 }

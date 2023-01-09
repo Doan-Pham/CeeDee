@@ -20,7 +20,7 @@ class RentalsViewModel(
 ) : ViewModel() {
 
     private val filteringCategory =
-        MutableLiveData(RentalFilterCategory.FILTER_BY_IN_PROGRESS)
+        MutableLiveData(RentalFilterCategory.FILTER_BY_IN_REQUEST)
 
     private val searchQuery = MutableLiveData("")
 
@@ -37,7 +37,7 @@ class RentalsViewModel(
             rentalsRepository.getRentalsStream()
                 .collect { rentals ->
                     val currentFilteringCategory = rentalsModifications.first
-                        ?: RentalFilterCategory.FILTER_BY_IN_PROGRESS
+                        ?: RentalFilterCategory.FILTER_BY_IN_REQUEST
                     val currentSearchQuery = rentalsModifications.second ?: ""
                     emit(
                         rentals.searchByCustomerName(currentSearchQuery)
@@ -70,6 +70,12 @@ class RentalsViewModel(
         }
     }
 
+    fun startAcceptedRental(rental: Rental) {
+        viewModelScope.launch {
+            rentalsRepository.startAcceptedRental(rental.id)
+        }
+    }
+
     fun cancelRental(rental: Rental) {
         viewModelScope.launch {
             rentalsRepository.deleteRental(rental.id)
@@ -99,7 +105,9 @@ class RentalsViewModel(
                 RentalFilterCategory.FILTER_BY_COMPLETE -> individualRental.rentalStatus == "Complete"
                 RentalFilterCategory.FILTER_BY_OVERDUE -> individualRental.rentalStatus == "Overdue"
                 RentalFilterCategory.FILTER_BY_IN_REQUEST -> individualRental.rentalStatus == "In request"
+                RentalFilterCategory.FILTER_BY_REQUEST_ACCEPTED -> individualRental.rentalStatus == "Request accepted"
                 RentalFilterCategory.FILTER_BY_ALL -> true
+
             }
         }
 
@@ -129,5 +137,6 @@ enum class RentalFilterCategory {
     FILTER_BY_OVERDUE,
     FILTER_BY_IN_PROGRESS,
     FILTER_BY_IN_REQUEST,
+    FILTER_BY_REQUEST_ACCEPTED,
     FILTER_BY_ALL
 }

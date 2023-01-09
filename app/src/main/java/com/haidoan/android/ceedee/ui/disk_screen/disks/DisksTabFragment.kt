@@ -23,6 +23,7 @@ import com.haidoan.android.ceedee.ui.disk_screen.repository.DiskStatusRepository
 import com.haidoan.android.ceedee.ui.disk_screen.utils.Response
 
 private const val TAG = "DisksTabFragment"
+
 class DisksTabFragment : Fragment() {
 
     private lateinit var diskAdapter: DiskAdapter
@@ -58,7 +59,13 @@ class DisksTabFragment : Fragment() {
         diskViewModel = ViewModelProvider(requireActivity())[DiskViewModel::class.java]
 
         diskAdapter = DiskAdapter(requireActivity(), diskViewModel, viewLifecycleOwner, this)
-        diskStatusAdapter = DiskStatusAdapter(requireActivity(), diskViewModel,viewLifecycleOwner,diskAdapter,binding)
+        diskStatusAdapter = DiskStatusAdapter(
+            requireActivity(),
+            diskViewModel,
+            viewLifecycleOwner,
+            diskAdapter,
+            binding
+        )
 
         diskViewModel.getDisks().observe(viewLifecycleOwner) { response ->
             when (response) {
@@ -131,8 +138,7 @@ class DisksTabFragment : Fragment() {
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
                 // Add menu items here
                 menuInflater.inflate(R.menu.menu_disk, menu)
-
-//                val menuItemNewRequisition =
+                //                val menuItemNewRequisition =
 //                    menu.findItem(R.id.menu_item_disk_tab_new_requisition)
 
 //                val newRequisitionActionView = (menuItemNewRequisition.actionView as FrameLayout)

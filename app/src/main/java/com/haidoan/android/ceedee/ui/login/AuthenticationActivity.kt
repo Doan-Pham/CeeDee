@@ -12,6 +12,7 @@ import com.google.firebase.ktx.Firebase
 import com.haidoan.android.ceedee.EXTRA_CURRENT_USER_PHONE_NUMBER
 import com.haidoan.android.ceedee.MainActivity
 import com.haidoan.android.ceedee.databinding.ActivityLoginBinding
+import com.haidoan.android.ceedee.ui.customer_related.CustomerActivity
 
 private const val TAG = "AuthenticationActivity"
 
@@ -30,6 +31,7 @@ class AuthenticationActivity : AppCompatActivity() {
             Log.d(TAG, "isUserSignedIn: $it")
             if (it == true) {
                 val i = Intent(this, MainActivity::class.java)
+                val iCustomer = Intent(this, CustomerActivity::class.java)
                 i.putExtra(
                     EXTRA_CURRENT_USER_PHONE_NUMBER,
                     authViewModel.getCurrentUser()?.phoneNumber ?: ""
@@ -38,8 +40,11 @@ class AuthenticationActivity : AppCompatActivity() {
                     TAG,
                     "authViewModel.getCurrentUser().value?.phoneNumber : ${authViewModel.getCurrentUser()?.phoneNumber}"
                 )
-                //i.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                startActivity(i)
+                if (!authViewModel.getCurrentUser()?.phoneNumber.isNullOrEmpty()) {
+                    startActivity(iCustomer)
+                } else {
+                    startActivity(i)
+                }
                 finish()
             }
         }

@@ -89,10 +89,10 @@ class DiskTitlesTabFragment : Fragment() {
                     diskTitleAdapter.submitList(list.toMutableList())
                     diskTitleAdapter.setAllDiskTitleFilterByGenre(list)
                     if (diskTitleAdapter.itemCount >= 2)
-                        binding.tvDiskTitlesTotal.text =
-                            diskTitleAdapter.itemCount.toString() + " Titles"
-                    else binding.tvDiskTitlesTotal.text =
-                        diskTitleAdapter.itemCount.toString() + " Title"
+//                        binding.tvDiskTitlesTotal.text =
+//                            diskTitleAdapter.itemCount.toString() + " Titles"
+//                    else binding.tvDiskTitlesTotal.text =
+//                        diskTitleAdapter.itemCount.toString() + " Title"
 
                     popularList = list.sortedByDescending { it.totalRentalAmount }.take(5)
                     popularAdapter.submitList(popularList.toMutableList())

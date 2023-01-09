@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.ImageView
-
 import androidx.core.net.toUri
 import androidx.core.os.bundleOf
 import androidx.navigation.findNavController
@@ -16,12 +15,13 @@ import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import com.haidoan.android.ceedee.R
 import com.haidoan.android.ceedee.data.DiskTitle
-import com.haidoan.android.ceedee.databinding.DiskTitlesItemBinding
 import com.haidoan.android.ceedee.databinding.ItemDiskTitlePopularBinding
 
 @SuppressLint("NotifyDataSetChanged")
-class PopularAdapter(private val context: Context,
-private val genreAdapter: GenreAdapter) :
+class PopularAdapter(
+    private val context: Context,
+    private val genreAdapter: GenreAdapter
+) :
     ListAdapter<DiskTitle, PopularAdapter.PopularViewHolder>(
         PopularUtils()
     ) {
@@ -52,6 +52,7 @@ private val genreAdapter: GenreAdapter) :
         fun setData(item: DiskTitle) {
             binding.apply {
                 tvPopularName.text = item.name
+                tvPopularName.text = item.author
             }
 
             bindImage(binding.imgPopularItem, item.coverImageUrl)

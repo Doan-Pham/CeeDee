@@ -15,7 +15,7 @@
             android:id="@+id/imageviewItem"
             android:layout_width="70dp"
             android:layout_height="70dp"
-            android:src="@drawable/clock" />
+            android:src="@drawable/ic_rented"/>
 
         <LinearLayout
             android:layout_width="match_parent"

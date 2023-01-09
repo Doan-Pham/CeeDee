@@ -52,6 +52,10 @@ class RentalSection(
                         imageviewItem.setImageResource(R.drawable.ic_in_request_black_24dp)
                         //buttonMore.visibility = View.VISIBLE
                     }
+                    "Request accepted" -> {
+                        imageviewItem.setImageResource(R.drawable.ic_request_accepted_blue_24)
+                        //buttonMore.visibility = View.VISIBLE
+                    }
                 }
                 tvCustomerName.text = rental.customerName
                 tvRentDate.text = convertToLocalDate(rental.rentDate)

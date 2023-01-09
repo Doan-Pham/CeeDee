@@ -109,5 +109,7 @@
     <string name="overdue">Overdue</string>
     <string name="complete">Complete</string>
     <string name="supplier_email_no_colon">Supplier email</string>
+    <string name="title_activity_customer">CustomerActivity</string>
     <string name="disks_to_import">Disks to Import</string>
+    <string name="request_accepted">Request accepted</string>
 </resources>

@@ -9,7 +9,7 @@
     tools:context=".ui.disk_screen.disk_import.DiskImportFragment">
 
     <ProgressBar
-        android:id="@+id/progressbar_import"
+        android:id="@+id/progressbar"
         android:layout_width="150dp"
         android:layout_height="150dp"
         android:layout_gravity="center"
@@ -177,7 +177,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="15dp"
                 android:layout_marginBottom="20dp"
-                android:text="@string/disks_to_import"
+                android:text="Disks to return"
                 android:textColor="@color/black"
                 android:textSize="18sp"
                 android:textStyle="bold"
@@ -278,7 +278,7 @@
             android:layout_marginBottom="20dp"
             android:background="@drawable/background_button_default"
             android:elevation="0dp"
-            android:text="@string/proceed"
+            android:text="Return disks"
             android:textAllCaps="false"
             android:textStyle="bold"
             app:backgroundTint="@color/primary" />

@@ -13,10 +13,10 @@
         android:layout_gravity="center"
         android:layout_marginEnd="5dp"
         android:contentDescription="@string/import_icon"
-        android:src="@drawable/ic_import_black_24dp" />
+        android:src="@drawable/ic_cart_black_24" />
 
     <TextView
-        android:id="@+id/textview_requisition_badge"
+        android:id="@+id/textview_badge"
         android:layout_width="16dp"
         android:layout_height="16dp"
         android:layout_gravity="end|top"

@@ -28,7 +28,7 @@ import com.haidoan.android.ceedee.data.DiskTitle
 import com.haidoan.android.ceedee.data.Genre
 import com.haidoan.android.ceedee.databinding.FragmentDiskAddEditBinding
 import com.haidoan.android.ceedee.ui.disk_screen.utils.Response
-import com.haidoan.android.ceedee.ui.report.util.PERMISSIONS
+import com.haidoan.android.ceedee.ui.utils.PERMISSIONS
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.InputStream

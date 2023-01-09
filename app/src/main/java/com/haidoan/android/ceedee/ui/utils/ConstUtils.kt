@@ -1,4 +1,4 @@
-package com.haidoan.android.ceedee.ui.report.util
+package com.haidoan.android.ceedee.ui.utils
 
 import android.Manifest
 import android.graphics.Color
@@ -6,6 +6,10 @@ import android.graphics.Color
 // Unit of measurement is pt, 1 pt = 1/72 inch
 val STANDARD_REPORT_PAGE_WIDTH = 595
 val STANDARD_REPORT_PAGE_HEIGHT = 842
+
+// Unit of measurement is pt, 1 pt = 1/72 inch
+val BILL_PAGE_WIDTH = 400
+val BILL_PAGE_HEIGHT = 500
 
 val PERMISSIONS = arrayOf(
     Manifest.permission.WRITE_EXTERNAL_STORAGE,

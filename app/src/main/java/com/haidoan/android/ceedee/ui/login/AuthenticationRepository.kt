@@ -1,25 +1,31 @@
 package com.haidoan.android.ceedee.ui.login
 
 import android.app.Activity
-import android.app.Application
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
+import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.*
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.messaging.FirebaseMessaging
 import com.haidoan.android.ceedee.data.User
+import com.haidoan.android.ceedee.data.notification.NotificationRepository
 import com.haidoan.android.ceedee.ui.disk_screen.utils.Response
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import java.util.concurrent.TimeUnit
 
 
 private const val TAG = "AuthenticationRepo"
 
-class AuthenticationRepository(private val application: Application) {
+class AuthenticationRepository {
     private val isUserSignedIn: MutableLiveData<Boolean> = MutableLiveData()
     var currentUser: FirebaseUser? = null
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
@@ -28,16 +34,35 @@ class AuthenticationRepository(private val application: Application) {
     private val firestoreDb: FirebaseFirestore = FirebaseFirestore.getInstance()
     private val defaultFirebaseApp = FirebaseApp.getInstance()
 
+    private val notificationRepository = NotificationRepository()
+    private val job = SupervisorJob()
+    private val scope = CoroutineScope(Dispatchers.IO + job)
+
     private val requiredText: MutableLiveData<String> = MutableLiveData()
 
     init {
         auth.addAuthStateListener {
-            Log.d(TAG, "Init - currentUser: ${it.currentUser?.uid}")
+            Log.d(TAG, "authStateListener - currentUser: ${it.currentUser?.uid}")
             currentUser = it.currentUser
-            if (it.currentUser != null) {
+            if (currentUser != null) {
+                val currentUserUid = it.currentUser?.uid
                 isUserSignedIn.postValue(true)
+                FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
+                    if (!task.isSuccessful) {
+                        Log.w(TAG, "Fetching FCM registration token failed", task.exception)
+                        return@OnCompleteListener
+                    }
+                    // Get new FCM registration token
+                    val token = task.result
+                    scope.launch {
+                        if (currentUserUid != null)
+                            notificationRepository.addToken(currentUserUid, token)
+                    }
+                    Log.d(TAG, "init() - Fetch current registration token : $token")
+                })
             } else {
                 isUserSignedIn.postValue(false)
+                job.cancel()
             }
         }
     }
@@ -136,6 +161,10 @@ class AuthenticationRepository(private val application: Application) {
     }
 
     fun signOut() {
+        val currentUserId = currentUser?.uid
+        scope.launch {
+            notificationRepository.deleteToken(currentUserId ?: "")
+        }
         auth.signOut()
         isUserSignedIn.postValue(false)
     }
@@ -154,7 +183,7 @@ class AuthenticationRepository(private val application: Application) {
         PhoneAuthProvider.verifyPhoneNumber(options)
     }
 
-    suspend fun signInWithPhoneAuthCredential(activity: Activity, credential: PhoneAuthCredential) =
+    fun signInWithPhoneAuthCredential(activity: Activity, credential: PhoneAuthCredential) =
         auth.signInWithCredential(credential)
 
 }

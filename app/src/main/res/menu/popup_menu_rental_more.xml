@@ -10,6 +10,10 @@
         android:title="Accept request"
         app:showAsAction="never" />
     <item
+        android:id="@+id/menu_item_rental_start_accepted_rental"
+        android:title="Start accepted rental"
+        app:showAsAction="never" />
+    <item
         android:id="@+id/menu_item_rental_view_disk_titles"
         android:title="View rented disk titles"
         app:showAsAction="never" />
