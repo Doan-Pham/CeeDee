@@ -64,7 +64,7 @@
     <fragment
         android:id="@+id/newRentalScreen"
         android:name="com.haidoan.android.ceedee.ui.rental.fragment.NewRentalScreen"
-        android:label="Rental Screen"
+        android:label="New Rental"
         tools:layout="@layout/fragment_new_rental_screen" />
     <fragment
         android:id="@+id/diskReturnFragment"

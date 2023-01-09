@@ -188,7 +188,7 @@ class UserManagementFragment : Fragment() {
         AlertDialog.Builder(context)
             .setTitle(title)
             .setMessage(message)
-            .setPositiveButton("Proceed", onPositiveButtonClick)
+            .setPositiveButton("Delete", onPositiveButtonClick)
             .setNegativeButton("Cancel") { _, _ -> }
             .create()
             .show()

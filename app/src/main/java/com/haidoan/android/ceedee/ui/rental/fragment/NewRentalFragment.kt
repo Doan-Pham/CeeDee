@@ -1,6 +1,7 @@
 package com.haidoan.android.ceedee.ui.rental.fragment
 
 
+import android.app.AlertDialog
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -104,51 +105,55 @@ class NewRentalScreen : Fragment() {
                 Toast.LENGTH_LONG
             ).show()
             else {
-                val spinnerPhoneText = binding.spinnerPhone.text.toString()
-                selectedCustomerId = customers.find { it.phone == spinnerPhoneText }?.id ?: ""
-                viewModel.setCustomerInformation(
-                    selectedCustomerId,
-                    binding.tvName.text.toString(),
-                    binding.tvAddress.text.toString(),
-                    spinnerPhoneText
-                )
-                viewModel.proceedCustomer().observe(viewLifecycleOwner) { result ->
-                    when (result) {
-                        is Response.Loading -> {
-                        }
-                        is Response.Success -> {
+                showConfirmationDialog {
+                    val spinnerPhoneText = binding.spinnerPhone.text.toString()
+                    selectedCustomerId = customers.find { it.phone == spinnerPhoneText }?.id ?: ""
+                    viewModel.setCustomerInformation(
+                        selectedCustomerId,
+                        binding.tvName.text.toString(),
+                        binding.tvAddress.text.toString(),
+                        spinnerPhoneText
+                    )
+                    viewModel.proceedCustomer().observe(viewLifecycleOwner) { result ->
+                        when (result) {
+                            is Response.Loading -> {
+                                binding.progressbar.visibility = View.VISIBLE
+                                binding.linearlayoutContentWrapper.visibility = View.GONE
+                                binding.btnProceed.visibility = View.GONE
+                            }
+                            is Response.Success -> {
 
-                        }
-                        is Response.Failure -> {
-                            Log.d(TAG, "Error: ${result.errorMessage}")
-                        }
-                    }
-                }
-                viewModel.addRental().observe(viewLifecycleOwner) { result ->
-                    when (result) {
-                        is Response.Loading -> {
-                        }
-                        is Response.Success -> {
-                            Toast.makeText(
-                                requireActivity(),
-                                "Rental added!",
-                                Toast.LENGTH_LONG
-                            ).show()
-                            viewModel.clearDiskTitleToRent()
-
-                            if (!isCurrentUserCustomer) {
-                                findNavController().popBackStack()
+                            }
+                            is Response.Failure -> {
+                                Log.d(TAG, "Error: ${result.errorMessage}")
                             }
                         }
-                        is Response.Failure -> {
-                            Log.d(TAG, "Error: ${result.errorMessage}")
+                    }
+                    viewModel.addRental().observe(viewLifecycleOwner) { result ->
+                        when (result) {
+                            is Response.Loading -> {
+                                binding.progressbar.visibility = View.VISIBLE
+                                binding.linearlayoutContentWrapper.visibility = View.GONE
+                                binding.btnProceed.visibility = View.GONE
+                            }
+                            is Response.Success -> {
+                                Toast.makeText(
+                                    requireActivity(),
+                                    "New rental added!",
+                                    Toast.LENGTH_LONG
+                                ).show()
+                                viewModel.clearDiskTitleToRent()
+
+                                findNavController().popBackStack()
+                            }
+                            is Response.Failure -> {
+                                Log.d(TAG, "Error: ${result.errorMessage}")
+                            }
                         }
                     }
                 }
             }
-
         }
-
     }
 
     private fun setAutoCompleteTextViewPhone() {
@@ -195,6 +200,15 @@ class NewRentalScreen : Fragment() {
                     customers.map { it.phone })
             )
         }
+    }
+
+    private fun showConfirmationDialog(onPositiveButtonClick: () -> Unit) {
+        AlertDialog.Builder(context)
+            .setTitle("Confirmation")
+            .setMessage("Add new rental for customer: ${binding.tvName.text} ?")
+            .setPositiveButton("Confirm") { _, _ -> onPositiveButtonClick() }
+            .setNegativeButton("Cancel") { _, _ -> }
+            .show()
     }
 
     companion object {

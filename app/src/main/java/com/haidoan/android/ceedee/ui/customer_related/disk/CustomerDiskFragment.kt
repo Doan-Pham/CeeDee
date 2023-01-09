@@ -119,7 +119,7 @@ class CustomerDiskFragment : Fragment() {
         binding.recyclerviewPopularDiskTitles.apply {
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
             adapter = popularDiskAdapter
-            addItemDecoration(MarginItemDecoration(spaceWidth = 48))
+            addItemDecoration(MarginItemDecoration(spaceWidth = 32))
         }
     }
 

@@ -238,7 +238,6 @@ class RentalFragment : Fragment() {
         }
     }
 
-
     private fun navigateToNewRentalFragment() {
         val action =
             RentalFragmentDirections.actionRentalFragmentToNewRentalScreen2()
@@ -250,13 +249,11 @@ class RentalFragment : Fragment() {
         message: String,
         onPositiveButtonClick: DialogInterface.OnClickListener
     ) {
-        // 1. Instantiate an <code><a href="/reference/android/app/AlertDialog.Builder.html">AlertDialog.Builder</a></code> with its constructor
-
         AlertDialog.Builder(context)
             .setTitle(title)
             .setMessage(message)
-            .setPositiveButton("Proceed", onPositiveButtonClick)
-            .setNegativeButton("Cancel") { _, _ -> }
+            .setPositiveButton("Confirm", onPositiveButtonClick)
+            .setNegativeButton("Exit") { _, _ -> }
             .create()
             .show()
     }

@@ -130,7 +130,7 @@ class DiskImportFragment : Fragment() {
 
     private fun showImportConfirmationDialog(onPositiveButtonClick: () -> Unit) {
         AlertDialog.Builder(context)
-            .setTitle("Import Confirmation")
+            .setTitle("Confirmation")
             .setMessage("Proceed with a new import? \nSupplier: ${binding.textviewSupplierName.text} \nTotal payment: ${binding.edittextTotalPayment.text}?")
             .setPositiveButton("Confirm") { _, _ -> onPositiveButtonClick() }
             .setNegativeButton("Cancel") { _, _ -> }

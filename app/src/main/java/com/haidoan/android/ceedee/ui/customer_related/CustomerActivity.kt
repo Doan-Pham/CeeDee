@@ -42,6 +42,8 @@ class CustomerActivity : AppCompatActivity() {
         )
     }
 
+    private var isShowMenuItemCart = true
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityCustomerBinding.inflate(layoutInflater)
@@ -62,8 +64,10 @@ class CustomerActivity : AppCompatActivity() {
         navController.addOnDestinationChangedListener { _, destination, _ ->
             if (appBarConfiguration.topLevelDestinations.contains(destination.id)) {
                 binding.bottomNav.visibility = View.VISIBLE
+                isShowMenuItemCart = true
             } else {
                 binding.bottomNav.visibility = View.GONE
+                isShowMenuItemCart = false
             }
         }
     }
@@ -93,6 +97,13 @@ class CustomerActivity : AppCompatActivity() {
         cartActionView.setOnClickListener {
             onOptionsItemSelected(menuItemCart)
         }
+
+        return true
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
+        menu?.findItem(R.id.menu_item_customer_cart)?.isVisible = isShowMenuItemCart
+
         return true
     }
 

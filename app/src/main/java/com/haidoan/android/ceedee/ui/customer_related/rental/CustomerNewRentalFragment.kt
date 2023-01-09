@@ -1,5 +1,7 @@
 package com.haidoan.android.ceedee.ui.customer_related.rental
 
+import android.app.AlertDialog
+import android.content.DialogInterface
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -69,46 +71,51 @@ class CustomerNewRentalFragment : Fragment() {
                 val customerPhone = binding.textviewCustomerPhone.text.toString()
                 val customerName = binding.textviewCustomerName.text.toString()
                 val customerAddress = binding.textviewCustomerAddress.text.toString()
+                createDialog(message = "Send a new rental request under this name: $customerName ?") { _, _ ->
+                    viewModel.addOrUpdateCustomerInfo(
+                        customerPhone,
+                        customerName,
+                        customerAddress
+                    ).observe(viewLifecycleOwner) { result ->
+                        when (result) {
+                            is Response.Loading -> {
+                            }
+                            is Response.Success -> {
 
-                viewModel.addOrUpdateCustomerInfo(
-                    customerPhone,
-                    customerName,
-                    customerAddress
-                ).observe(viewLifecycleOwner) { result ->
-                    when (result) {
-                        is Response.Loading -> {
+                            }
+                            is Response.Failure -> {
+                                Log.d(NewRentalScreen.TAG, "Error: ${result.errorMessage}")
+                            }
                         }
-                        is Response.Success -> {
+                    }
 
-                        }
-                        is Response.Failure -> {
-                            Log.d(NewRentalScreen.TAG, "Error: ${result.errorMessage}")
+                    viewModel.requestRental(
+                        customerPhone,
+                        customerName,
+                        customerAddress
+                    ).observe(viewLifecycleOwner) { result ->
+                        when (result) {
+                            is Response.Loading -> {
+                                binding.progressbar.visibility = View.VISIBLE
+                                binding.linearlayoutContentWrapper.visibility = View.GONE
+                                binding.buttonRequestRental.visibility = View.GONE
+                            }
+                            is Response.Success -> {
+                                Toast.makeText(
+                                    requireActivity(),
+                                    "New rental request sent!",
+                                    Toast.LENGTH_LONG
+                                ).show()
+                                viewModel.clearDiskTitleToRent()
+                                findNavController().popBackStack()
+                            }
+                            is Response.Failure -> {
+                                Log.d(NewRentalScreen.TAG, "Error: ${result.errorMessage}")
+                            }
                         }
                     }
                 }
 
-                viewModel.requestRental(
-                    customerPhone,
-                    customerName,
-                    customerAddress
-                ).observe(viewLifecycleOwner) { result ->
-                    when (result) {
-                        is Response.Loading -> {
-                        }
-                        is Response.Success -> {
-                            Toast.makeText(
-                                requireActivity(),
-                                "New rental request sent!",
-                                Toast.LENGTH_LONG
-                            ).show()
-                            viewModel.clearDiskTitleToRent()
-                            findNavController().popBackStack()
-                        }
-                        is Response.Failure -> {
-                            Log.d(NewRentalScreen.TAG, "Error: ${result.errorMessage}")
-                        }
-                    }
-                }
             }
         }
 
@@ -132,5 +139,21 @@ class CustomerNewRentalFragment : Fragment() {
                     it.phoneNumber?.toPhoneNumberWithoutCountryCode()
             }
         }
+    }
+
+    private fun createDialog(
+        title: String = "Confirmation",
+        message: String,
+        onPositiveButtonClick: DialogInterface.OnClickListener
+    ) {
+        // 1. Instantiate an <code><a href="/reference/android/app/AlertDialog.Builder.html">AlertDialog.Builder</a></code> with its constructor
+
+        AlertDialog.Builder(context)
+            .setTitle(title)
+            .setMessage(message)
+            .setPositiveButton("Request", onPositiveButtonClick)
+            .setNegativeButton("Cancel") { _, _ -> }
+            .create()
+            .show()
     }
 }

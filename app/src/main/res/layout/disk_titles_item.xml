@@ -39,20 +39,21 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Kid A"
+            android:textColor="@color/black"
             android:textStyle="bold" />
 
         <TextView
             android:id="@+id/tv_disk_titles_author"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-
+            android:textColor="@color/black"
             android:text="Radio head" />
 
         <TextView
             android:id="@+id/tv_disk_titles_amount"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-
+            android:textColor="@color/black"
             android:text="In store: 34CD" />
     </LinearLayout>
 

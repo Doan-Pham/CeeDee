@@ -79,6 +79,10 @@ class CustomerRentalFragment : Fragment() {
                 }
                 binding.chipGroupFilter.addView(chip)
             }
+            if (filterChipIds.values.firstOrNull() != null){
+                binding.chipGroupFilter.check(filterChipIds.values.first() )
+                Log.d(TAG, "viewModel.rentalStatus.observe() -: ${filterChipIds.values.first()}")
+            }
         }
         return binding.root
     }
@@ -97,8 +101,10 @@ class CustomerRentalFragment : Fragment() {
             )
             Log.d(TAG, "CheckId change: ${group.checkedChipId}")
         }
-        binding.chipGroupFilter.check(filterChipIds.values.first())
-        Log.d(TAG, "setUpChipGroup() -: ${filterChipIds.values.first()}")
+        if (filterChipIds.values.firstOrNull() != null){
+            binding.chipGroupFilter.check(filterChipIds.values.first() )
+            Log.d(TAG, "setUpChipGroup() -: ${filterChipIds.values.first()}")
+        }
     }
 
     private fun setUpRecyclerView() {

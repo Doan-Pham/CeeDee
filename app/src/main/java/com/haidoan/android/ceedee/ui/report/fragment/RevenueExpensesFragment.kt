@@ -36,9 +36,11 @@ import com.haidoan.android.ceedee.R
 import com.haidoan.android.ceedee.data.report.FirestoreStatisticsDataSource
 import com.haidoan.android.ceedee.data.report.ReportRepository
 import com.haidoan.android.ceedee.databinding.FragmentRevenueExpensesBinding
-import com.haidoan.android.ceedee.ui.report.util.*
 import com.haidoan.android.ceedee.ui.report.util.ImageUtils.Companion.resizeBitmap
+import com.haidoan.android.ceedee.ui.report.util.MonthYearPickerDialog
+import com.haidoan.android.ceedee.ui.report.util.MonthYearXAxisValueFormatter
 import com.haidoan.android.ceedee.ui.report.viewmodel.ReportViewModel
+import com.haidoan.android.ceedee.ui.utils.*
 import java.io.File
 import java.io.FileOutputStream
 import java.text.DecimalFormat
@@ -131,7 +133,6 @@ class RevenueExpensesFragment : Fragment() {
         setUpTextViewChooseEndTime()
         setUpOptionMenu()
         setUpButtonPrint()
-        setUpButtonOpenPdf()
 
         viewModel.monthlyRevenue.observe(viewLifecycleOwner) {
             styleLineChart()
@@ -215,7 +216,8 @@ class RevenueExpensesFragment : Fragment() {
                 .setMessage(R.string.chart_print_note)
                 .setPositiveButton("Print") { _, _ ->
                     printReportAsPdf()
-                    enabledButtonViewPdfFile()
+                    if (handlePermission())
+                        openPdf()
                 }
                 .setNegativeButton("Cancel") { dialog, _ -> dialog.cancel() }
                 .create()
@@ -339,24 +341,14 @@ class RevenueExpensesFragment : Fragment() {
         reportAsPdf.close()
     }
 
-    private fun setUpButtonOpenPdf() {
-        binding.buttonViewPdf.setOnClickListener {
-            // on below line we are checking permission
-            if (!handlePermission()) return@setOnClickListener
 
-            openPdf()
-        }
-    }
-    private fun enabledButtonViewPdfFile() {
-        binding.buttonViewPdf.visibility = View.VISIBLE
-    }
     private fun openPdf() {
         val file = pdfFile
         val target = Intent(Intent.ACTION_VIEW)
         target.setDataAndType(Uri.fromFile(file), "application/pdf")
         target.flags = Intent.FLAG_ACTIVITY_NO_HISTORY
 
-        val intent = Intent.createChooser(target, "Open File")
+        val intent = Intent.createChooser(target, "Open report file with")
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         try {
             requireContext().startActivity(intent)

@@ -13,13 +13,13 @@ class MarginItemDecoration(private val spaceHeight: Int = 0, private val spaceWi
         with(outRect) {
             bottom = spaceHeight
             right = spaceWidth
-            if (parent.getChildAdapterPosition(view) == 0) {
-                top = 0
-                left = 0
-            } else if (parent.getChildAdapterPosition(view) == parent.childCount - 1) {
-                bottom = 0
-                right = 0
-            }
+//            if (parent.getChildAdapterPosition(view) == 0) {
+//                top = 0
+//                left = 0}
+//            } else if (parent.getChildAdapterPosition(view) == parent.childCount) {
+//                bottom = 0
+//                right = 0
+//            }
         }
     }
 }

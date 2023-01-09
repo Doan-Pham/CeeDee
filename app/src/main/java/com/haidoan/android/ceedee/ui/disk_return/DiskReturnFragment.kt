@@ -1,6 +1,7 @@
 package com.haidoan.android.ceedee.ui.disk_return
 
 import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -25,7 +26,6 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
-
 import com.haidoan.android.ceedee.R
 import com.haidoan.android.ceedee.data.disk_rental.DiskRentalFirestoreDataSource
 import com.haidoan.android.ceedee.data.disk_rental.DiskRentalRepository
@@ -34,12 +34,7 @@ import com.haidoan.android.ceedee.ui.disk_screen.repository.DiskTitlesRepository
 import com.haidoan.android.ceedee.ui.disk_screen.repository.DisksRepository
 import com.haidoan.android.ceedee.ui.disk_screen.utils.Response
 import com.haidoan.android.ceedee.ui.rental.adapters.DisksToReturnAdapter
-
-import com.haidoan.android.ceedee.ui.report.util.PERMISSIONS
-import com.haidoan.android.ceedee.ui.report.util.STANDARD_REPORT_PAGE_HEIGHT
-import com.haidoan.android.ceedee.ui.report.util.STANDARD_REPORT_PAGE_WIDTH
-import com.haidoan.android.ceedee.ui.utils.toFormattedCurrencyString
-import com.haidoan.android.ceedee.ui.utils.toFormattedString
+import com.haidoan.android.ceedee.ui.utils.*
 import java.io.File
 import java.io.FileOutputStream
 import java.time.LocalDate
@@ -142,27 +137,30 @@ class DiskReturnFragment : Fragment() {
 
     private fun setUpButtonProceed() {
         binding.buttonProceed.setOnClickListener {
-            viewModel.completeRental().observe(viewLifecycleOwner) { response ->
-                when (response) {
-                    is Response.Loading -> {
-                        binding.linearlayoutContentWrapper.visibility = View.GONE
-                        binding.progressbarImport.visibility = View.VISIBLE
-                    }
-                    is Response.Failure -> {}
-                    is Response.Success -> {
-                        findNavController().popBackStack()
-                        Toast.makeText(
-                            requireActivity(),
-                            "Disk returned!",
-                            Toast.LENGTH_LONG
-                        ).show()
+            showConfirmationDialog {
+                if (handlePermission()) {
+                    printReportAsPdf()
+                    openPdf()
+                }
+                viewModel.completeRental().observe(viewLifecycleOwner) { response ->
+                    when (response) {
+                        is Response.Loading -> {
+                            binding.linearlayoutContentWrapper.visibility = View.GONE
+                            binding.progressbar.visibility = View.VISIBLE
+                        }
+                        is Response.Failure -> {}
+                        is Response.Success -> {
+                            findNavController().popBackStack()
+                            Toast.makeText(
+                                requireActivity(),
+                                "Disks returned!",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
                     }
                 }
             }
 
-            if (!handlePermission()) return@setOnClickListener
-            printReportAsPdf()
-            openPdf()
         }
     }
 
@@ -172,7 +170,7 @@ class DiskReturnFragment : Fragment() {
         target.setDataAndType(Uri.fromFile(file), "application/pdf")
         target.flags = Intent.FLAG_ACTIVITY_NO_HISTORY
 
-        val intent = Intent.createChooser(target, "Open File")
+        val intent = Intent.createChooser(target, "Open bill PDF file with")
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         try {
             requireContext().startActivity(intent)
@@ -192,11 +190,12 @@ class DiskReturnFragment : Fragment() {
         val overdueDateCount = binding.textviewOverdueDateCount.text.toString()
         val overdueFee = binding.textviewOverdueFee.text.toString()
 
+        val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH.mm")
         val totalPayment = binding.textviewTotalPayment.text.toString()
 
         val reportAsPdf = PdfDocument()
         val pageInfo: PdfDocument.PageInfo? = PdfDocument.PageInfo.Builder(
-            STANDARD_REPORT_PAGE_WIDTH, STANDARD_REPORT_PAGE_HEIGHT, 1
+            BILL_PAGE_WIDTH, BILL_PAGE_HEIGHT, 1
         ).create()
         val firstPage: PdfDocument.Page = reportAsPdf.startPage(pageInfo)
         val pageCanvas: Canvas = firstPage.canvas
@@ -212,212 +211,219 @@ class DiskReturnFragment : Fragment() {
         textPaint.color = ContextCompat.getColor(requireActivity(), R.color.black)
         textPaint.textAlign = Paint.Align.CENTER
 
-        textPaint.textSize = 18f
+        textPaint.textSize = 16f
         textPaint.isFakeBoldText = true
 
+        var currentY = 40f
         pageCanvas.drawText(
-            "Customer",
+            "CeeDee - CD Rental Shop",
             pageCanvas.width / 2f,
-            60f,
+            currentY,
             textPaint
         )
 
+        currentY += 20f
+        pageCanvas.drawText(
+            "Rental Bill",
+            pageCanvas.width / 2f,
+            currentY,
+            textPaint
+        )
+
+        currentY += 20f
         // Draw Name
         textPaint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.NORMAL)
         textPaint.color = ContextCompat.getColor(requireActivity(), R.color.black)
-        textPaint.textAlign = Paint.Align.LEFT
+        textPaint.textAlign = Paint.Align.CENTER
 
-        textPaint.textSize = 14f
-        textPaint.isFakeBoldText = true
-
-        pageCanvas.drawText(
-            "Name:",
-            pageCanvas.width / 8f,
-            80f,
-            textPaint
-        )
-        textPaint.color = ContextCompat.getColor(requireActivity(), R.color.dark_grey)
         textPaint.textSize = 14f
         textPaint.isFakeBoldText = false
 
         pageCanvas.drawText(
-            customerName,
-            pageCanvas.width * 3 / 8f,
-            80f,
+            "Date: ${formatter.format(LocalDateTime.now())}",
+            pageCanvas.width / 2f,
+            currentY,
             textPaint
         )
 
+
+        currentY += 40f
+        textPaint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.NORMAL)
+        textPaint.color = ContextCompat.getColor(requireActivity(), R.color.black)
+        textPaint.textAlign = Paint.Align.LEFT
+
+        textPaint.textSize = 12f
+        textPaint.isFakeBoldText = true
+
+        pageCanvas.drawText(
+            "Customer name:",
+            pageCanvas.width / 8f,
+            currentY,
+            textPaint
+        )
+
+        textPaint.color = ContextCompat.getColor(requireActivity(), R.color.dark_grey)
+        textPaint.textSize = 12f
+        textPaint.isFakeBoldText = false
+        pageCanvas.drawText(
+            customerName,
+            pageCanvas.width * 4 / 8f,
+            currentY,
+            textPaint
+        )
+
+        currentY += 20f
         // Draw phone
         textPaint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.NORMAL)
         textPaint.color = ContextCompat.getColor(requireActivity(), R.color.black)
         textPaint.textAlign = Paint.Align.LEFT
 
-        textPaint.textSize = 14f
+        textPaint.textSize = 12f
         textPaint.isFakeBoldText = true
 
         pageCanvas.drawText(
-            "Phone:",
+            "Customer phone:",
             pageCanvas.width / 8f,
-            100f,
+            currentY,
             textPaint
         )
         textPaint.color = ContextCompat.getColor(requireActivity(), R.color.dark_grey)
-        textPaint.textSize = 14f
+        textPaint.textSize = 12f
         textPaint.isFakeBoldText = false
 
         pageCanvas.drawText(
             customerPhone,
-            pageCanvas.width * 3 / 8f,
-            100f,
+            pageCanvas.width * 4 / 8f,
+            currentY,
             textPaint
         )
 
+        currentY += 20f
         // Draw address
         textPaint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.NORMAL)
         textPaint.color = ContextCompat.getColor(requireActivity(), R.color.black)
         textPaint.textAlign = Paint.Align.LEFT
 
-        textPaint.textSize = 14f
+        textPaint.textSize = 12f
         textPaint.isFakeBoldText = true
 
         pageCanvas.drawText(
-            "Address:",
+            "Customer address:",
             pageCanvas.width / 8f,
-            120f,
+            currentY,
             textPaint
         )
         textPaint.color = ContextCompat.getColor(requireActivity(), R.color.dark_grey)
-        textPaint.textSize = 14f
+        textPaint.textSize = 12f
         textPaint.isFakeBoldText = false
 
         pageCanvas.drawText(
             customerAddress,
-            pageCanvas.width * 3 / 8f,
-            120f,
+            pageCanvas.width * 4 / 8f,
+            currentY,
             textPaint
         )
 
 
-        // Draw rent date
-        textPaint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.NORMAL)
-        textPaint.color = ContextCompat.getColor(requireActivity(), R.color.black)
-        textPaint.textAlign = Paint.Align.LEFT
+//        // Draw rent date
+//        textPaint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.NORMAL)
+//        textPaint.color = ContextCompat.getColor(requireActivity(), R.color.black)
+//        textPaint.textAlign = Paint.Align.LEFT
+//
+//        textPaint.textSize = 14f
+//        textPaint.isFakeBoldText = true
+//
+//        pageCanvas.drawText(
+//            "Rent Date:",
+//            pageCanvas.width / 8f,
+//            140f,
+//            textPaint
+//        )
+//        textPaint.color = ContextCompat.getColor(requireActivity(), R.color.dark_grey)
+//        textPaint.textSize = 14f
+//        textPaint.isFakeBoldText = false
+//
+//        pageCanvas.drawText(
+//            customerRentDate,
+//            pageCanvas.width * 3 / 8f,
+//            140f,
+//            textPaint
+//        )
+//
+//        // Draw due date
+//        textPaint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.NORMAL)
+//        textPaint.color = ContextCompat.getColor(requireActivity(), R.color.black)
+//        textPaint.textAlign = Paint.Align.LEFT
+//
+//        textPaint.textSize = 14f
+//        textPaint.isFakeBoldText = true
+//
+//        pageCanvas.drawText(
+//            "Due Date:",
+//            pageCanvas.width / 8f,
+//            160f,
+//            textPaint
+//        )
+//        textPaint.color = ContextCompat.getColor(requireActivity(), R.color.dark_grey)
+//        textPaint.textSize = 14f
+//        textPaint.isFakeBoldText = false
+//
+//        pageCanvas.drawText(
+//            customerDueDate,
+//            pageCanvas.width * 3 / 8f,
+//            160f,
+//            textPaint
+//        )
 
-        textPaint.textSize = 14f
-        textPaint.isFakeBoldText = true
-
-        pageCanvas.drawText(
-            "Rent Date:",
-            pageCanvas.width / 8f,
-            140f,
-            textPaint
-        )
-        textPaint.color = ContextCompat.getColor(requireActivity(), R.color.dark_grey)
-        textPaint.textSize = 14f
-        textPaint.isFakeBoldText = false
-
-        pageCanvas.drawText(
-            customerRentDate,
-            pageCanvas.width * 3 / 8f,
-            140f,
-            textPaint
-        )
-
-        // Draw due date
-        textPaint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.NORMAL)
-        textPaint.color = ContextCompat.getColor(requireActivity(), R.color.black)
-        textPaint.textAlign = Paint.Align.LEFT
-
-        textPaint.textSize = 14f
-        textPaint.isFakeBoldText = true
-
-        pageCanvas.drawText(
-            "Due Date:",
-            pageCanvas.width / 8f,
-            160f,
-            textPaint
-        )
-        textPaint.color = ContextCompat.getColor(requireActivity(), R.color.dark_grey)
-        textPaint.textSize = 14f
-        textPaint.isFakeBoldText = false
-
-        pageCanvas.drawText(
-            customerDueDate,
-            pageCanvas.width * 3 / 8f,
-            160f,
-            textPaint
-        )
-
-        // Draw disk to import title
-        textPaint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.NORMAL)
-        textPaint.color = ContextCompat.getColor(requireActivity(), R.color.black)
-        textPaint.textAlign = Paint.Align.CENTER
-
-        textPaint.textSize = 18f
-        textPaint.isFakeBoldText = true
-
-        pageCanvas.drawText(
-            "Disk to Import",
-            pageCanvas.width / 2f,
-            180f,
-            textPaint
-        )
+//        // Draw disk to import title
+//        textPaint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.NORMAL)
+//        textPaint.color = ContextCompat.getColor(requireActivity(), R.color.black)
+//        textPaint.textAlign = Paint.Align.CENTER
+//
+//        textPaint.textSize = 18f
+//        textPaint.isFakeBoldText = true
+//
+//        pageCanvas.drawText(
+//            "Disk to Import",
+//            pageCanvas.width / 2f,
+//            180f,
+//            textPaint
+//        )
 
         // Draw disk
-        val diskTitleToReturn = diskTitlesToReturnAdapter.currentList.last()
-        // TODO: </ draw image
+        currentY += 40f
+        diskTitlesToReturnAdapter.currentList.forEach { diskTitleAmountPayment ->
+            textPaint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.NORMAL)
+            textPaint.color = ContextCompat.getColor(requireActivity(), R.color.black)
+            textPaint.textAlign = Paint.Align.LEFT
 
-
-        textPaint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.NORMAL)
-        textPaint.color = ContextCompat.getColor(requireActivity(), R.color.black)
-        textPaint.textAlign = Paint.Align.LEFT
-
-        textPaint.textSize = 14f
-        textPaint.isFakeBoldText = true
-
-        pageCanvas.drawText(
-            diskTitleToReturn.first.name,
-            pageCanvas.width / 8f,
-            200f,
-            textPaint
-        )
-        textPaint.color = ContextCompat.getColor(requireActivity(), R.color.dark_grey)
-        textPaint.textSize = 14f
-        textPaint.isFakeBoldText = false
-
-        pageCanvas.drawText(
-            "Amount: ${diskTitleToReturn.second} CD",
-            pageCanvas.width * 3 / 8f,
-            200f,
-            textPaint
-        )
-
-        // TODO: draw image />
-
-        // Draw Overdue title
-        textPaint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.NORMAL)
-        textPaint.color = ContextCompat.getColor(requireActivity(), R.color.primary)
-        textPaint.textAlign = Paint.Align.CENTER
-
-        textPaint.textSize = 18f
-        textPaint.isFakeBoldText = true
-
+            textPaint.textSize = 14f
+            textPaint.isFakeBoldText = false
+            pageCanvas.drawText(
+                diskTitleAmountPayment.first.name,
+                pageCanvas.width / 8f,
+                currentY,
+                textPaint
+            )
+            pageCanvas.drawText(
+                "${diskTitleAmountPayment.second} CD",
+                pageCanvas.width * 4 / 8f,
+                currentY,
+                textPaint
+            )
+            pageCanvas.drawText(
+                diskTitleAmountPayment.third.toFormattedCurrencyString(),
+                pageCanvas.width * 6 / 8f,
+                currentY,
+                textPaint
+            )
+            currentY += 20f
+        }
+        currentY += 20f
         pageCanvas.drawText(
             "Overdue:",
-            pageCanvas.width / 8f,
-            240f,
-            textPaint
-        )
-
-        // Draw OverdueDateCount
-        textPaint.color = ContextCompat.getColor(requireActivity(), R.color.dark_grey)
-        textPaint.textSize = 14f
-        textPaint.isFakeBoldText = false
-
-        pageCanvas.drawText(
-            overdueDateCount,
-            pageCanvas.width / 8f,
-            260f,
+            pageCanvas.width * 4 / 8f,
+            currentY,
             textPaint
         )
 
@@ -427,24 +433,25 @@ class DiskReturnFragment : Fragment() {
         textPaint.isFakeBoldText = false
 
         pageCanvas.drawText(
-            overdueFee,
-            pageCanvas.width / 8f,
-            260f,
+            if (overdueFee.isNotBlank()) overdueFee else "0 VND",
+            pageCanvas.width * 6 / 8f,
+            currentY,
             textPaint
         )
 
         // Draw TotalPayment
         textPaint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.NORMAL)
         textPaint.color = ContextCompat.getColor(requireActivity(), R.color.black)
-        textPaint.textAlign = Paint.Align.CENTER
+        textPaint.textAlign = Paint.Align.LEFT
 
         textPaint.textSize = 18f
         textPaint.isFakeBoldText = true
 
+        currentY += 20f
         pageCanvas.drawText(
             "Total:",
-            pageCanvas.width / 8f,
-            280f,
+            pageCanvas.width * 4 / 8f,
+            currentY,
             textPaint
         )
         textPaint.color = ContextCompat.getColor(requireActivity(), R.color.dark_grey)
@@ -453,28 +460,22 @@ class DiskReturnFragment : Fragment() {
 
         pageCanvas.drawText(
             totalPayment,
-            pageCanvas.width / 8f,
-            300f,
+            pageCanvas.width * 6 / 8f,
+            currentY,
             textPaint
         )
 
         reportAsPdf.finishPage(firstPage)
-
-        val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm")
         val fileOutput = File(
             Environment.getExternalStorageDirectory(),
-            "Report_Disk_${formatter.format(LocalDateTime.now())}.pdf"
+            "Bill_${
+                DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm").format(LocalDateTime.now())
+            }.pdf"
         )
         pdfFile = fileOutput
         val outputStream = FileOutputStream(fileOutput)
         try {
             reportAsPdf.writeTo(outputStream)
-            Toast.makeText(
-                requireActivity(),
-                "PDF file generated..",
-                Toast.LENGTH_SHORT
-            ).show()
-
         } catch (e: Exception) {
             // on below line we are displaying a toast message as fail to generate PDF
             Toast.makeText(
@@ -502,6 +503,15 @@ class DiskReturnFragment : Fragment() {
             Log.d("PERMISSIONS", "Permission already granted: $permission")
         }
         return true
+    }
+
+    private fun showConfirmationDialog(onPositiveButtonClick: () -> Unit) {
+        AlertDialog.Builder(context)
+            .setTitle("Confirmation")
+            .setMessage("Return disks rented by customer: ${binding.textviewCustomerName.text} and print bill ?")
+            .setPositiveButton("Confirm") { _, _ -> onPositiveButtonClick() }
+            .setNegativeButton("Cancel") { _, _ -> }
+            .show()
     }
 
     // on below line we are creating a function to request permission.

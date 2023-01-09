@@ -33,9 +33,10 @@ import com.haidoan.android.ceedee.R
 import com.haidoan.android.ceedee.data.report.FirestoreStatisticsDataSource
 import com.haidoan.android.ceedee.data.report.ReportRepository
 import com.haidoan.android.ceedee.databinding.FragmentReportDiskBinding
-import com.haidoan.android.ceedee.ui.report.util.*
+import com.haidoan.android.ceedee.ui.report.util.ImageUtils
 import com.haidoan.android.ceedee.ui.report.viewmodel.DiskDataGroupingCategory
 import com.haidoan.android.ceedee.ui.report.viewmodel.ReportViewModel
+import com.haidoan.android.ceedee.ui.utils.*
 import java.io.File
 import java.io.FileOutputStream
 import java.time.LocalDate
@@ -90,7 +91,6 @@ class ReportDiskFragment : Fragment() {
         pieChart = binding.pieChart
         setUpButtonPrint()
         setUpOptionMenu()
-        setUpButtonOpenPdf()
         styleAndDrawPieChart()
         viewModel.diskRelatedData.observe(requireActivity()) { data ->
             styleAndDrawPieChart()
@@ -166,8 +166,11 @@ class ReportDiskFragment : Fragment() {
             AlertDialog.Builder(requireContext())
                 .setTitle("Important Note")
                 .setMessage(R.string.chart_print_note)
-                .setPositiveButton("Print") { _, _ -> printReportAsPdf()
-                enabledButtonViewPdfFile()}
+                .setPositiveButton("Print") { _, _ ->
+                    printReportAsPdf()
+                    if (handlePermission())
+                        openPdf()
+                }
                 .setNegativeButton("Cancel") { dialog, _ -> dialog.cancel() }
                 .create()
                 .show()
@@ -276,7 +279,7 @@ class ReportDiskFragment : Fragment() {
             Environment.getExternalStorageDirectory(),
             "Report_Disk_${formatter.format(LocalDateTime.now())}.pdf"
         )
-        pdfFile=fileOutput
+        pdfFile = fileOutput
         val outputStream = FileOutputStream(fileOutput)
         try {
             reportAsPdf.writeTo(outputStream)
@@ -291,7 +294,7 @@ class ReportDiskFragment : Fragment() {
             // on below line we are displaying a toast message as fail to generate PDF
             Toast.makeText(
                 requireActivity(),
-                "Fail to generate PDF file..",
+                "Fail to generate PDF file.",
                 Toast.LENGTH_SHORT
             )
                 .show()
@@ -301,24 +304,14 @@ class ReportDiskFragment : Fragment() {
         reportAsPdf.close()
     }
 
-    private fun setUpButtonOpenPdf() {
-        binding.buttonViewPdf.setOnClickListener {
-            // on below line we are checking permission
-            if (!handlePermission()) return@setOnClickListener
 
-            openPdf()
-        }
-    }
-    private fun enabledButtonViewPdfFile() {
-        binding.buttonViewPdf.visibility = View.VISIBLE
-    }
     private fun openPdf() {
         val file = pdfFile
         val target = Intent(Intent.ACTION_VIEW)
         target.setDataAndType(Uri.fromFile(file), "application/pdf")
         target.flags = Intent.FLAG_ACTIVITY_NO_HISTORY
 
-        val intent = Intent.createChooser(target, "Open File")
+        val intent = Intent.createChooser(target, "Open report file with")
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         try {
             requireContext().startActivity(intent)
