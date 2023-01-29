@@ -67,17 +67,25 @@
                 android:id="@+id/menu_disk_titles_add_supplier"
                 android:title="Add new supplier" />
             <item
-                android:id="@+id/menu_disk_titles_add_disk_title"
-                android:title="Add new disk title" />
+                android:title="Add new disk title">
+                <menu>
+                    <item
+                        android:id="@+id/menu_disk_titles_add_disk_title"
+                        android:title="Add manually" />
+                    <item
+                        android:id="@+id/menu_disk_titles_add_disk_title_from_file"
+                        android:title="Add from JSON file" />
+                </menu>
+            </item>
         </menu>
     </item>
-<!--    <item-->
-<!--        android:id="@+id/menu_item_disk_title_tab_new_requisition"-->
-<!--        app:actionLayout="@layout/menu_item_badge"-->
-<!--        android:orderInCategory="1000"-->
-<!--        android:title="@string/new_requisition"-->
-<!--        app:showAsAction="always"-->
-<!--        tools:ignore="AlwaysShowAction" />-->
+    <!--    <item-->
+    <!--        android:id="@+id/menu_item_disk_title_tab_new_requisition"-->
+    <!--        app:actionLayout="@layout/menu_item_badge"-->
+    <!--        android:orderInCategory="1000"-->
+    <!--        android:title="@string/new_requisition"-->
+    <!--        app:showAsAction="always"-->
+    <!--        tools:ignore="AlwaysShowAction" />-->
 
 
 </menu>

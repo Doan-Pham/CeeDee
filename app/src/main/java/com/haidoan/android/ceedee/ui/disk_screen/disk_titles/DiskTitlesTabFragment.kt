@@ -9,6 +9,8 @@ import android.widget.EditText
 import android.widget.SearchView
 import android.widget.SearchView.OnQueryTextListener
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
@@ -24,12 +26,57 @@ import com.haidoan.android.ceedee.databinding.FragmentDiskTabDiskTitlesBinding
 import com.haidoan.android.ceedee.ui.disk_screen.repository.GenreRepository
 import com.haidoan.android.ceedee.ui.disk_screen.utils.Response
 import com.haidoan.android.ceedee.ui.disk_screen.utils.TypeUtils
+import org.json.JSONArray
+import org.json.JSONException
+
+
+private const val TAG = "DiskTitlesTabFragment"
 
 class DiskTitlesTabFragment : Fragment() {
     private var _binding: FragmentDiskTabDiskTitlesBinding? = null
 
+    private var jsonActivityResultLauncher: ActivityResultLauncher<String> =
+        registerForActivityResult(
+            ActivityResultContracts.GetContent()
+        ) { uri ->
+            Log.d(TAG, "Chosen json file: ${uri.toString()}")
+            if (uri != null) {
+                val jsonSelectedFile = context?.contentResolver?.openInputStream(uri);
+                val jsonString = jsonSelectedFile?.bufferedReader().use { it?.readText() }
+                Log.d(TAG, "jsonString: $jsonString")
+                try {
+                    val jsonArray = JSONArray(jsonString)
+                    val diskTitlesToAdd = mutableListOf<DiskTitle>()
+                    for (i in 0 until jsonArray.length()) {
+                        Log.d(
+                            TAG,
+                            "jsonArray.getJSONObject(i).getString(author): ${
+                                jsonArray.getJSONObject(i).getString("author")
+                            }"
+                        )
+                        diskTitlesViewModel.addDiskTitle(
+                            author = jsonArray.getJSONObject(i).getString("author"),
+                            description = jsonArray.getJSONObject(i).getString("description"),
+                            name = jsonArray.getJSONObject(i).getString("name"),
+                            genreId = jsonArray.getJSONObject(i).getString("genreId"),
+                            coverImageUrl = jsonArray.getJSONObject(i)
+                                .getString("coverImageUrl")
+                        ).observe(viewLifecycleOwner) {
+                            if (it is Response.Success) {
+                                Log.d(TAG, "Add new disk title success: ${it.data.id}")
+                            }
+                        }
+                    }
+                } catch (e: JSONException) {
+                    e.printStackTrace()
+                }
+            }
+        }
+
     private lateinit var diskTitleAdapter: DiskTitlesAdapter
-    private lateinit var popularAdapter: PopularAdapter
+
+    private lateinit
+    var popularAdapter: PopularAdapter
     private lateinit var diskTitlesViewModel: DiskTitlesViewModel
 
     private lateinit var genreAdapter: GenreAdapter
@@ -71,7 +118,7 @@ class DiskTitlesTabFragment : Fragment() {
             diskTitlesAdapter = diskTitleAdapter,
             fragmentDiskTitlesBinding = binding
         )
-        popularAdapter = PopularAdapter(requireActivity(),genreAdapter)
+        popularAdapter = PopularAdapter(requireActivity(), genreAdapter)
         diskTitleAdapter.setGenreAdapter(genreAdapter)
         diskTitlesViewModel.getDiskTitles().observe(viewLifecycleOwner) { response ->
             when (response) {
@@ -94,7 +141,7 @@ class DiskTitlesTabFragment : Fragment() {
 //                    else binding.tvDiskTitlesTotal.text =
 //                        diskTitleAdapter.itemCount.toString() + " Title"
 
-                    popularList = list.sortedByDescending { it.totalRentalAmount }.take(5)
+                        popularList = list.sortedByDescending { it.totalRentalAmount }.take(5)
                     popularAdapter.submitList(popularList.toMutableList())
                 }
                 is Response.Failure -> {
@@ -205,6 +252,10 @@ class DiskTitlesTabFragment : Fragment() {
                         addDiskTitle()
                         true
                     }
+                    R.id.menu_disk_titles_add_disk_title_from_file -> {
+                        openFile()
+                        true
+                    }
                     R.id.menu_disk_titles_add_supplier -> {
                         addSupplier()
                         true
@@ -229,9 +280,6 @@ class DiskTitlesTabFragment : Fragment() {
                 }
             }
 
-            override fun onPrepareMenu(menu: Menu) {
-                super.onPrepareMenu(menu)
-            }
         }, viewLifecycleOwner, Lifecycle.State.RESUMED)
     }
 
@@ -249,6 +297,11 @@ class DiskTitlesTabFragment : Fragment() {
 
     private fun addDiskTitle() {
         view?.findNavController()?.navigate(R.id.diskAddEditFragment)
+    }
+
+
+    fun openFile() {
+        jsonActivityResultLauncher.launch("application/json")
     }
 
     private fun addGenre() {
