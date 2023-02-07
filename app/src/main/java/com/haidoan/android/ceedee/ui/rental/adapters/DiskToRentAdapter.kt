@@ -34,6 +34,7 @@ class DiskToRentAdapter(
                 imageviewDiskCover.load(diskTitle.coverImageUrl) {
                     crossfade(true)
                     placeholder(R.drawable.ic_disk_cover_placeholder_96)
+                    error(R.drawable.ic_disk_cover_placeholder_96)
                 }
 
                 var diskAmountString = "0 CD"

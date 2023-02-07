@@ -48,6 +48,7 @@ class DiskTitlesAdapter(private val context: Context) :
         allDiskTitles.addAll(newList.toList())
         displayedDiskTitles.clear()
         displayedDiskTitles.addAll(newList.toList())
+        notifyDataSetChanged()
     }
 
     fun setAllDiskTitleFilterByGenre(newList: List<DiskTitle>) {
@@ -119,7 +120,7 @@ class DiskTitlesAdapter(private val context: Context) :
 
     override fun onBindViewHolder(holder: DiskTitlesViewHolder, position: Int) {
         holder.setData(displayedDiskTitles[position])
-        holder.setIsRecyclable(true)
+        //holder.setIsRecyclable(true)
     }
 
     class DiskTitleUtils : DiffUtil.ItemCallback<DiskTitle>() {

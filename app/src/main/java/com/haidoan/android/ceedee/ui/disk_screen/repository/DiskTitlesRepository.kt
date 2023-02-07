@@ -5,6 +5,7 @@ import android.net.Uri
 import android.util.Log
 import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.*
+import com.google.firebase.firestore.ktx.snapshots
 import com.google.firebase.storage.FirebaseStorage
 import com.haidoan.android.ceedee.data.DiskTitle
 import com.haidoan.android.ceedee.ui.disk_screen.utils.Response
@@ -14,6 +15,7 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.tasks.await
 
 private const val TAG = "DiskTitlesRepository"
@@ -42,17 +44,23 @@ class DiskTitlesRepository(private val application: Application) {
         }
     }
 
-    fun getDiskTitleFilterByGenreIdFromFireStore(id: String) = flow {
+    fun getDiskTitleFilterByGenreIdFromFireStore(id: String) = queryDiskTitle
+        .whereEqualTo("genreId", id).snapshots().map {
+            Response.Success(it.documents.mapNotNull { doc ->
+                doc.toObject(DiskTitle::class.java)
+            })
+        }.catch {
+            throw(it)
+        }
+
+    fun getFiveDiskTitlesWithTotalRentalAmountDescendingFromFireStore() = flow {
         emit(Response.Loading())
         emit(
-            Response.Success(queryDiskTitle
-                .whereEqualTo("genreId", id)
-                .get()
-                .await()
-                .documents
-                .mapNotNull { doc ->
-                    doc.toObject(DiskTitle::class.java)
-                })
+            Response.Success(
+                queryDiskTitle.orderBy("totalRentalAmount", Query.Direction.DESCENDING).limit(5)
+                    .get().await().documents.mapNotNull { doc ->
+                        doc.toObject(DiskTitle::class.java)
+                    })
         )
     }.catch { error ->
         error.message?.let { errorMessage ->
@@ -60,28 +68,13 @@ class DiskTitlesRepository(private val application: Application) {
         }
     }
 
-    fun getFiveDiskTitlesWithTotalRentalAmountDescendingFromFireStore() = flow {
-        emit(Response.Loading())
-        emit(Response.Success(
-            queryDiskTitle.orderBy("totalRentalAmount", Query.Direction.DESCENDING).limit(5).get().await().documents.mapNotNull { doc ->
+    fun getDiskTitlesFromFireStore() = queryDiskTitle.snapshots().map {
+            Response.Success(it.documents.mapNotNull { doc ->
                 doc.toObject(DiskTitle::class.java)
-        }))
-    }.catch { error ->
-        error.message?.let { errorMessage ->
-            emit(Response.Failure(errorMessage))
+            })
+        }.catch {
+            throw(it)
         }
-    }
-
-    fun getDiskTitlesFromFireStore() = flow {
-        emit(Response.Loading())
-        emit(Response.Success(queryDiskTitle.get().await().documents.mapNotNull { doc ->
-            doc.toObject(DiskTitle::class.java)
-        }))
-    }.catch { error ->
-        error.message?.let { errorMessage ->
-            emit(Response.Failure(errorMessage))
-        }
-    }
 
     fun getDiskTitlesAvailableInStore() = flow {
         emit(queryDiskTitle.whereGreaterThan("diskInStoreAmount", 0).get()
